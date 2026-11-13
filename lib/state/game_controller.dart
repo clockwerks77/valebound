@@ -38,6 +38,20 @@ class GameController extends ChangeNotifier {
   DateTime get now => repo.clock();
   String get companionName => companion?.name ?? 'your companion';
 
+  /// Set when the saved data could not be opened at launch.
+  String? startupTrouble;
+
+  /// [init], but a problem opening storage is shown instead of thrown.
+  Future<void> start() async {
+    try {
+      await init();
+    } catch (error) {
+      startupTrouble = '$error';
+      loading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> init() async {
     hasProfile = await repo.hasProfile();
     if (hasProfile) {

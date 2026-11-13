@@ -4,11 +4,13 @@
 set -uo pipefail
 
 STAGE="${1:-final}"
+BRANCH="${RESULTS_BRANCH:-ci-results}"
 OUT="$(mktemp -d)"
 mkdir -p "$OUT/logs" "$OUT/screenshots"
 
 cp -r ci_out/. "$OUT/logs/" 2>/dev/null || true
 cp test/golden/goldens/*.png "$OUT/screenshots/" 2>/dev/null || true
+cp device_shots/*.png "$OUT/screenshots/" 2>/dev/null || true
 
 APK="build/app/outputs/flutter-apk/app-debug.apk"
 APK_BYTES=0
@@ -29,6 +31,7 @@ cat > "$OUT/status.json" <<EOF
   "analyze": "${S_ANALYZE:-}",
   "test": "${S_TEST:-}",
   "apk": "${S_APK:-}",
+  "device": "${S_DEVICE:-}",
   "apk_path": "${APK}",
   "apk_bytes": ${APK_BYTES},
   "apk_sha256": "${APK_SHA256}",
@@ -37,10 +40,10 @@ cat > "$OUT/status.json" <<EOF
 EOF
 
 cd "$OUT" || exit 0
-git init -q -b ci-results
+git init -q -b "$BRANCH"
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git add -A
 git commit -qm "CI results for ${GITHUB_SHA:-unknown} (${STAGE})"
-git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-results \
+git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BRANCH" \
   || echo "Could not publish results (non-fatal)."

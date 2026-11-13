@@ -20,6 +20,6 @@ Future<void> main() async {
   // Everything is on the device: one local SQLite file, no network.
   final database = AppDatabase();
   final controller = GameController(GameRepository(database));
-  await controller.init();
   runApp(HabitAdventureApp(controller: controller));
+  await controller.start();
 }

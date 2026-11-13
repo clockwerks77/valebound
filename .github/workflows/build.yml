@@ -10,6 +10,7 @@ on:
   push:
     branches-ignore:
       - ci-results
+      - ci-device-results
   workflow_dispatch:
 
 permissions:
@@ -147,3 +148,70 @@ jobs:
       - name: Fail the run if anything did not pass
         if: steps.pub_get.outcome != 'success' || steps.codegen.outcome != 'success' || steps.analyze.outcome != 'success' || steps.test.outcome != 'success' || steps.apk.outcome != 'success'
         run: exit 1
+
+  # Installs the APK on an Android emulator, launches and relaunches it, and
+  # runs the on-device test (first run, a completed quest, reopen storage).
+  # Results go to the `ci-device-results` branch.
+  device-check:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS_BRANCH: ci-device-results
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.x
+          cache: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-debug-apk
+          path: apk
+
+      - name: Prepare
+        run: |
+          mkdir -p ci_out device_shots
+          flutter pub get 2>&1 | tail -3
+          dart run build_runner build --delete-conflicting-outputs 2>&1 | tail -3
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run on emulator
+        id: device
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: bash tool/device_check.sh
+
+      - name: Publish device results
+        if: always()
+        env:
+          S_DEVICE: ${{ steps.device.outcome }}
+        run: bash tool/ci_publish.sh device
+
+      - name: Fail the run if the device check did not pass
+        if: steps.device.outcome != 'success'
+        run: exit 1
+
