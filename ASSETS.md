@@ -34,6 +34,7 @@ Status values: `generated` · `coded` · `placeholder` · `needed-from-Adam`.
 | Hero level-up fanfare (rays, motes) | `lib/ui/celebrations.dart` | `CustomPaint` animation | coded |
 | Companion level-up and Discovery cards | `lib/ui/celebrations.dart` | Flutter | coded |
 | Fonts: Fraunces SemiBold/Bold, Figtree Regular–Bold | `assets/fonts/` | TTF, OFL 1.1 | bundled |
+| Launcher icon: gold lantern on forest green (adaptive + legacy) | `android/app/src/main/res/` | PNG rendered from SVG, 432×432 foreground | coded |
 
 ## 2. Phase 1 stand-ins (code-drawn, to be replaced)
 
@@ -46,7 +47,6 @@ illustration in the design. Each has a matching entry in section 3.
 | Companion crests ×6 (Hound, Cat, Fox, Owl, Hare, Clockwork Sprite) | `lib/ui/art/crests.dart` | Companion portraits | placeholder |
 | Dawn valley vista (sky, sun, ridges, mist, lanterns) | `lib/ui/art/vista.dart` | Dawn header scene, Vale view, onboarding scene | placeholder |
 | Lantern roundel on the Discovery card | `lib/ui/celebrations.dart` | Discovery scene art | placeholder |
-| Launcher icon | Flutter default | App icon | placeholder |
 
 ## 3. Illustrated raster assets (needed from Adam)
 
@@ -97,7 +97,7 @@ regions and buildings.
 
 | File | Size | Notes | Status |
 |---|---|---|---|
-| `icon/launcher_foreground.png` | 432×432, transparent, subject inside the centre 264×264 | a gold lantern, or the hound's head | needed-from-Adam (I can ship a coded crest icon instead) |
+| `icon/launcher_foreground.png` | 432×432, transparent, subject inside the centre 264×264 | a gold lantern, or the hound's head | optional: a coded lantern icon ships now |
 | Background | solid `#12352C` | set in code | coded |
 
 ## 4. Three ways to get the illustrated assets

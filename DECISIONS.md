@@ -60,4 +60,5 @@ any line here and I will follow it.
 ## Flagged for your call (not built)
 
 - **Undo.** One tap completes a quest, and §6.4 says XP is never removed, so there is no undo. A five-second "Undo" before the completion is committed would protect against mis-taps without contradicting §6.4. Say the word and I will add it.
+- **Changing the companion later.** §7A.1 puts this in Settings, which arrives in Phase 2. Until then the kind and name chosen in onboarding stay as they are.
 - **Navigation when open.** When the Fold is open the navigation is a slim left rail rather than a bottom bar, to keep vertical space on a 4:3 screen. §9.1 specifies bottom navigation for the cover screen only.

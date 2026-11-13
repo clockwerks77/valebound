@@ -212,8 +212,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         const SizedBox(height: 6),
         Text(
           'Every kind is equal. The star marks a favourite attribute, for '
-          'flavour only. You can change kind and name later and keep all '
-          'progress.',
+          'flavour only.',
           style: AppText.small.copyWith(color: Palette.slateSoft),
         ),
       ],

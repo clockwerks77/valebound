@@ -11,6 +11,9 @@ on:
     branches-ignore:
       - ci-results
       - ci-device-results
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   workflow_dispatch:
 
 permissions:
