@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
 import 'package:habit_adventure/data/seed.dart';
+import 'package:habit_adventure/rules/companion_rules.dart';
 import 'package:habit_adventure/rules/day_key.dart';
 import 'package:habit_adventure/rules/enums.dart';
 import 'package:habit_adventure/rules/schedule.dart';
@@ -264,6 +265,43 @@ void main() {
       await repo.completeQuest((await questNamed('Play / Train with Babs')).id);
       after = (await repo.companion())!;
       expect(after.bond, 1 + 3 + 1);
+    });
+
+    test('Sniff Out: one bonus material a day once the companion is level 2',
+        () async {
+      await start();
+      final companion = (await repo.companion())!;
+      await (db.update(db.companions)
+            ..where((c) => c.id.equals(companion.id)))
+          .write(const CompanionsCompanion(totalXp: Value(100)));
+      final today = DayKey.of(now);
+      final kind = sniffOutMaterial(today);
+
+      final first = await repo.completeQuest(
+        (await questNamed('Play / Train with Babs')).id,
+      );
+      expect(first!.sniffOutFound, kind);
+      expect(decodeMaterials((await repo.hero())!.materials)[kind], 1);
+      expect((await repo.dayLog(today))!.sniffOutGranted, isTrue);
+      final row = (await repo.completionsOn(today)).single;
+      expect(row.materialKind, kind);
+      expect(row.materialAmount, 1);
+
+      // A second companion quest the same day finds nothing more.
+      final second =
+          await repo.completeQuest((await questNamed('Walk Babs')).id);
+      expect(second!.sniffOutFound, isNull);
+      expect(decodeMaterials((await repo.hero())!.materials)[kind], 1);
+
+      // The next day there is a new find, of the next kind.
+      now = now.add(const Duration(days: 1));
+      await repo.ensureDawn();
+      final nextKind = sniffOutMaterial(DayKey.of(now));
+      expect(nextKind, isNot(kind));
+      final third =
+          await repo.completeQuest((await questNamed('Walk Babs')).id);
+      expect(third!.sniffOutFound, nextKind);
+      expect(decodeMaterials((await repo.hero())!.materials)[nextKind], 1);
     });
 
     test('ten Paces unlock the first Discovery, in order', () async {

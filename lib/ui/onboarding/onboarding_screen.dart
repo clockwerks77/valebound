@@ -460,15 +460,16 @@ class _PortraitChoice extends StatelessWidget {
               children: <Widget>[
                 child,
                 const SizedBox(height: 6),
-                Text(
-                  label,
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.small.copyWith(
-                    color: Palette.slate,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    fontSize: 12.5,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label.replaceAll(' ', '\n'),
+                    textAlign: TextAlign.center,
+                    style: AppText.small.copyWith(
+                      color: Palette.slate,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: 12.5,
+                    ),
                   ),
                 ),
               ],

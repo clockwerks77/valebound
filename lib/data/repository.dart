@@ -360,6 +360,8 @@ class GameRepository {
         track: quest.track,
         attribute: quest.attribute,
         bondLevelBonusGrantedToday: log?.bondLevelBonusGranted ?? false,
+        sniffOutFind:
+            (log?.sniffOutGranted ?? false) ? null : sniffOutMaterial(day),
       );
       final after = outcome.after;
 
@@ -416,6 +418,10 @@ class GameRepository {
         await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
             .write(const DayLogsCompanion(bondLevelBonusGranted: Value(true)));
       }
+      if (outcome.sniffOutFound != null && log != null) {
+        await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
+            .write(const DayLogsCompanion(sniffOutGranted: Value(true)));
+      }
 
       final existingProgress = await _progressFor(questId, day);
       if (existingProgress?.timerStartedAt != null) {
@@ -437,8 +443,13 @@ class GameRepository {
               pacesAwarded: Value(outcome.award.paces),
               bondAwarded: Value(outcome.totalBond),
               goldAwarded: Value(outcome.award.gold),
-              materialKind: Value(outcome.materialKind),
-              materialAmount: Value(outcome.award.materials),
+              materialKind: Value(
+                outcome.materialKind ?? outcome.sniffOutFound,
+              ),
+              materialAmount: Value(
+                outcome.award.materials +
+                    (outcome.sniffOutFound == null ? 0 : 1),
+              ),
               difficultySnapshot: quest.difficulty,
               trackSnapshot: quest.track,
               attributeSnapshot: quest.attribute,

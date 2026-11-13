@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/rules/awards.dart';
+import 'package:habit_adventure/rules/companion_rules.dart';
 import 'package:habit_adventure/rules/enums.dart';
 import 'package:habit_adventure/rules/journey.dart';
 import 'package:habit_adventure/rules/materials.dart';
@@ -327,6 +328,91 @@ void main() {
     });
   });
 
+  group('Sniff Out (DESIGN §7A.3, learned at companion level 2)', () {
+    test('finds one bonus material on a companion quest', () {
+      final o = applyCompletion(
+        totals: const PartyTotals(companionXp: 100),
+        difficulty: Difficulty.minor,
+        track: Track.companion,
+        attribute: Attribute.care,
+        sniffOutFind: MaterialKind.stone,
+      );
+      expect(o.sniffOutFound, MaterialKind.stone);
+      expect(o.after.materialCount(MaterialKind.stone), 1);
+      expect(o.after.materialCount(MaterialKind.timber), 0);
+    });
+
+    test('also on a shared quest', () {
+      final o = applyCompletion(
+        totals: const PartyTotals(companionXp: 400),
+        difficulty: Difficulty.standard,
+        track: Track.shared,
+        attribute: Attribute.care,
+        sniffOutFind: MaterialKind.starShard,
+      );
+      expect(o.sniffOutFound, MaterialKind.starShard);
+      expect(o.after.materialCount(MaterialKind.starShard), 1);
+    });
+
+    test('not before the trick is learned', () {
+      final o = applyCompletion(
+        totals: const PartyTotals(companionXp: 10),
+        difficulty: Difficulty.minor,
+        track: Track.companion,
+        attribute: Attribute.care,
+        sniffOutFind: MaterialKind.stone,
+      );
+      expect(o.after.companionLevel, 1);
+      expect(o.sniffOutFound, isNull);
+      expect(o.after.materials, isEmpty);
+    });
+
+    test('starts on the very quest that reaches level 2', () {
+      final o = applyCompletion(
+        totals: const PartyTotals(companionXp: 90),
+        difficulty: Difficulty.standard,
+        track: Track.companion,
+        attribute: Attribute.care,
+        sniffOutFind: MaterialKind.timber,
+      );
+      expect(o.after.companionLevel, 2);
+      expect(o.sniffOutFound, MaterialKind.timber);
+    });
+
+    test('never on a hero quest, and only once a day', () {
+      final hero = applyCompletion(
+        totals: const PartyTotals(companionXp: 500),
+        difficulty: Difficulty.standard,
+        track: Track.hero,
+        attribute: Attribute.order,
+        sniffOutFind: MaterialKind.stone,
+      );
+      expect(hero.sniffOutFound, isNull);
+      expect(hero.after.materialCount(MaterialKind.stone), 0);
+      expect(hero.after.materialCount(MaterialKind.timber), 2);
+
+      final alreadyFound = applyCompletion(
+        totals: const PartyTotals(companionXp: 500),
+        difficulty: Difficulty.minor,
+        track: Track.companion,
+        attribute: Attribute.care,
+      );
+      expect(alreadyFound.sniffOutFound, isNull);
+      expect(alreadyFound.after.materials, isEmpty);
+    });
+
+    test('the kind rotates by calendar day and is the same all day', () {
+      expect(sniffOutMaterial('2026-01-01'), MaterialKind.timber);
+      expect(sniffOutMaterial('2026-01-02'), MaterialKind.stone);
+      expect(sniffOutMaterial('2026-01-03'), MaterialKind.starShard);
+      expect(sniffOutMaterial('2026-01-04'), MaterialKind.timber);
+      expect(sniffOutMaterial('2025-12-31'), MaterialKind.starShard);
+      expect(sniffOutMaterial('2026-11-14'), sniffOutMaterial('2026-11-14'));
+      expect(tricksInPlay, contains('sniff_out'));
+      expect(sniffOutLevel, 2);
+    });
+  });
+
   group('Nothing is ever taken away (DESIGN §6.4)', () {
     test('every total only grows over 2,000 random completions', () {
       final random = math.Random(20261113);
@@ -341,6 +427,9 @@ void main() {
           track: Track.values[random.nextInt(Track.values.length)],
           attribute: attribute,
           bondLevelBonusGrantedToday: random.nextBool(),
+          sniffOutFind: random.nextBool()
+              ? MaterialKind.values[random.nextInt(MaterialKind.values.length)]
+              : null,
         );
         final next = o.after;
         expect(next.heroXp >= totals.heroXp, isTrue);

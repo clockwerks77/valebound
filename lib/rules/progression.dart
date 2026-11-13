@@ -1,4 +1,5 @@
 import 'awards.dart';
+import 'companion_rules.dart';
 import 'enums.dart';
 import 'journey.dart';
 import 'materials.dart';
@@ -51,6 +52,7 @@ class CompletionOutcome {
     required this.bondBonus,
     required this.materialKind,
     required this.newDiscoveryIndexes,
+    this.sniffOutFound,
   });
 
   final Award award;
@@ -69,6 +71,9 @@ class CompletionOutcome {
   /// Zero-based Discovery indexes unlocked by this completion.
   final List<int> newDiscoveryIndexes;
 
+  /// The one bonus material the companion found today through Sniff Out.
+  final MaterialKind? sniffOutFound;
+
   int get totalBond => award.bond + bondBonus;
   bool get heroLevelledUp => after.heroLevel > before.heroLevel;
   bool get companionLevelledUp => after.companionLevel > before.companionLevel;
@@ -80,12 +85,17 @@ class CompletionOutcome {
 ///
 /// [bondLevelBonusGrantedToday] is true when today's companion level-up bonus
 /// has already been handed out, so it is given at most once a day.
+///
+/// [sniffOutFind] is the material Sniff Out would turn up today, or null when
+/// today's find has already been made. It is only granted on a companion or
+/// shared quest, and only once the companion has learned the trick.
 CompletionOutcome applyCompletion({
   required PartyTotals totals,
   required Difficulty difficulty,
   required Track track,
   required Attribute attribute,
   bool bondLevelBonusGrantedToday = false,
+  MaterialKind? sniffOutFind,
 }) {
   final award = awardFor(difficulty: difficulty, track: track);
 
@@ -112,6 +122,14 @@ CompletionOutcome applyCompletion({
       ? bondLevelUpBonus
       : 0;
 
+  MaterialKind? sniffOutFound;
+  if (sniffOutFind != null &&
+      track.travelsWithCompanion &&
+      XpCurve.levelForXp(companionXp) >= sniffOutLevel) {
+    sniffOutFound = sniffOutFind;
+    materials[sniffOutFind] = (materials[sniffOutFind] ?? 0) + 1;
+  }
+
   final paces = totals.paces + award.paces;
 
   final after = PartyTotals(
@@ -135,5 +153,6 @@ CompletionOutcome applyCompletion({
     bondBonus: bonus,
     materialKind: materialKind,
     newDiscoveryIndexes: newDiscoveries(totals.paces, paces),
+    sniffOutFound: sniffOutFound,
   );
 }

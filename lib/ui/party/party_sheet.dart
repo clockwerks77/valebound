@@ -597,6 +597,14 @@ class _TrickRow extends StatelessWidget {
                           fontSize: 12.5,
                         ),
                       ),
+                      if (unlocked && !tricksInPlay.contains(trick.key))
+                        Text(
+                          'Learned. It comes into play when the map opens.',
+                          style: AppText.small.copyWith(
+                            color: Palette.companionDeep,
+                            fontSize: 12.5,
+                          ),
+                        ),
                     ],
                   ),
                 ),

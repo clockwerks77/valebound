@@ -86,6 +86,12 @@ List<_Reward> _rewardsFor(CompletionOutcome o, String companionName) {
         '+${a.materials} ${o.materialKind!.label}',
         Palette.material(o.materialKind!),
       ),
+    if (o.sniffOutFound != null)
+      _Reward(
+        materialIcon(o.sniffOutFound!),
+        '$companionName found 1 ${o.sniffOutFound!.label}',
+        Palette.companion,
+      ),
     if (a.gold > 0) _Reward('coin', '+${a.gold} gold', Palette.goldDeep),
   ];
 }
@@ -246,7 +252,7 @@ Future<void> showHeroLevelUp(
     context: context,
     barrierDismissible: false,
     barrierLabel: 'Level up',
-    barrierColor: Palette.forestNight.withValues(alpha: 0.94),
+    barrierColor: Palette.forestNight.withValues(alpha: 0.975),
     transitionDuration: const Duration(milliseconds: 420),
     transitionBuilder: (context, animation, _, child) => FadeTransition(
       opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
@@ -258,7 +264,7 @@ Future<void> showHeroLevelUp(
       eyebrow: 'LEVEL UP',
       headline: 'Level $level',
       line: titleUnlockedAt(level) != null
-          ? '${hero.name}, you are now ${titleUnlockedAt(level)}.'
+          ? '${hero.name} earns the title ${titleUnlockedAt(level)}.'
           : 'Well travelled, ${hero.name}. The Vale is brighter for it.',
       button: 'Onward',
     ),

@@ -148,13 +148,16 @@ class DawnHeader extends StatelessWidget {
                 style: AppText.label.copyWith(color: Palette.goldBright),
               ),
               const SizedBox(height: 3),
-              Text(
-                DayKey.friendly(game.day),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.display.copyWith(
-                  color: Palette.onDark,
-                  fontSize: 25,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  DayKey.friendly(game.day),
+                  maxLines: 1,
+                  style: AppText.display.copyWith(
+                    color: Palette.onDark,
+                    fontSize: 25,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -278,13 +281,16 @@ class _PartyBadge extends StatelessWidget {
                       track: Palette.onDark.withValues(alpha: 0.16),
                     ),
                     const SizedBox(height: 3),
-                    Text(
-                      xpText,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.small.copyWith(
-                        color: Palette.onDarkSoft,
-                        fontSize: 11,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        xpText,
+                        maxLines: 1,
+                        style: AppText.small.copyWith(
+                          color: Palette.onDarkSoft,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   ],
@@ -321,14 +327,17 @@ class _JourneyStrip extends StatelessWidget {
                   const VIcon('pace', size: 15, color: Palette.goldBright),
                   const SizedBox(width: 7),
                   Expanded(
-                    child: Text(
-                      '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
-                      'the next discovery',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.small.copyWith(
-                        color: Palette.onDark,
-                        fontSize: 12.5,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
+                        'the next discovery',
+                        maxLines: 1,
+                        style: AppText.small.copyWith(
+                          color: Palette.onDark,
+                          fontSize: 12.5,
+                        ),
                       ),
                     ),
                   ),

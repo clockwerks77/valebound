@@ -14,6 +14,10 @@ Finder completeButton(String questName) => find.byWidgetPredicate(
       (w) => w is CompleteButton && w.label == 'Complete $questName',
     );
 
+/// A companion kind in the onboarding grid (labels break at spaces).
+Finder kindChoice(CompanionKind kind) =>
+    find.text(kind.label.replaceAll(' ', '\n'));
+
 Finder roundButton(String semanticLabel) => find.byWidgetPredicate(
       (w) => w is RoundIconButton && w.semanticLabel == semanticLabel,
     );
@@ -39,7 +43,7 @@ void main() {
 
       // All six kinds in the roster.
       for (final kind in CompanionKind.values) {
-        expect(find.text(kind.label), findsWidgets, reason: kind.label);
+        expect(kindChoice(kind), findsOneWidget, reason: kind.label);
       }
       expect(
         find.text('Small, kind, easy-to-drop goals live with your companion. '
@@ -48,8 +52,8 @@ void main() {
       );
 
       // Free naming with any kind.
-      await tester.ensureVisible(find.text('Owl'));
-      await tester.tap(find.text('Owl'));
+      await tester.ensureVisible(kindChoice(CompanionKind.owl));
+      await tester.tap(kindChoice(CompanionKind.owl));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'Moss');
       await tester.pumpAndSettle();
@@ -89,8 +93,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Clockwork Sprite'));
-      await tester.tap(find.text('Clockwork Sprite'));
+      await tester.ensureVisible(kindChoice(CompanionKind.clockworkSprite));
+      await tester.tap(kindChoice(CompanionKind.clockworkSprite));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'Tock');
       await tester.pumpAndSettle();

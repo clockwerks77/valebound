@@ -181,6 +181,10 @@ class DayLogs extends Table {
   BoolColumn get bondLevelBonusGranted =>
       boolean().withDefault(const Constant(false))();
 
+  /// Today's Sniff Out find has been made.
+  BoolColumn get sniffOutGranted =>
+      boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

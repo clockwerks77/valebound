@@ -1,6 +1,9 @@
 /// Companion tricks, Bond milestones and hero titles.
 library;
 
+import 'day_key.dart';
+import 'enums.dart';
+
 /// DESIGN §7A.3: tricks unlock at companion levels 2, 4, 6, 8 and 10.
 /// They are deterministic and never withhold anything.
 class Trick {
@@ -46,6 +49,21 @@ const List<Trick> companionTricks = <Trick>[
     'A portrait of the two of you for the Party Sheet and the Campfire.',
   ),
 ];
+
+/// Tricks whose effect is live in this build. The others unlock on schedule
+/// and come into play with the systems they act on (DECISIONS.md D-28).
+const Set<String> tricksInPlay = <String>{'sniff_out'};
+
+/// Companion level at which Sniff Out is learned (DESIGN §7A.3).
+const int sniffOutLevel = 2;
+
+/// Sniff Out finds one bonus material on a day a companion quest is done.
+/// The kind rotates by calendar day, so it is the same however the day goes.
+MaterialKind sniffOutMaterial(String day) {
+  const kinds = MaterialKind.values;
+  final index = DayKey.daysBetween('2026-01-01', day) % kinds.length;
+  return kinds[index < 0 ? index + kinds.length : index];
+}
 
 /// Keys of the tricks a companion of [level] has unlocked, in order.
 List<String> tricksUnlockedAt(int level) => <String>[
