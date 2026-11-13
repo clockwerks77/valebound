@@ -6,6 +6,7 @@ import '../../rules/enums.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
+import '../adaptive.dart';
 import '../log/quest_editor.dart';
 import '../widgets/common.dart';
 import 'quest_actions.dart';
@@ -13,6 +14,26 @@ import 'quest_actions.dart';
 /// Opens the detail sheet for a quest on today's board: the larger controls
 /// for its completion type, an optional note, "Later" and "Edit".
 Future<void> showQuestSheet(BuildContext context, String questId) {
+  if (isExpanded(context)) {
+    // A full-width sheet would lay its buttons across the crease.
+    return showDialog<void>(
+      context: context,
+      useRootNavigator: true,
+      barrierColor: Palette.forestNight.withValues(alpha: 0.7),
+      builder: (context) => CreaseAware(
+        child: Dialog(
+          insetPadding: const EdgeInsets.all(16),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 22),
+              child: _QuestSheet(questId: questId, inDialog: true),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
   return showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
@@ -23,9 +44,12 @@ Future<void> showQuestSheet(BuildContext context, String questId) {
 }
 
 class _QuestSheet extends StatefulWidget {
-  const _QuestSheet({required this.questId});
+  const _QuestSheet({required this.questId, this.inDialog = false});
 
   final String questId;
+
+  /// A dialog already makes room for the keyboard; a bottom sheet does not.
+  final bool inDialog;
 
   @override
   State<_QuestSheet> createState() => _QuestSheetState();
@@ -60,7 +84,8 @@ class _QuestSheetState extends State<_QuestSheet> {
   Widget build(BuildContext context) {
     final game = GameScope.of(context);
     final entry = _entry(game);
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final bottom =
+        widget.inDialog ? 0.0 : MediaQuery.viewInsetsOf(context).bottom;
     if (entry == null) {
       return const SizedBox(height: 80);
     }

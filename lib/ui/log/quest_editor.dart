@@ -23,14 +23,16 @@ Future<void> openQuestEditor(BuildContext context, {QuestRow? quest}) {
       context: context,
       useRootNavigator: true,
       barrierColor: Palette.forestNight.withValues(alpha: 0.7),
-      builder: (dialogContext) => Dialog(
-        insetPadding: const EdgeInsets.all(16),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440, maxHeight: 660),
-          child: QuestEditor(
-            quest: quest,
-            onClose: () => Navigator.of(dialogContext).pop(),
+      builder: (dialogContext) => CreaseAware(
+        child: Dialog(
+          insetPadding: const EdgeInsets.all(16),
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440, maxHeight: 660),
+            child: QuestEditor(
+              quest: quest,
+              onClose: () => Navigator.of(dialogContext).pop(),
+            ),
           ),
         ),
       ),

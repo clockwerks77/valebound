@@ -129,20 +129,41 @@ class HeroPane extends StatelessWidget {
               companionName: companion.name,
             ),
           const _PaneHeading('Totals'),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: <Widget>[
-              _Tile(icon: 'check', value: '${game.completionCount}', label: 'Quests done'),
-              _Tile(icon: 'star', value: '${hero.totalXp}', label: 'Total XP'),
-              _Tile(icon: 'coin', value: '${hero.gold}', label: 'Gold'),
-              for (final m in MaterialKind.values)
-                _Tile(
-                  icon: materialIcon(m),
-                  value: '${game.materials[m] ?? 0}',
-                  label: m.label,
-                ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = ((constraints.maxWidth - 20) / 3).floorToDouble();
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: <Widget>[
+                  _Tile(
+                    width: width,
+                    icon: 'check',
+                    value: '${game.completionCount}',
+                    label: 'Quests done',
+                  ),
+                  _Tile(
+                    width: width,
+                    icon: 'star',
+                    value: '${hero.totalXp}',
+                    label: 'Total XP',
+                  ),
+                  _Tile(
+                    width: width,
+                    icon: 'coin',
+                    value: '${hero.gold}',
+                    label: 'Gold',
+                  ),
+                  for (final m in MaterialKind.values)
+                    _Tile(
+                      width: width,
+                      icon: materialIcon(m),
+                      value: '${game.materials[m] ?? 0}',
+                      label: m.label,
+                    ),
+                ],
+              );
+            },
           ),
           const _PaneHeading('Titles earned'),
           Wrap(
@@ -474,8 +495,14 @@ class _AttributeRow extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.icon, required this.value, required this.label});
+  const _Tile({
+    required this.width,
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
 
+  final double width;
   final String icon;
   final String value;
   final String label;
@@ -486,7 +513,7 @@ class _Tile extends StatelessWidget {
       label: '$label: $value',
       child: ExcludeSemantics(
         child: Container(
-          width: 96,
+          width: width,
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 9),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.5),

@@ -298,7 +298,7 @@ class _TimerControlState extends State<TimerControl> {
             : formatClock(seconds);
         final button = RoundIconButton(
           icon: running ? 'pause' : 'play',
-          size: widget.large ? 64 : 46,
+          size: widget.large ? 64 : 44,
           semanticLabel: running
               ? 'Pause ${entry.quest.name}'
               : 'Start ${entry.quest.name}',
@@ -321,9 +321,26 @@ class _TimerControlState extends State<TimerControl> {
             children: <Widget>[text, const SizedBox(height: 14), button],
           );
         }
-        return Row(
+        // On a card: the button with a short reading beneath it, so the
+        // quest's name keeps its room.
+        final idle = !running && seconds == 0;
+        return Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[text, const SizedBox(width: 10), button],
+          children: <Widget>[
+            button,
+            const SizedBox(height: 3),
+            Text(
+              idle ? '${entry.quest.target ?? 0} min' : formatClock(seconds),
+              style: AppText.small.copyWith(
+                color: Palette.slateSoft,
+                fontWeight: FontWeight.w700,
+                fontSize: 11.5,
+                fontFeatures: const <FontFeature>[
+                  FontFeature.tabularFigures(),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );

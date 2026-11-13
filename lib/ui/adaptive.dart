@@ -94,3 +94,34 @@ class TwoPane extends StatelessWidget {
     );
   }
 }
+
+/// Keeps a dialog, sheet or toast entirely on one side of the crease.
+///
+/// Flutter's own dialogs only step aside for a hinge that has width or is
+/// half-folded; a Fold lying flat reports a zero-width fold, and a centred
+/// dialog would put its buttons right on it. This confines [child] to the
+/// start pane (or the end pane) whenever a vertical crease is present.
+class CreaseAware extends StatelessWidget {
+  const CreaseAware({super.key, required this.child, this.preferEnd = false});
+
+  final Widget child;
+  final bool preferEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final crease = verticalCrease(context);
+    if (crease == null) return child;
+    final width = MediaQuery.sizeOf(context).width;
+    final padding = preferEnd
+        ? EdgeInsets.only(left: crease.right + creasePadding)
+        : EdgeInsets.only(right: width - crease.left + creasePadding);
+    return Padding(padding: padding, child: child);
+  }
+}
+
+/// Horizontal centre of the start pane, or of the screen without a crease.
+double startPaneCentre(BuildContext context) {
+  final crease = verticalCrease(context);
+  final width = MediaQuery.sizeOf(context).width;
+  return crease == null ? width / 2 : (crease.left - creasePadding) / 2;
+}

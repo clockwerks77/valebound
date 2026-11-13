@@ -74,6 +74,7 @@ void main() {
       expect(app.game.hero!.name, 'Adam');
       expect(app.game.companion!.name, 'Babs');
       expect(app.game.companion!.kind, CompanionKind.hound);
+      await reveal(tester, find.text('With Babs'));
       expect(find.text('With Babs'), findsOneWidget);
     });
 
@@ -99,6 +100,7 @@ void main() {
       await app.settle(tester);
       expect(app.game.companion!.kind, CompanionKind.clockworkSprite);
       expect(app.game.companion!.name, 'Tock');
+      await reveal(tester, find.text('With Tock'));
       expect(find.text('With Tock'), findsOneWidget);
     });
   });

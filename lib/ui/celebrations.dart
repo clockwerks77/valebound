@@ -10,6 +10,7 @@ import '../rules/progression.dart';
 import '../state/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../theme/palette.dart';
+import 'adaptive.dart';
 import 'art/crests.dart';
 import 'widgets/common.dart';
 import 'widgets/v_icon.dart';
@@ -145,7 +146,7 @@ class _RewardToastState extends State<_RewardToast>
     return Positioned.fill(
       child: IgnorePointer(
         // Stay within one side of a folded display.
-        child: DisplayFeatureSubScreen(
+        child: CreaseAware(
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -277,7 +278,8 @@ Future<void> showCompanionLevelUp(
   return showDialog<void>(
     context: context,
     barrierColor: Palette.forestNight.withValues(alpha: 0.78),
-    builder: (context) => Dialog(
+    builder: (context) => CreaseAware(
+      child: Dialog(
       insetPadding: const EdgeInsets.all(24),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
@@ -340,6 +342,7 @@ Future<void> showCompanionLevelUp(
           ),
         ),
       ),
+      ),
     ),
   );
 }
@@ -355,7 +358,8 @@ Future<void> showDiscovery(
   return showDialog<void>(
     context: context,
     barrierColor: Palette.forestNight.withValues(alpha: 0.78),
-    builder: (context) => Dialog(
+    builder: (context) => CreaseAware(
+      child: Dialog(
       insetPadding: const EdgeInsets.all(24),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
@@ -399,6 +403,7 @@ Future<void> showDiscovery(
             ],
           ),
         ),
+      ),
       ),
     ),
   );
@@ -459,10 +464,12 @@ class _FanfareState extends State<_Fanfare> with TickerProviderStateMixin {
                   angle: _spin.value * math.pi * 2,
                   reveal: Curves.easeOutCubic.transform(_enter.value),
                   color: widget.rayColor,
+                  centreX: startPaneCentre(context),
                 ),
               ),
             ),
-            Center(
+            CreaseAware(
+              child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(28),
                 child: ConstrainedBox(
@@ -514,6 +521,7 @@ class _FanfareState extends State<_Fanfare> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              ),
             ),
           ],
         ),
@@ -523,15 +531,21 @@ class _FanfareState extends State<_Fanfare> with TickerProviderStateMixin {
 }
 
 class _RaysPainter extends CustomPainter {
-  _RaysPainter({required this.angle, required this.reveal, required this.color});
+  _RaysPainter({
+    required this.angle,
+    required this.reveal,
+    required this.color,
+    required this.centreX,
+  });
 
   final double angle;
   final double reveal;
   final Color color;
+  final double centreX;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.36);
+    final center = Offset(centreX, size.height * 0.36);
     final radius = size.longestSide * 0.9 * reveal;
     if (radius <= 0) return;
     final paint = Paint()
@@ -576,7 +590,9 @@ class _RaysPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RaysPainter oldDelegate) =>
-      oldDelegate.angle != angle || oldDelegate.reveal != reveal;
+      oldDelegate.angle != angle ||
+      oldDelegate.reveal != reveal ||
+      oldDelegate.centreX != centreX;
 }
 
 /// A single happy hop, played once.

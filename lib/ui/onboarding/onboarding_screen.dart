@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Who walks the Vale?', style: AppText.heading),
+        const Text('Who walks the Vale?', style: AppText.heading),
         const SizedBox(height: 6),
         Text(
           'Your real day is the adventure. Name your hero and pick a look.',
@@ -116,16 +116,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 18),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
+        _ChoiceGrid(
+          columns: 4,
           children: <Widget>[
             for (final p in heroPortraits)
               _PortraitChoice(
                 label: p.label,
                 selected: _portrait == p.id,
                 onTap: () => setState(() => _portrait = p.id),
-                child: HeroPortrait(portraitId: p.id, size: 66),
+                child: HeroPortrait(portraitId: p.id, size: 56),
               ),
           ],
         ),
@@ -138,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Choose your companion', style: AppText.heading),
+        const Text('Choose your companion', style: AppText.heading),
         const SizedBox(height: 6),
         Text(
           'Small, kind, easy-to-drop goals live with your companion. They '
@@ -155,9 +154,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         const SizedBox(height: 16),
         Text('OR CHOOSE A KIND', style: AppText.label.copyWith(color: Palette.slateSoft)),
         const SizedBox(height: 10),
-        Wrap(
-          spacing: 10,
-          runSpacing: 12,
+        _ChoiceGrid(
+          columns: 3,
           children: <Widget>[
             for (final k in CompanionKind.values)
               _PortraitChoice(
@@ -227,7 +225,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Your first quests', style: AppText.heading),
+        const Text('Your first quests', style: AppText.heading),
         const SizedBox(height: 6),
         Text(
           'These start you off. Rename, change or archive any of them in the '
@@ -269,7 +267,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('Add Five-Minute Reset', style: AppText.cardTitle),
+                    const Text(
+                      'Add Five-Minute Reset',
+                      style: AppText.cardTitle,
+                    ),
                     Text(
                       'A tidy, a stretch or a reset of one small space, '
                       'carried by ${name.isEmpty ? 'your companion' : name}.',
@@ -445,7 +446,6 @@ class _PortraitChoice extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: ExcludeSemantics(
           child: Container(
-            width: 92,
             padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
             decoration: BoxDecoration(
               color: selected ? accent.withValues(alpha: 0.14) : Colors.transparent,
@@ -476,6 +476,33 @@ class _PortraitChoice extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Lays choices out in equal columns across the available width.
+class _ChoiceGrid extends StatelessWidget {
+  const _ChoiceGrid({required this.columns, required this.children});
+
+  final int columns;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 8.0;
+        final width =
+            ((constraints.maxWidth - gap * (columns - 1)) / columns)
+                .floorToDouble();
+        return Wrap(
+          spacing: gap,
+          runSpacing: 10,
+          children: <Widget>[
+            for (final child in children) SizedBox(width: width, child: child),
+          ],
+        );
+      },
     );
   }
 }

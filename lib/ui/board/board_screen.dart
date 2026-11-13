@@ -71,13 +71,18 @@ class BoardScreen extends StatelessWidget {
             ],
           ],
         ),
+        // Centred, so it never covers the completion controls on the right
+        // of a card, and reachable with either thumb.
         Positioned(
-          right: 16,
-          bottom: 16,
-          child: PrimaryButton(
-            label: 'Quest',
-            icon: 'plus',
-            onPressed: () => openQuestEditor(context),
+          left: 0,
+          right: 0,
+          bottom: 14,
+          child: Center(
+            child: PrimaryButton(
+              label: 'Quest',
+              icon: 'plus',
+              onPressed: () => openQuestEditor(context),
+            ),
           ),
         ),
       ],
@@ -131,29 +136,28 @@ class DawnHeader extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'DAWN IN THE VALE',
+                'DAWN IN THE VALE · ${game.questsDoneToday} OF '
+                '${game.questsTotalToday} DONE',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppText.label.copyWith(color: Palette.goldBright),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 DayKey.friendly(game.day),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppText.display.copyWith(
                   color: Palette.onDark,
-                  fontSize: 26,
+                  fontSize: 25,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '${game.questsDoneToday} of ${game.questsTotalToday} quests '
-                'done today',
-                style: AppText.small.copyWith(color: Palette.onDarkSoft),
-              ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -186,7 +190,7 @@ class DawnHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               const _JourneyStrip(),
             ],
           ),
@@ -294,7 +298,8 @@ class _PartyBadge extends StatelessWidget {
   }
 }
 
-/// Slim world-progress + journey strip.
+/// Slim world-progress + journey strip (DESIGN §8.1). Restoration progress
+/// joins it in Phase 2; materials are on the Vale and the Party Sheet.
 class _JourneyStrip extends StatelessWidget {
   const _JourneyStrip();
 
@@ -303,57 +308,49 @@ class _JourneyStrip extends StatelessWidget {
     final game = GameScope.of(context);
     final paces = game.world?.journeyPaces ?? 0;
     final toNext = pacesToNextDiscovery(paces);
-    return _Frost(
-      padding: const EdgeInsets.fromLTRB(12, 9, 12, 9),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
+    return Semantics(
+      label: '$paces Paces on the road, $toNext to the next discovery',
+      child: ExcludeSemantics(
+        child: _Frost(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 9),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const VIcon('pace', size: 16, color: Palette.goldBright),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Text(
-                  '$paces ${paces == 1 ? 'Pace' : 'Paces'} on the road · '
-                  '$toNext to the next discovery',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.small.copyWith(
-                    color: Palette.onDark,
-                    fontSize: 12.5,
+              Row(
+                children: <Widget>[
+                  const VIcon('pace', size: 15, color: Palette.goldBright),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
+                      'the next discovery',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.small.copyWith(
+                        color: Palette.onDark,
+                        fontSize: 12.5,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  StatChip(
+                    icon: 'coin',
+                    value: '${game.hero?.gold ?? 0}',
+                    label: 'Gold',
+                    iconColor: Palette.goldBright,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              XpBar(
+                fraction: pacesIntoStretch(paces) / pacesPerDiscovery,
+                color: Palette.companion,
+                height: 5,
+                track: Palette.onDark.withValues(alpha: 0.16),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          XpBar(
-            fraction: pacesIntoStretch(paces) / pacesPerDiscovery,
-            color: Palette.companion,
-            height: 5,
-            track: Palette.onDark.withValues(alpha: 0.16),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 14,
-            runSpacing: 4,
-            children: <Widget>[
-              for (final m in MaterialKind.values)
-                StatChip(
-                  icon: materialIcon(m),
-                  value: '${game.materials[m] ?? 0}',
-                  label: m.label,
-                  iconColor: Palette.sage,
-                ),
-              StatChip(
-                icon: 'coin',
-                value: '${game.hero?.gold ?? 0}',
-                label: 'Gold',
-                iconColor: Palette.goldBright,
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

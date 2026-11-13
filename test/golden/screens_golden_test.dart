@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/rules/journey.dart';
 import 'package:habit_adventure/ui/adaptive.dart';
@@ -67,21 +66,29 @@ Future<void> openTab(WidgetTester tester, String label) async {
   await tester.pumpAndSettle();
 }
 
+/// A screenshot test with real shadows. The flag has to be put back before
+/// the test body returns, or the framework reports a changed debug variable.
+void screenTest(String name, Future<void> Function(WidgetTester) body) {
+  testWidgets(name, (tester) async {
+    debugDisableShadows = false;
+    try {
+      await body(tester);
+    } finally {
+      debugDisableShadows = true;
+    }
+  });
+}
+
 void main() {
   setUpAll(loadAppFonts);
 
-  setUp(() => debugDisableShadows = false);
-  tearDown(() => debugDisableShadows = true);
-
   group('Cover screen (compact)', () {
-    testWidgets('Board', (tester) async {
+    screenTest('Board', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       await TestApp.start(tester, now: saturday, withHistory: true);
-      expect(find.text('With Babs'), findsOneWidget);
       await shot(tester, '01_board_cover');
 
-      await tester.drag(find.byType(ListView).first, const Offset(0, -330));
-      await tester.pumpAndSettle();
+      await reveal(tester, find.text('With Babs'));
       await shot(tester, '02_board_cover_companion_section');
 
       await tester.drag(find.byType(ListView).first, const Offset(0, -900));
@@ -89,7 +96,7 @@ void main() {
       await shot(tester, '03_board_cover_done');
     });
 
-    testWidgets('Party Sheet', (tester) async {
+    screenTest('Party Sheet', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       await TestApp.start(tester, now: saturday, withHistory: true);
       await openTab(tester, 'Character');
@@ -99,7 +106,7 @@ void main() {
       await shot(tester, '05_party_cover_companion');
     });
 
-    testWidgets('Quest Log and the quest creator', (tester) async {
+    screenTest('Quest Log and the quest creator', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       await TestApp.start(tester, now: saturday, withHistory: true);
       await openTab(tester, 'Log');
@@ -112,7 +119,7 @@ void main() {
       await shot(tester, '07_new_quest_cover');
     });
 
-    testWidgets('Onboarding: companion choice', (tester) async {
+    screenTest('Onboarding: companion choice', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       await TestApp.start(tester, now: saturday, withProfile: false);
       await shot(tester, '08_onboarding_cover_hero');
@@ -125,7 +132,7 @@ void main() {
       await shot(tester, '09_onboarding_cover_companion');
     });
 
-    testWidgets('Level-up and Discovery moments', (tester) async {
+    screenTest('Level-up and Discovery moments', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       final app = await TestApp.start(tester, now: saturday, withHistory: true);
       final context = tester.element(find.byType(AppShell));
@@ -164,21 +171,19 @@ void main() {
   });
 
   group('Opened Fold (expanded, with crease)', () {
-    testWidgets('Board + Vale side by side', (tester) async {
+    screenTest('Board + Vale side by side', (tester) async {
       useDevice(tester, TestDevice.foldOpen);
       await TestApp.start(tester, now: saturday, withHistory: true);
-      expect(find.text('With Babs'), findsOneWidget);
       expect(find.text('THE VALE'), findsOneWidget);
       expectCreaseClear(tester, TestDevice.foldOpen);
       await shot(tester, '20_board_open');
 
-      await tester.drag(find.byType(ListView).first, const Offset(0, -380));
-      await tester.pumpAndSettle();
+      await reveal(tester, find.text('With Babs'));
       expectCreaseClear(tester, TestDevice.foldOpen);
       await shot(tester, '21_board_open_companion_section');
     });
 
-    testWidgets('Party Sheet: hero on one pane, companion on the other',
+    screenTest('Party Sheet: hero on one pane, companion on the other',
         (tester) async {
       useDevice(tester, TestDevice.foldOpen);
       await TestApp.start(tester, now: saturday, withHistory: true);
@@ -197,7 +202,7 @@ void main() {
       await shot(tester, '22_party_open');
     });
 
-    testWidgets('Quest Log: list + detail', (tester) async {
+    screenTest('Quest Log: list + detail', (tester) async {
       useDevice(tester, TestDevice.foldOpen);
       await TestApp.start(tester, now: saturday, withHistory: true);
       await openTab(tester, 'Log');
@@ -208,7 +213,7 @@ void main() {
       await shot(tester, '23_log_open');
     });
 
-    testWidgets('Dialogs stay on one side of the crease', (tester) async {
+    screenTest('Dialogs stay on one side of the crease', (tester) async {
       useDevice(tester, TestDevice.foldOpen);
       final app = await TestApp.start(tester, now: saturday, withHistory: true);
       final context = tester.element(find.byType(AppShell));
@@ -229,9 +234,26 @@ void main() {
       await shot(tester, '24_discovery_open');
       await tester.tap(find.text('Mark it with a lantern'));
       await tester.pumpAndSettle();
+
+      // The quest detail (a bottom sheet on the cover screen) becomes a
+      // dialog inside one pane.
+      await tester.tap(find.text('7,000 Steps'));
+      await tester.pumpAndSettle();
+      expect(find.text('Mark done'), findsOneWidget);
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '26_quest_detail_open');
+      await tester.tapAt(const Offset(700, 20));
+      await tester.pumpAndSettle();
+
+      // So does the quest creator.
+      await tester.tap(find.text('Quest'));
+      await tester.pumpAndSettle();
+      expect(find.text('New quest'), findsOneWidget);
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '27_new_quest_open');
     });
 
-    testWidgets('Onboarding', (tester) async {
+    screenTest('Onboarding', (tester) async {
       useDevice(tester, TestDevice.foldOpen);
       await TestApp.start(tester, now: saturday, withProfile: false);
       await tester.enterText(find.byType(TextField).first, 'Adam');
@@ -244,7 +266,7 @@ void main() {
   });
 
   group('Compact phone', () {
-    testWidgets('Board on a 360dp phone', (tester) async {
+    screenTest('Board on a 360dp phone', (tester) async {
       useDevice(tester, TestDevice.compactPhone);
       await TestApp.start(tester, now: saturday, withHistory: true);
       expect(tester.takeException(), isNull);
