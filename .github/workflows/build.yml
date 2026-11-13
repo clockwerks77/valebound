@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -157,8 +157,9 @@ jobs:
   # Results go to the `ci-device-results` branch.
   device-check:
     needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Pinned: the emulator needs KVM, which is known to work on this image.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RESULTS_BRANCH: ci-device-results
@@ -167,7 +168,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -202,10 +203,10 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          target: aosp_atd
           profile: pixel_6
           disable-animations: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          emulator-boot-timeout: 900
           script: bash tool/device_check.sh
 
       - name: Publish device results
