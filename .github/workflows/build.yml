@@ -147,7 +147,7 @@ jobs:
             --prerelease \
             --target "$GITHUB_SHA" \
             --title "Latest debug build" \
-            --notes "Debug APK built from ${GITHUB_REF_NAME} at ${GITHUB_SHA}. Sideload on Android; not for the Play Store." \
+            --notes "Debug APK built from ${GITHUB_REF_NAME} at ${GITHUB_SHA}. Sideload on Android; not for the Play Store. Signed with the project's fixed personal key, so it installs over any earlier build signed with that key and keeps its data." \
             2>&1 | tee ci_out/release.txt
 
       - name: Publish final results

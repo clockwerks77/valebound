@@ -11,8 +11,13 @@ analytics, no network calls.
 
 ## Status
 
-Phase 1 (the playable day) is on the `phase-1` branch. Phases 2 and 3 follow
-the order in the build brief.
+- **Phase 1, the playable day:** done and confirmed on the Fold
+  ([report](docs/PHASE-1.md)). Branch `phase-1`.
+- **Phase 2, the world, the journey and the vault:** built and tested
+  ([report](docs/PHASE-2.md), [sample export files](docs/samples)). Branch
+  `phase-2`. The vault folder picker, Share and backup still need their
+  first run on a real phone.
+- **Phase 3, real life connects:** next.
 
 ## Getting the app
 
@@ -29,6 +34,14 @@ from the Actions tab.
 
 Debug builds are large (about 150 MB) because they carry every CPU
 architecture and Flutter's debug engine. That is expected for v1.
+
+Builds are signed with a fixed key kept in this private repository
+(`android/app/personal-debug.p12`), so each one installs over the last and
+keeps the data on the phone. Builds made before Phase 2 used throwaway keys
+and have to be uninstalled once first.
+
+A commit message containing `[apk-check]` builds the APK to prove it
+compiles without replacing the release.
 
 ## Building it yourself
 
@@ -50,14 +63,17 @@ Install on a connected device: `flutter install` or
 
 | Path | What lives there |
 |---|---|
-| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, schedules, day rollover. No Flutter, no database. |
-| `lib/data/` | Local SQLite storage (Drift): schema, seeded quests, the repository. |
+| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still, schedules, day rollover. No Flutter, no database. |
+| `lib/data/` | Local SQLite storage (Drift): schema and its migrations, seeded quests, the repository, the JSON backup. |
+| `lib/export/` | The Markdown export: the three documents as pure text builders, the queue, and the door to the vault folder. |
+| `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. |
 | `lib/state/` | One controller that the screens listen to. |
 | `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout. |
 | `lib/ui/art/` | Code-drawn stand-in art (see ASSETS.md). |
 | `test/rules/` | Unit tests for every rule. |
-| `test/data/` | Repository tests on an in-memory database, including persistence across restart and time away. |
-| `test/ui/` | Screen flow tests: onboarding, completing quests, the quest creator. |
+| `test/data/` | Repository tests on an in-memory database, including persistence across restart, time away, the backup, and the upgrade from the Phase 1 database. |
+| `test/export/` | The Markdown contract field by field, the export queue, and the generator for `docs/samples`. |
+| `test/ui/` | Screen flow tests: onboarding, completing quests, Undo, the quest creator, Map, Inventory, Campfire, Settings. |
 | `test/golden/` | Renders the screens at cover-screen and opened-Fold sizes and checks nothing sits on the crease. |
 | `test/copy/` | Copy audit: no guilt language, no banned names, no network packages. |
 | `.github/workflows/build.yml` | The build. Logs and screenshots are published to the `ci-results` branch. |
