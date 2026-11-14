@@ -33,6 +33,14 @@ analytics, no network calls.
   minutes while the app is open, a release build, and motion, haptics and a
   launch screen that belong to the app ([report](docs/PHASE-5.md)). Branch
   `phase-5`. Built and tested; not yet run on a phone.
+- **Classes, the daily encounter and real stakes, version 0.7.0:** four
+  classes fed by the day's quests, a turn-based fight each day that can be
+  lost (never anything already earned), and a weekly boss whose HP carries
+  over, to Amendment v0.3 in
+  [`docs/AMENDMENTS_v0.3_v0.4.md`](docs/AMENDMENTS_v0.3_v0.4.md)
+  ([report, with the balance numbers](docs/PHASE-7.md)). Branch `phase-7`.
+  Built and tested; not yet run on a phone. Part B of the amendments
+  (the questionnaire and quest generation) is the next build.
 
 ## Getting the app
 
@@ -93,6 +101,7 @@ Install on a connected device:
 | `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout; `tour/` holds the first-run tour and the one-time screen hints; `story/` holds the prologue, the chapter pages and the Chronicle; `motion.dart` and `feel.dart` hold the app's motion and haptics. |
 | `lib/ui/art/` | Code-drawn stand-in art, and the widgets that show the illustrated pieces (see ASSETS.md). |
 | `assets/art/` | The illustrated pieces: ten portraits; since 0.5.1 the 20 places, 20 villagers, six Still creatures and 11 pieces of gear; since 0.5.2 all 20 Discovery cards, the 15 story pictures, the valley behind the Today board (in four lights) and the camp. |
+| `tool/sim/` | The combat rules a second time, in Python, used to tune the numbers. The Dart engine is tested against it fight for fight. |
 | `test/rules/` | Unit tests for every rule. |
 | `test/data/` | Repository tests on an in-memory database, including persistence across restart, time away, the backup, and the upgrades from the Phase 1 and Phase 2 databases. |
 | `test/export/` | The Markdown contract field by field, the export queue, and the generator for `docs/samples`. |

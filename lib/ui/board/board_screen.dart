@@ -615,16 +615,16 @@ class _EncounterRow extends StatelessWidget {
         ),
         const SizedBox(width: 7),
         Expanded(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              encounterLine(game),
-              maxLines: 1,
-              style: AppText.small.copyWith(
-                color: Palette.onDark,
-                fontSize: 12.5,
-              ),
+          // Wraps and stays readable on the opened Fold's narrow board pane,
+          // where shrinking one line to fit made it far too small.
+          child: Text(
+            encounterLine(game),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: AppText.small.copyWith(
+              color: Palette.onDark,
+              fontSize: 12.5,
+              height: 1.25,
             ),
           ),
         ),

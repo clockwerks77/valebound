@@ -442,7 +442,7 @@ class _EncounterScreenState extends State<EncounterScreen> {
               ),
               ChoicePill(
                 label: 'Heroic',
-                caption: 'Tougher, half as much again',
+                caption: 'Tougher, for a chest half as big again',
                 selected: _heroic,
                 color: Palette.companionDeep,
                 onTap: () => setState(() => _heroic = true),
