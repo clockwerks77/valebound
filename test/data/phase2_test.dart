@@ -50,15 +50,17 @@ void main() {
   group('Restoration on record (DESIGN §3A)', () {
     test('the quest that brings the last material wakes the place', () async {
       await start();
-      // Morning Health Check: 1 Timber. Steps: 2 Stone. Campfire: 1 Shard.
+      // Morning Health Check: 1 Timber. Steps: 2 Stone. Two quests, so the
+      // day's Still creature sleeps on and leaves nothing (D-70).
       final first = await repo.completeQuest(await id('Morning Health Check'));
       expect(first!.newRestorationIndexes, isEmpty);
       await repo.completeQuest(await id('7,000 Steps'));
-      await repo.completeQuest(await id('Campfire Review'));
       expect(decodeStringMap((await repo.world())!.buildingState), isEmpty);
 
       await nextDay();
-      // The fourth hero quest drops Timber again: 2 Timber, 2 Stone in all.
+      // Campfire: 1 Shard. Then the fourth hero quest drops Timber again:
+      // 2 Timber, 2 Stone in all.
+      await repo.completeQuest(await id('Campfire Review'));
       final wakes = await repo.completeQuest(await id('Morning Health Check'));
       expect(wakes!.newRestorationIndexes, <int>[0]);
 
@@ -78,9 +80,11 @@ void main() {
       expect(inStores(decodeMaterials(hero.materials))[MaterialKind.timber], 0);
 
       final completions = await repo.completionsOn('2026-11-15');
-      expect(decodeExtras(completions.single.extras)['restored'], <String>[
-        'gate_lantern',
-      ]);
+      final waking = completions
+          .map((c) => decodeExtras(c.extras))
+          .where((extras) => extras.containsKey('restored'))
+          .single;
+      expect(waking['restored'], <String>['gate_lantern']);
     });
 
     test('a restored place stays restored whatever happens next', () async {

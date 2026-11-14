@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../data/database.dart';
 import '../rules/companion_rules.dart';
+import '../rules/daily_still.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/journey.dart';
@@ -37,6 +38,7 @@ Future<void> celebrate(
     outcome,
     companionName: game.companionName,
     still: questId != null && outcome.clearsStill ? stillFor(questId) : null,
+    dailyStill: outcome.wokeDailyStill ? dailyStillFor(game.day) : null,
   );
 
   for (final index in outcome.newRestorationIndexes) {
@@ -83,10 +85,19 @@ List<_Reward> _rewardsFor(
   CompletionOutcome o,
   String companionName,
   StillCreature? still,
+  StillCreature? dailyStill,
 ) {
   final a = o.award;
   return <_Reward>[
     if (still != null) _Reward('still', still.wakes, Palette.slateSoft),
+    // The day's creature, woken by the third quest (DECISIONS D-70).
+    if (dailyStill != null && o.dailyStillGift != null)
+      _Reward(
+        'still',
+        'The ${dailyStill.name} woke: +${o.stillGiftGold} gold, '
+            '+$dailyStillMaterials ${o.dailyStillGift!.label}',
+        Palette.goldDeep,
+      ),
     if (o.heroXpGained > 0)
       _Reward(
         attributeIcon(o.attribute),
@@ -142,13 +153,14 @@ void showRewardToast(
   CompletionOutcome outcome, {
   required String companionName,
   StillCreature? still,
+  StillCreature? dailyStill,
 }) {
   final overlay = Overlay.maybeOf(context, rootOverlay: true);
   if (overlay == null) return;
   late final OverlayEntry entry;
   entry = OverlayEntry(
     builder: (context) => _RewardToast(
-      rewards: _rewardsFor(outcome, companionName, still),
+      rewards: _rewardsFor(outcome, companionName, still, dailyStill),
       onDone: () {
         if (entry.mounted) entry.remove();
       },

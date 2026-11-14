@@ -5,6 +5,7 @@ import '../../data/repository.dart';
 import '../../data/seed.dart';
 import '../../device/device_port.dart';
 import '../../export/markdown.dart' show thousands;
+import '../../rules/daily_still.dart';
 import '../../rules/day_cycle.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
@@ -366,9 +367,11 @@ class _JourneyStrip extends StatelessWidget {
     final toNext = pacesToNextDiscovery(paces);
     final target = game.target;
     final progress = targetProgress(game.materials);
+    final still = game.dailyStillToday;
     return Semantics(
       label: 'Restoring ${target.name}, ${(progress * 100).round()} percent. '
-          '$paces Paces on the road, $toNext to the next discovery',
+          '$paces Paces on the road, $toNext to the next discovery'
+          '${still == null ? '' : '. ${_dailyStillSpoken(still, target.name)}'}',
       child: ExcludeSemantics(
         child: _Frost(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 9),
@@ -438,8 +441,97 @@ class _JourneyStrip extends StatelessWidget {
                 height: 5,
                 track: Palette.onDark.withValues(alpha: 0.16),
               ),
+              if (still != null) ...<Widget>[
+                const SizedBox(height: 8),
+                _DailyStillRow(today: still, place: target.name),
+              ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What the day's Still creature is doing, in a line.
+String _dailyStillLine(DailyStillToday today, String place) {
+  final name = today.still.creature.name;
+  if (!today.still.awake) return 'A $name dozes by $place';
+  final gift = today.gift;
+  return gift == null
+      ? 'The $name woke and wandered off'
+      : 'The $name woke: +$dailyStillGold gold, '
+          '+$dailyStillMaterials ${gift.label}';
+}
+
+String _dailyStillSpoken(DailyStillToday today, String place) =>
+    today.still.awake
+        ? '${_dailyStillLine(today, place)}.'
+        : '${_dailyStillLine(today, place)}. ${today.still.stirs} of '
+            '$dailyStillStirs quests have stirred it.';
+
+/// The day's Still creature (DECISIONS D-70): where it dozes, a pip for each
+/// quest that has stirred it, and what it left once it has woken.
+class _DailyStillRow extends StatelessWidget {
+  const _DailyStillRow({required this.today, required this.place});
+
+  final DailyStillToday today;
+  final String place;
+
+  @override
+  Widget build(BuildContext context) {
+    final awake = today.still.awake;
+    return Row(
+      children: <Widget>[
+        VIcon(
+          awake ? 'sun' : 'still',
+          size: 15,
+          color: awake ? Palette.goldBright : Palette.onDarkSoft,
+        ),
+        const SizedBox(width: 7),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _dailyStillLine(today, place),
+              maxLines: 1,
+              style: AppText.small.copyWith(
+                color: Palette.onDark,
+                fontSize: 12.5,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        for (var i = 0; i < dailyStillStirs; i++)
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: _StirPip(lit: awake || i < today.still.stirs),
+          ),
+      ],
+    );
+  }
+}
+
+class _StirPip extends StatelessWidget {
+  const _StirPip({required this.lit});
+
+  final bool lit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 9,
+      height: 9,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: lit ? Palette.goldBright : Colors.transparent,
+        border: Border.all(
+          color: lit
+              ? Palette.goldBright
+              : Palette.onDark.withValues(alpha: 0.45),
+          width: 1.2,
         ),
       ),
     );

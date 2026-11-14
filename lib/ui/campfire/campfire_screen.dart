@@ -687,6 +687,13 @@ class _WorldCard extends StatelessWidget {
               color: Palette.companionDeep,
               text: 'Discovered: ${sceneFor(i).title}.',
             ),
+          if (game.dailyStillToday?.still.awake ?? false)
+            _WorldRow(
+              icon: 'still',
+              color: Palette.slateSoft,
+              text: 'Woke: the '
+                  '${game.dailyStillToday!.still.creature.name}.',
+            ),
         ],
       ),
     );

@@ -107,6 +107,9 @@ class GameController extends ChangeNotifier {
   /// The weekly Delve, when one can be entered at the Campfire.
   DelveWaiting? delve;
 
+  /// The day's Still creature and how far along it is (DECISIONS D-70).
+  DailyStillToday? dailyStillToday;
+
   bool notificationsAllowed = false;
 
   /// Set when the app was opened from Health Connect's "why" link.
@@ -246,6 +249,7 @@ class GameController extends ChangeNotifier {
     await repo.recordBoardSize(day, board.length);
     this.today = await repo.dayLog(day);
     healthToday = await repo.healthEntriesByKey(day);
+    dailyStillToday = await repo.dailyStillOn(day);
     delve = await repo.delveWaiting();
     if (readDevice) await _readCalendar();
     await _filterSuggestions();

@@ -196,12 +196,10 @@ void main() {
         await at(day, 8, 0);
         await repo.completeQuest(await id('Walk Babs'));
       }
-      await at(12, 8, 0);
-      await repo.completeQuest(await id('Morning Health Check'));
+      // Two quests this day (the walk and the Campfire), so the day's Still
+      // creature sleeps on and brings nothing extra (D-70).
       await at(12, 9, 0);
       await repo.completeQuest(await id('Walk Babs'));
-      await at(12, 18, 0);
-      await repo.completeQuest(await id('7,000 Steps'));
       await repo.setHealthEntry('2026-11-12', 'steps', '8214');
       await repo.setHealthEntry('2026-11-12', 'glucose', '5.8', unit: 'mmol/L');
       await at(12, 21, 0);

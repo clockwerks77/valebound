@@ -1,5 +1,6 @@
 import 'awards.dart';
 import 'companion_rules.dart';
+import 'daily_still.dart';
 import 'enums.dart';
 import 'gear.dart';
 import 'journey.dart';
@@ -67,6 +68,7 @@ class CompletionOutcome {
     this.newCosmetics = const <String>[],
     this.bonusHeroXp = 0,
     this.comfortBond = 0,
+    this.dailyStillGift,
   });
 
   final Award award;
@@ -106,6 +108,16 @@ class CompletionOutcome {
   /// quest (DESIGN §7A.3).
   final int comfortBond;
 
+  /// The material the day's Still creature left as it woke, when this was
+  /// the quest that woke it (DECISIONS D-70). Null on every other quest.
+  final MaterialKind? dailyStillGift;
+
+  /// This quest woke the day's Still creature.
+  bool get wokeDailyStill => dailyStillGift != null;
+
+  /// Gold the day's Still creature left, on the quest that woke it.
+  int get stillGiftGold => wokeDailyStill ? dailyStillGold : 0;
+
   /// Hero XP this completion gave in all.
   int get heroXpGained => award.heroXp + bonusHeroXp;
 
@@ -135,6 +147,11 @@ class CompletionOutcome {
 ///
 /// [bonusHeroXp] and [bonusBond] are extras a system quest may carry (the
 /// comeback quest, DESIGN §4.3 and §7A.3). They only ever add.
+///
+/// [wakeDailyStill] is true when this is the quest that wakes the day's
+/// Still creature: it leaves a little gold and one material the place being
+/// restored still needs (DECISIONS D-70). No XP, so a level stays the sum of
+/// the quests done.
 CompletionOutcome applyCompletion({
   required PartyTotals totals,
   required Difficulty difficulty,
@@ -145,6 +162,7 @@ CompletionOutcome applyCompletion({
   bool fetchAvailable = false,
   int bonusHeroXp = 0,
   int bonusBond = 0,
+  bool wakeDailyStill = false,
 }) {
   final award = awardFor(difficulty: difficulty, track: track);
   final extraXp = bonusHeroXp < 0 ? 0 : bonusHeroXp;
@@ -190,6 +208,13 @@ CompletionOutcome applyCompletion({
     materials[fetchCarried] = (materials[fetchCarried] ?? 0) + 1;
   }
 
+  MaterialKind? dailyStillGift;
+  if (wakeDailyStill) {
+    dailyStillGift = stillNeeded(materials);
+    materials[dailyStillGift] =
+        (materials[dailyStillGift] ?? 0) + dailyStillMaterials;
+  }
+
   final paces = totals.paces + award.paces;
 
   final after = PartyTotals(
@@ -198,7 +223,7 @@ CompletionOutcome applyCompletion({
     companionXp: companionXp,
     bond: totals.bond + award.bond + bonus + extraBond,
     paces: paces,
-    gold: totals.gold + award.gold,
+    gold: totals.gold + award.gold + (wakeDailyStill ? dailyStillGold : 0),
     materials: Map<MaterialKind, int>.unmodifiable(materials),
     heroTrackCompletions: heroTrackCompletions,
   );
@@ -234,6 +259,7 @@ CompletionOutcome applyCompletion({
     ),
     bonusHeroXp: extraXp,
     comfortBond: extraBond,
+    dailyStillGift: dailyStillGift,
   );
 }
 

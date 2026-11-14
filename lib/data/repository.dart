@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../rules/companion_rules.dart';
+import '../rules/daily_still.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
 import '../rules/delve.dart';
@@ -48,6 +49,36 @@ class BoardQuest {
 }
 
 /// What the user fills in when creating or editing a quest (DESIGN §6.1).
+/// Key in a completion's `extras` for the gift the day's Still creature
+/// left on the quest that woke it (DECISIONS D-70).
+const String dailyStillExtra = 'dailyStill';
+
+/// The material the day's Still creature left on [c], or null when [c] is
+/// not the quest that woke it.
+MaterialKind? dailyStillGiftOf(CompletionRow c) {
+  if (!c.extras.contains(dailyStillExtra)) return null;
+  try {
+    final extras = jsonDecode(c.extras);
+    final gift = extras is Map ? extras[dailyStillExtra] : null;
+    final name = gift is Map ? gift['material'] : null;
+    for (final kind in MaterialKind.values) {
+      if (kind.name == name) return kind;
+    }
+  } on FormatException {
+    return null;
+  }
+  return null;
+}
+
+bool _wokeDailyStill(CompletionRow c) => dailyStillGiftOf(c) != null;
+
+/// The day's Still creature as it stands, with its gift once it has woken.
+class DailyStillToday {
+  const DailyStillToday(this.still, this.gift);
+  final DailyStill still;
+  final MaterialKind? gift;
+}
+
 class QuestDraft {
   QuestDraft({
     this.id,
@@ -491,6 +522,7 @@ class GameRepository {
         materials: decodeMaterials(heroRow.materials),
         heroTrackCompletions: heroRow.heroTrackCompletions,
       );
+      final doneToday = await completionsOn(day);
       final outcome = applyCompletion(
         totals: totals,
         difficulty: quest.difficulty,
@@ -507,6 +539,11 @@ class GameRepository {
                 companionRow.level >= comfortLevel
             ? comfortBonusBond
             : 0,
+        // The day's Still creature wakes on the third quest (D-70).
+        wakeDailyStill: wakesDailyStill(
+          doneBefore: doneToday.length,
+          giftGiven: doneToday.any(_wokeDailyStill),
+        ),
       );
       final after = outcome.after;
 
@@ -647,6 +684,12 @@ class GameRepository {
                   if (outcome.bonusHeroXp > 0) 'bonusXp': outcome.bonusHeroXp,
                   if (outcome.comfortBond > 0)
                     'comfortBond': outcome.comfortBond,
+                  if (outcome.dailyStillGift != null)
+                    dailyStillExtra: <String, Object>{
+                      'creature': dailyStillFor(day).key,
+                      'gold': outcome.stillGiftGold,
+                      'material': outcome.dailyStillGift!.name,
+                    },
                 }),
               ),
             ),
@@ -833,6 +876,20 @@ class GameRepository {
             ..where((c) => c.day.equals(day))
             ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
           .get();
+
+  /// The day's Still creature (DECISIONS D-70): how many quests have stirred
+  /// it, and what it left if it has woken.
+  Future<DailyStillToday> dailyStillOn(String day) async {
+    final done = await completionsOn(day);
+    MaterialKind? gift;
+    for (final c in done) {
+      gift ??= dailyStillGiftOf(c);
+    }
+    return DailyStillToday(
+      dailyStill(day: day, questsDone: done.length, giftGiven: gift != null),
+      gift,
+    );
+  }
 
   // ---- The world -----------------------------------------------------
 
