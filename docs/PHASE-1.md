@@ -65,6 +65,30 @@ inner 816×616dp with a centre fold, 3× density). Half-size copies:
 | Onboarding | [companion choice](screenshots/phase-1/onboarding-cover-companion.png) | [companion choice](screenshots/phase-1/onboarding-open-companion.png) |
 | Level-up | [hero](screenshots/phase-1/level-up-cover.png) | |
 
+## On a real Android runtime
+
+The build installs the APK on an Android 14 emulator in CI and captures the
+screen. Verified there (commit `c7e1e4f`, the same app code as the current
+build):
+
+- The APK installs, starts, survives a force-stop and starts again, with no
+  crash in the device log.
+- The first screen appears, which means the on-device SQLite database opened.
+- It lays out as one column at phone size and at the Fold's cover size, and
+  as two panes at the Fold's inner size
+  ([phone](screenshots/phase-1/emulator-first-launch.png),
+  [cover size](screenshots/phase-1/emulator-cover-size.png),
+  [inner size](screenshots/phase-1/emulator-open-size.png)).
+
+Not yet verified on a device or emulator: going through onboarding,
+completing a quest, and finding it still there after a restart. That path is
+covered by the host tests (including closing and reopening a database file),
+and a scripted on-device run exists (`integration_test/app_test.dart`), but
+it has not completed on the hosted emulator, which ran out of memory when a
+build ran beside it. The job has been reworked; until it reports, the
+quickest proof is on the Fold itself: onboard, complete Walk Babs, swipe the
+app away, reopen.
+
 ## Evidence
 
 | Check | Result |
