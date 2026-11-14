@@ -15,7 +15,7 @@ followed by its own `Subject:` line.
 | Vector drawing in code | Yes | Flutter `CustomPaint`, SVG path data. |
 | Code-painted raster | Yes | Python (Pillow), ImageMagick, rsvg. Good for textures, gradients, terrain and light. Not good enough for premium portraits or scenes. |
 | Fonts | Yes | Fraunces and Figtree, SIL OFL 1.1, bundled. |
-| Adam's PC and Chrome | With per-app / per-site approval | Nothing used for art so far. |
+| Adam's PC and Chrome | With per-app / per-site approval | Chrome is used to run Firefly, with Adam's go-ahead. No folder on the PC is connected, so files cannot be fetched from it. |
 | Adobe connector | Connected 13 Nov 2026 | Finds Firefly generations, previews them (up to 600 pixels), crops, resizes, grades, removes backgrounds. **Cannot generate.** |
 | Hugging Face connector | Connected 13 Nov 2026 | Browsing only; running a model is switched off in the built-in connector. Not used. |
 
@@ -51,8 +51,8 @@ Status values: `generated` · `coded` · `placeholder` · `needed-from-Adam`.
 
 ## 2. Stand-ins (code-drawn, to be replaced by painted art)
 
-These are original and on-palette, but they are **not** the painterly
-illustration in the design. Each has a matching entry in section 3.
+These are original and on-palette, but they are **not** the illustration
+the design asks for. Each has a matching entry in section 3.
 
 | Stand-in | Where | Replaces | Since | Status |
 |---|---|---|---|---|
@@ -63,20 +63,22 @@ illustration in the design. Each has a matching entry in section 3.
 | Fog banks over sleeping regions | `lib/ui/map/vale_map.dart` | Painted fog | Phase 2 | placeholder (may simply stay coded) |
 | Place medallions ×20 (an icon in a ring, grey when asleep, gold-lit when restored) | `lib/ui/map/vale_map.dart` | Building art, asleep and restored | Phase 2 | placeholder |
 | Villager medallions ×20 (the villager's icon on a green roundel) | `lib/ui/board/board_screen.dart` | Villager portraits | Phase 2 | placeholder |
-| Campfire night scene (stars, ridges, fire glow) with the two crests | `lib/ui/campfire/campfire_screen.dart` | Campfire scene | Phase 2 | placeholder |
-| Lantern roundel on the Discovery card (same for all 20) | `lib/ui/celebrations.dart` | Discovery scene art | Phase 1 | placeholder |
+| Campfire night scene (stars, ridges, fire glow) with the two portraits | `lib/ui/campfire/campfire_screen.dart` | Campfire scene | Phase 2 | placeholder |
+| Lantern roundel on the Discovery card (the same for the 19 scenes not yet illustrated) | `lib/ui/celebrations.dart` | Discovery scene art | Phase 1 | placeholder; the standing stone shows its illustration |
 | Still creatures: a sleepy grey blob on the map, a small icon on the card (same for all 6) | `lib/ui/map/vale_map.dart`, `v_icon.dart` | Still creature art | Phase 2 | placeholder |
 | Companion gear: a slot icon (collar, bell, cloak, blanket) as a badge on the portrait | `lib/ui/art/crests.dart` | Gear art per kind | Phase 2 | placeholder |
 | Portrait frames: the portrait ring in a different colour | `lib/ui/art/crests.dart` | Frame art | Phase 2 | placeholder (may simply stay coded) |
 | Village decorations: small flags, dots and lights on the map | `lib/ui/map/vale_map.dart` | Painted into the awake map | Phase 2 | placeholder |
-| "Old Friends" scene: the two crests side by side | `lib/ui/party/party_sheet.dart` | Hero + companion portrait scene (companion L10) | Phase 2 | placeholder |
+| "Old Friends" scene: the two portraits side by side | `lib/ui/party/party_sheet.dart` | Hero + companion portrait scene (companion L10) | Phase 2 | placeholder |
 
-## 3. Illustrated raster assets (needed from Adam)
+## 3. Illustrated raster assets
 
-Deliver as **PNG or WebP, sRGB, no text baked in**, into
-`assets/art/<folder>/` with the exact filenames below. Sizes are final pixel
-sizes; anything larger at the same aspect ratio is fine and I will resize.
+Generated in Firefly (section 4). Files go into `assets/art/<folder>/` with
+the filenames below, sRGB, no text baked in. Sizes are final pixel sizes.
 The largest on-screen use on the Fold 8 is noted so nothing ships oversized.
+A status of `needed-from-Adam` below now means "not made yet": the piece is
+waiting its turn, and anything larger than a portrait is also waiting on a
+way to bring the full-size file over (section 4).
 
 ### Needed first: the reference board (STYLE.md §7)
 
@@ -183,27 +185,35 @@ Status: needed-from-Adam.
 | `icon/launcher_foreground.png` | 432×432, transparent, subject inside the centre 264×264 | a gold lantern, or the hound's head | optional: a coded lantern icon ships now |
 | Background | solid `#12352C` | set in code | coded |
 
-## 4. Ways to get the illustrated assets
+## 4. How the illustrated assets are made
 
-1. **A connector generates them.** Adobe or Hugging Face, connected to
-   Claude (offered 13 Nov 2026). I would generate the three reference-board
-   pieces first, show them, and only roll out the rest once the look is
-   approved. Images are bundled at build time; the app stays offline.
-2. **You generate them** in whatever image tool you use, pasting the style
-   prompt and each Subject line, and drop the files into the repo.
-3. **I drive an image tool you are signed in to**, in your Chrome, if you
-   name it and say go. It would use your account and any credits it charges.
-4. **Stay code-drawn.** Consistent and free, but it reads as stylised
-   vector, not painterly.
+Decided 14 November 2026 (DECISIONS.md D-48 to D-50): Claude drives Adobe
+Firefly in Adam's Chrome, with his go-ahead, using Adobe's own Firefly Image
+5 model, the style prompt from STYLE.md §6 word for word and one Subject
+line per piece. Each piece costs 10 of Adam's Firefly credits. Images are
+bundled at build time; the app stays offline.
 
-Swapping is a contained change whichever you choose: every portrait, scene
-and medallion is drawn by one widget each (`HeroPortrait`,
-`CompanionPortrait`, `Vista`, `ValeMap`, `CampScene`), so raster art replaces
-the stand-in in one place. That swap is not built yet; it comes with the
-first delivered files.
+**What is in the way of the larger pieces.** A portrait is small enough to
+come across through the Adobe connector's 600-pixel preview. Discovery
+cards, scenes and the map are shown larger than that, so they need the
+full-size file. Either of these unblocks it:
 
-## 5. Suggested order
+- Adam connects a folder on his PC to the session in the Claude desktop app
+  (his Downloads folder, or a new `Valebound art` folder). Claude then saves
+  each piece from Firefly into it and reads it from there.
+- Adam downloads the pieces from Firefly and attaches them in chat.
 
-Reference board (3) → remaining portraits (8) → the two map paintings →
-Campfire and Dawn scenes → Discoveries (19 more) → places (20) → the Still
-(6) → gear (11) → villagers (20).
+**Showing them.** Every portrait is drawn by one widget (`HeroPortrait`,
+`CompanionPortrait`) and every Discovery picture by another
+(`DiscoveryPicture`), all listed in `lib/ui/art/painted.dart`. A piece that
+has no file yet falls back to its code-drawn stand-in, so adding one is a
+file and one line. Scenes, the map, places, villagers, the Still and gear
+do not have their picture widgets yet; each arrives with its first file.
+
+## 5. Order
+
+Done: the reference board (3) and the remaining portraits (8).
+
+Next, once full-size files can come across: Discoveries (19 more) →
+Campfire and Dawn scenes → the two map paintings → places (20) → the Still
+(6) → gear (11) → villagers (20). One to redo: the clockwork sprite.
