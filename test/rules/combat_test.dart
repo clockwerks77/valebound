@@ -247,9 +247,9 @@ void main() {
       final guarded = Fight(against(EnemyType.brute, HeroClass.ranger));
       for (final f in <Fight>[open, guarded]) {
         f.act(CombatAction.defend);
-        expect(f.intent, Intent.charge);
+        expect(f.intent, EnemyIntent.charge);
         f.act(CombatAction.defend);
-        expect(f.intent, Intent.big);
+        expect(f.intent, EnemyIntent.big);
       }
       final big = open.intentDamage;
       final before = open.heroHp;
@@ -263,7 +263,7 @@ void main() {
     test('a Sage reads an Arcane trick; nobody else can', () {
       final sage = Fight(against(EnemyType.arcane, HeroClass.sage));
       final ranger = Fight(against(EnemyType.arcane, HeroClass.ranger));
-      expect(sage.intent, Intent.hex);
+      expect(sage.intent, EnemyIntent.hex);
       expect(sage.intentVeiled, isFalse);
       expect(ranger.intentVeiled, isTrue);
     });
@@ -278,7 +278,7 @@ void main() {
       );
       fight.act(CombatAction.defend);
       fight.act(CombatAction.defend);
-      expect(fight.intent, Intent.ward);
+      expect(fight.intent, EnemyIntent.ward);
       fight.act(CombatAction.defend);
       expect(fight.ward, isTrue);
       final before = fight.enemyHp;

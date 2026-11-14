@@ -87,7 +87,6 @@ class _EncounterScreenState extends State<EncounterScreen> {
     }
   }
 
-  String get _the => widget.boss ? _name : 'the $_name';
   String get _capName => widget.boss ? _name : 'The $_name';
 
   void _begin() {
@@ -509,20 +508,20 @@ class _EncounterScreenState extends State<EncounterScreen> {
     final exact = f.cls == HeroClass.sage;
     final dmg = exact && f.intentDamage > 0 ? ' (${f.intentDamage})' : '';
     return switch (f.intent) {
-      Intent.hit => 'It means to hit you$dmg.',
-      Intent.hitCompanion => f.taunt > 0 || f.companionHp <= 0
+      EnemyIntent.hit => 'It means to hit you$dmg.',
+      EnemyIntent.hitCompanion => f.taunt > 0 || f.companionHp <= 0
           ? 'It means to hit you$dmg.'
           : 'It is eyeing $companion$dmg.',
-      Intent.heavy => 'A heavy blow is coming for you$dmg. Defend halves it.',
-      Intent.charge => 'It is winding up. The big blow comes next turn.',
-      Intent.big => 'The big blow lands this turn$dmg. Defend halves it.',
-      Intent.fortify => 'It means to settle in and mend.',
-      Intent.hex =>
+      EnemyIntent.heavy => 'A heavy blow is coming for you$dmg. Defend halves it.',
+      EnemyIntent.charge => 'It is winding up. The big blow comes next turn.',
+      EnemyIntent.big => 'The big blow lands this turn$dmg. Defend halves it.',
+      EnemyIntent.fortify => 'It means to settle in and mend.',
+      EnemyIntent.hex =>
         'It is weaving a hex. Defend, or your next blow is halved.',
-      Intent.ward => 'It is raising a ward that will swallow one blow.',
-      Intent.swarm => 'They all come at you at once$dmg.',
-      Intent.swarmCompanion => 'They come at you, and one at $companion$dmg.',
-      Intent.swarmAll => 'They are massing to rush you all together$dmg. '
+      EnemyIntent.ward => 'It is raising a ward that will swallow one blow.',
+      EnemyIntent.swarm => 'They all come at you at once$dmg.',
+      EnemyIntent.swarmCompanion => 'They come at you, and one at $companion$dmg.',
+      EnemyIntent.swarmAll => 'They are massing to rush you all together$dmg. '
           'Defend halves it.',
     };
   }

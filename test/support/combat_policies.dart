@@ -15,7 +15,7 @@ Move smart(Fight f) {
   final comp = f.companionReady;
   final c = f.cls;
   final dangerous = !veiled &&
-      (it == Intent.big || it == Intent.heavy || it == Intent.swarmAll);
+      (it == EnemyIntent.big || it == EnemyIntent.heavy || it == EnemyIntent.swarmAll);
   final low = f.heroHp * 100 <= f.heroMax * 35;
   if (low && f.count(ItemKind.salve) > 0 && !dangerous) {
     return (CombatAction.salve, comp);
@@ -40,11 +40,11 @@ Move smart(Fight f) {
       if (f.canAbility && f.taunt == 0) return (CombatAction.ability, comp);
       return (CombatAction.strike, comp);
     case HeroClass.sage:
-      if (it == Intent.charge && f.resource < 2) {
+      if (it == EnemyIntent.charge && f.resource < 2) {
         return (CombatAction.defend, comp);
       }
-      if (it == Intent.charge) return (CombatAction.strike, comp);
-      if (it == Intent.hex) return (CombatAction.defend, comp);
+      if (it == EnemyIntent.charge) return (CombatAction.strike, comp);
+      if (it == EnemyIntent.hex) return (CombatAction.defend, comp);
       if (f.canAbility &&
           f.resource >= 5 &&
           f.type != EnemyType.brute &&

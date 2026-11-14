@@ -73,7 +73,7 @@ Effect effectOf(HeroClass cls, EnemyType type) =>
     _matrix[type]![cls] ?? Effect.normal;
 
 /// What the creature means to do this turn. Shown before the player acts.
-enum Intent {
+enum EnemyIntent {
   hit,
   hitCompanion,
   heavy,
@@ -175,29 +175,29 @@ const int _bossHp = 260, _bossAtk = 85;
 const int bossTurns = 7;
 const int _bossDebuff = 75, _bossShield = 40;
 
-const Map<EnemyType, List<Intent>> _patterns = <EnemyType, List<Intent>>{
-  EnemyType.swift: <Intent>[
-    Intent.hit, Intent.hitCompanion, Intent.heavy, Intent.hit, //
+const Map<EnemyType, List<EnemyIntent>> _patterns = <EnemyType, List<EnemyIntent>>{
+  EnemyType.swift: <EnemyIntent>[
+    EnemyIntent.hit, EnemyIntent.hitCompanion, EnemyIntent.heavy, EnemyIntent.hit, //
   ],
-  EnemyType.armoured: <Intent>[
-    Intent.hit, Intent.fortify, Intent.heavy, Intent.hitCompanion, //
+  EnemyType.armoured: <EnemyIntent>[
+    EnemyIntent.hit, EnemyIntent.fortify, EnemyIntent.heavy, EnemyIntent.hitCompanion, //
   ],
-  EnemyType.brute: <Intent>[
-    Intent.hit, Intent.charge, Intent.big, Intent.hitCompanion, //
+  EnemyType.brute: <EnemyIntent>[
+    EnemyIntent.hit, EnemyIntent.charge, EnemyIntent.big, EnemyIntent.hitCompanion, //
   ],
-  EnemyType.swarm: <Intent>[
-    Intent.swarm, Intent.swarmCompanion, Intent.swarmAll, Intent.swarm, //
+  EnemyType.swarm: <EnemyIntent>[
+    EnemyIntent.swarm, EnemyIntent.swarmCompanion, EnemyIntent.swarmAll, EnemyIntent.swarm, //
   ],
-  EnemyType.arcane: <Intent>[
-    Intent.hex, Intent.hit, Intent.ward, Intent.heavy, Intent.hitCompanion, //
+  EnemyType.arcane: <EnemyIntent>[
+    EnemyIntent.hex, EnemyIntent.hit, EnemyIntent.ward, EnemyIntent.heavy, EnemyIntent.hitCompanion, //
   ],
 };
 
 /// A boss changes its ways as it wears down: three phases by thirds.
-const List<List<Intent>> _bossPhases = <List<Intent>>[
-  <Intent>[Intent.hit, Intent.charge, Intent.big, Intent.hitCompanion],
-  <Intent>[Intent.heavy, Intent.hex, Intent.hit, Intent.ward],
-  <Intent>[Intent.charge, Intent.big, Intent.heavy],
+const List<List<EnemyIntent>> _bossPhases = <List<EnemyIntent>>[
+  <EnemyIntent>[EnemyIntent.hit, EnemyIntent.charge, EnemyIntent.big, EnemyIntent.hitCompanion],
+  <EnemyIntent>[EnemyIntent.heavy, EnemyIntent.hex, EnemyIntent.hit, EnemyIntent.ward],
+  <EnemyIntent>[EnemyIntent.charge, EnemyIntent.big, EnemyIntent.heavy],
 ];
 
 const int _mask = 0xFFFFFFFF;
@@ -427,31 +427,31 @@ class Fight {
     return left > enemyMax * 2 ? 1 : (left > enemyMax ? 2 : 3);
   }
 
-  List<Intent> get _pattern =>
+  List<EnemyIntent> get _pattern =>
       boss ? _bossPhases[bossPhase - 1] : _patterns[type]!;
 
   /// What the creature will do this turn unless it is stopped.
-  Intent get intent {
-    if (charging) return Intent.big;
+  EnemyIntent get intent {
+    if (charging) return EnemyIntent.big;
     final p = _pattern;
     final it = p[_step % p.length];
     // A big blow only ever follows its own wind-up.
-    return it == Intent.big ? Intent.hit : it;
+    return it == EnemyIntent.big ? EnemyIntent.hit : it;
   }
 
   /// Whether the class can read [intent] this turn. Only a Sage sees
   /// through an Arcane trick before it happens (Amendment v0.3 §2).
   bool get intentVeiled =>
-      cls != HeroClass.sage && (intent == Intent.hex || intent == Intent.ward);
+      cls != HeroClass.sage && (intent == EnemyIntent.hex || intent == EnemyIntent.ward);
 
   /// What this turn's intent would take off the hero or companion if
   /// nothing softened it. For a swarm, what each one does.
   int get intentDamage => switch (intent) {
-        Intent.hit || Intent.hitCompanion => enemyAttack,
-        Intent.heavy => _pct(enemyAttack, _heavy),
-        Intent.big => _pct(enemyAttack, _big),
-        Intent.swarm || Intent.swarmCompanion => _pct(enemyAttack, _swarmHit),
-        Intent.swarmAll => _pct(enemyAttack, _swarmAll),
+        EnemyIntent.hit || EnemyIntent.hitCompanion => enemyAttack,
+        EnemyIntent.heavy => _pct(enemyAttack, _heavy),
+        EnemyIntent.big => _pct(enemyAttack, _big),
+        EnemyIntent.swarm || EnemyIntent.swarmCompanion => _pct(enemyAttack, _swarmHit),
+        EnemyIntent.swarmAll => _pct(enemyAttack, _swarmAll),
         _ => 0,
       };
 
@@ -570,7 +570,6 @@ class Fight {
     assert(outcome == null, 'the fight is over');
     assert(canDo(action), 'that action is not available');
     final events = <CombatEvent>[];
-    final strong = effect == Effect.strong;
     var defended = false;
     var skip = false;
 
@@ -683,31 +682,31 @@ class Fight {
     final companionWasUp = companionHp > 0;
     if (!skip) {
       final atCompanion =
-          (it == Intent.hitCompanion || it == Intent.swarmCompanion) &&
+          (it == EnemyIntent.hitCompanion || it == EnemyIntent.swarmCompanion) &&
               companionHp > 0 &&
               taunt == 0;
       switch (it) {
-        case Intent.hit:
+        case EnemyIntent.hit:
           _take(enemyAttack, defended, events, CombatEventKind.enemyHit);
-        case Intent.hitCompanion:
+        case EnemyIntent.hitCompanion:
           if (atCompanion) {
             _hitCompanion(enemyAttack, events);
           } else {
             _take(enemyAttack, defended, events, CombatEventKind.enemyHit);
           }
-        case Intent.charge:
+        case EnemyIntent.charge:
           charging = true;
           events.add(const CombatEvent(CombatEventKind.enemyCharge));
-        case Intent.big:
+        case EnemyIntent.big:
           _take(_pct(enemyAttack, _big), defended, events,
               CombatEventKind.enemyBig);
           charging = false;
-        case Intent.heavy:
+        case EnemyIntent.heavy:
           _take(_pct(enemyAttack, _heavy), defended, events,
               CombatEventKind.enemyHeavy);
-        case Intent.swarm || Intent.swarmCompanion || Intent.swarmAll:
+        case EnemyIntent.swarm || EnemyIntent.swarmCompanion || EnemyIntent.swarmAll:
           final each =
-              _pct(enemyAttack, it == Intent.swarmAll ? _swarmAll : _swarmHit);
+              _pct(enemyAttack, it == EnemyIntent.swarmAll ? _swarmAll : _swarmHit);
           final up = bodiesUp;
           for (var k = 0; k < up; k++) {
             if (atCompanion && k == 0) {
@@ -716,14 +715,14 @@ class Fight {
               _take(each, defended, events, CombatEventKind.enemySwarm);
             }
           }
-        case Intent.fortify:
+        case EnemyIntent.fortify:
           final healed = bodies[0] + _pct(enemyMax, _fortify);
           final before = bodies[0];
           bodies[0] = healed > enemyMax ? enemyMax : healed;
           events.add(
             CombatEvent(CombatEventKind.enemyFortify, amount: bodies[0] - before),
           );
-        case Intent.hex:
+        case EnemyIntent.hex:
           if (!defended && cls != HeroClass.sage) {
             dimmed = true;
             resource = resource > 0 ? resource - 1 : 0;
@@ -731,12 +730,12 @@ class Fight {
           } else {
             events.add(const CombatEvent(CombatEventKind.enemyHexShrugged));
           }
-        case Intent.ward:
+        case EnemyIntent.ward:
           ward = true;
           events.add(const CombatEvent(CombatEventKind.enemyWard));
       }
     } else {
-      if (it == Intent.big) charging = false;
+      if (it == EnemyIntent.big) charging = false;
       events.add(const CombatEvent(CombatEventKind.enemyStopped));
     }
     if (companionWasUp && companionHp <= 0) {
