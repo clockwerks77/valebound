@@ -86,10 +86,10 @@ List<_Reward> _rewardsFor(
   final a = o.award;
   return <_Reward>[
     if (still != null) _Reward('still', still.wakes, Palette.slateSoft),
-    if (a.heroXp > 0)
+    if (o.heroXpGained > 0)
       _Reward(
         attributeIcon(o.attribute),
-        '+${a.heroXp} XP · ${o.attribute.label}',
+        '+${o.heroXpGained} XP · ${o.attribute.label}',
         Palette.attribute(o.attribute),
       ),
     if (a.companionXp > 0)

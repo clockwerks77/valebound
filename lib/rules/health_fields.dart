@@ -115,3 +115,22 @@ String healthKeyFor(String label, Iterable<String> taken) {
   }
   return key;
 }
+
+/// How a ticked check field is stored: the tick, and the note if one was
+/// typed (e.g. a dose).
+const String checkDone = 'Done';
+
+String encodeCheck(String note) {
+  final text = note.trim();
+  return text.isEmpty ? checkDone : '$checkDone ($text)';
+}
+
+/// The note inside a stored check value; empty when there was none.
+String decodeCheck(String value) {
+  final text = value.trim();
+  if (text == checkDone) return '';
+  if (text.startsWith('$checkDone (') && text.endsWith(')')) {
+    return text.substring(checkDone.length + 2, text.length - 1);
+  }
+  return text;
+}

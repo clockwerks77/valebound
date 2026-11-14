@@ -1,5 +1,6 @@
 import '../data/database.dart';
 import '../data/repository.dart';
+import '../data/seed.dart';
 import '../rules/companion_rules.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
@@ -134,7 +135,8 @@ class ExportService {
           companionName: companion.name,
           quests: <QuestLine>[
             for (final q in quests)
-              if (q.active)
+              // The welcome-back quest is the app's own, not a definition.
+              if (q.active && q.systemKey != systemKeyComeback)
                 QuestLine(
                   name: q.name,
                   attribute: q.attribute,
@@ -249,6 +251,10 @@ class ExportService {
     }
     final pacesTotal = pacesBefore + pacesToday;
     final health = await repo.healthEntriesOn(day);
+    // A field the user named keeps the name they gave it.
+    final labels = <String, String>{
+      for (final f in (await repo.settings()).healthFields) f.key: f.label,
+    };
     int? steps;
     for (final h in health) {
       if (h.fieldKey == 'steps') {
@@ -290,7 +296,7 @@ class ExportService {
       health: <HealthLine>[
         for (final h in health)
           HealthLine(
-            healthLabel(h.fieldKey),
+            labels[h.fieldKey] ?? healthLabel(h.fieldKey),
             h.fieldKey == 'steps' && steps != null ? thousands(steps) : h.value,
             h.unit,
           ),
