@@ -6,6 +6,11 @@ Updated the same night with Adam's run of 0.3.0 on his Galaxy Z Fold 8 and
 the three files the app wrote into his vault. Version 0.3.1 followed
 (commit `008449d`, run 43568359044, 317 tests passing, published as the
 `latest-debug` release); it changes only how calendar suggestions are offered.
+Version 0.4.0 (commit `c0d4e11`, run 43573409549, 361 tests passing) adds
+what Adam asked for after that run and is the build on the release now. It
+has not been run on a phone yet; see [`PHASE-4.md`](PHASE-4.md). The twelve
+items below are still covered by its test suite, and the device results
+recorded here are from 0.3.0.
 
 **How it was run.** Claude's workspace cannot build Flutter, so the build,
 the analyser and all the tests ran on GitHub Actions and the results were

@@ -116,8 +116,8 @@ crease.
 | Check | Result |
 |---|---|
 | `flutter analyze` | No issues |
-| `flutter test` | TESTCOUNT tests, all passing |
-| `flutter build apk --debug` | BUILDLINE |
+| `flutter test` | 361 tests, all passing |
+| `flutter build apk --debug` | Succeeds (commit `c0d4e11`, run 43573409549): 162,921,267 bytes, SHA-256 `c5b986f0…5542c62`, signed with the fixed key, published as the `latest-debug` release |
 | The creature: turns, stirs, waking once, the gift, no XP | `test/rules/daily_still_test.dart`, `test/data/daily_still_test.dart` |
 | Glucose: the average kept and exported, typed readings untouched, nothing for a day never opened | `test/data/glucose_test.dart` |
 | The creature, glucose and the tour on screen | `test/ui/phase4_flows_test.dart`, against a stand-in device |
