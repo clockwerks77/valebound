@@ -160,6 +160,10 @@ jobs:
   # stopped: on the 2-core hosted runner, a build running beside the
   # emulator starves it of memory and the emulator dies.
   device-check:
+    # Run by hand from the Actions tab ("Run workflow"), not on every push:
+    # the hosted emulator has proved unreliable here, and each run spends
+    # about fifteen of the account's included Actions minutes.
+    if: github.event_name == 'workflow_dispatch'
     # Pinned: the emulator needs KVM, which is known to work on this image.
     runs-on: ubuntu-24.04
     timeout-minutes: 40
