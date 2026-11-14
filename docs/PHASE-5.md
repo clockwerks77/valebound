@@ -91,6 +91,9 @@ either way.
 | The Vale awake | `98_vale_awake_cover.png` | |
 | Chronicle | `99_chronicle_cover.png`, `99b_chronicle_story_cover.png` | `99_chronicle_open.png` |
 | Tour: the narrator's line | `90_tour_story_cover.png` | `90_tour_story_open.png` |
+| A place wakes, with its picture and who came home (0.5.1) | `50_restoration_cover.png` | `65_restoration_open.png` |
+| Places on the Map, asleep and awake (0.5.1) | `42_map_cover_places.png` | `60_map_open.png` |
+| Gear in the Inventory (0.5.1) | `44_inventory_cover_companion.png` | `61_inventory_open.png` |
 
 On the opened Fold the story pages put the picture on one pane and the
 words on the other, and the Chronicle puts where things stand beside the
@@ -126,7 +129,8 @@ files, which need a folder on the PC connected to the chat.
 
 ## Tests
 
-418 pass. New in this version: `test/rules/narrator_test.dart` (the words
+423 pass. New in these versions: `test/ui/art_test.dart` (every picture
+exists under the key the rules use), `test/rules/narrator_test.dart` (the words
 and which line is told when), `test/ui/phase5_flows_test.dart` (the read
 while open, the prologue, the narrator's lines, chapters, the Chronicle),
 `test/golden/phase5_golden_test.dart` (the screenshots above, with the
