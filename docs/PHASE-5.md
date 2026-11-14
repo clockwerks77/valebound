@@ -82,7 +82,7 @@ either way.
 
 | What | Cover | Open |
 |---|---|---|
-| Board with the narrator's line | `01_board_cover.png` | `02_board_open.png` |
+| Board with the narrator’s line | `01_board_cover.png` | `20_board_open.png` |
 | Board in the afternoon, evening, night | `100_board_*_cover.png` | |
 | Prologue, first page | `91_prologue_hill_cover.png` | `91_prologue_hill_open.png` |
 | Prologue, the lantern | `93_prologue_lantern_cover.png` | `93_prologue_lantern_open.png` |
