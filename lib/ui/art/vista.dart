@@ -24,7 +24,6 @@ class PaintedVista extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = this.child;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: Stack(
@@ -45,7 +44,7 @@ class PaintedVista extends StatelessWidget {
               ),
             ),
           ),
-          if (child != null) child,
+          ?child,
         ],
       ),
     );

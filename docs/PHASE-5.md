@@ -1,15 +1,15 @@
-# The narrator, and a first polish pass: versions 0.5.0 and 0.5.1
+# The narrator, and a first polish pass: versions 0.5.0 to 0.5.2
 
 Branch `phase-5` (built on `phase-4`). Built and tested on GitHub Actions
-with Flutter 3.47.9 (Dart 3.13.7). App version 0.5.1 (0.5.0 without the
-new art).
+with Flutter 3.47.9 (Dart 3.13.7). App version 0.5.2 (0.5.0 without the
+new art, 0.5.1 with the small pieces, 0.5.2 with the large paintings).
 
 This is what Adam asked for on 14 November 2026 after 0.4.0: Health Connect
 read again while the app is open, something that puts the player into the
 setting, and much more polish. He chose the narrator's voice, the release
 build and the whole art list from options put to him. The narrator changes
 the design, so it has a dated amendment in `docs/DESIGN.md` §7; the
-decisions are D-74 to D-78 in `DECISIONS.md`.
+decisions are D-74 to D-85 in `DECISIONS.md`.
 
 Nothing here has been run on a phone yet.
 
@@ -113,24 +113,58 @@ are shown small are in the app:
 - **Gear:** the Inventory shows each piece you have found.
 
 The 38 that are shown large (Discovery cards, the scenes, the story
-pictures, the map) are generated and waiting: they need the full-size
-files, which need a folder on the PC connected to the chat.
+pictures, the map) needed the full-size files; they came in with 0.5.2.
+
+## Added in 0.5.2: the large paintings
+
+Adam connected a folder on his PC on 14 Nov 2026 and the 38 full-size
+files came across (ASSETS.md section 7; decisions D-80 to D-85). 36 are in
+the app:
+
+- **The story is painted.** Every page of the prologue and every chapter
+  page has its painting: 15 in all. The sleeping pictures are grey, as the
+  narrator says, and the gate lantern is the one warm thing on its page. On
+  the opened Fold the painting has a whole pane. On the cover screen it is
+  a plate above the words, cut to its subject where the screen is too
+  short to show it whole.
+- **Every Discovery has its card.** All 20, where there was one.
+- **The valley behind the Today board is a painting.** The same valley in
+  four lights: morning, afternoon, evening and night, with the village
+  windows lit after dark and stars over it. It fades from one light to the
+  next as the hour moves on.
+- **The Campfire has its camp.** The painted camp beside the road, with
+  hero and companion either side of its fire, and the narrator's line on
+  the card beneath.
+- **Paintings fade in** if they were not ready at once; a story loads all
+  its pages as it opens.
+
+Screenshots: `91`–`98` (story pages, both layouts, every chapter),
+`100_board_*` (the four lights), `45_campfire_cover_scene`,
+`101_discovery_*`.
+
+Two of the 38 are not in the app, on purpose: the map and the "old
+friends" scene (see below).
 
 ## What is not done
 
 - **Not run on a phone.** The release build, the haptics, the launch
   screen and the three-minute read are proven in tests and by reading the
   built file, not by hand.
-- **The story pictures are still drawn in code.** The painted ones are
-  being generated (see ASSETS.md) and need full-size files from the PC.
-- **Large art.** 38 generated pieces are not in the app yet (see above).
+- **The map is still drawn in code.** The painted first look is a picture
+  of the valley at an angle, with a lake where the coded map has the river
+  crossing; the road and markers would not sit on it. A painted map needs a
+  take made to the coded layout. With Adam for a look.
+- **The "old friends" scene is not used.** The take shows a stranger
+  alone; the scene is meant to be the player's own hero and companion.
+- **The welcome screen** (first run only) still has the code-drawn valley.
 - **The clockwork sprite** portrait is still the earlier one; two new
   takes came out glossy and three-dimensional.
 
 ## Tests
 
-423 pass. New in these versions: `test/ui/art_test.dart` (every picture
-exists under the key the rules use), `test/rules/narrator_test.dart` (the words
+429 pass. New in these versions: `test/ui/art_test.dart` (every picture
+exists under the key the rules use, including every Discovery card, story
+page and light of the valley), `test/rules/narrator_test.dart` (the words
 and which line is told when), `test/ui/phase5_flows_test.dart` (the read
 while open, the prologue, the narrator's lines, chapters, the Chronicle),
 `test/golden/phase5_golden_test.dart` (the screenshots above, with the

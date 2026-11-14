@@ -319,14 +319,15 @@ class CampScene extends StatelessWidget {
             // The painted camp, with the two of them either side of its
             // fire.
             AspectRatio(
-              aspectRatio: 1.7,
+              aspectRatio: 1.6,
               child: Stack(
                 fit: StackFit.expand,
                 children: <Widget>[
+                  // Cut evenly top and bottom: the lantern on its post
+                  // hangs clear below the heading, and the whole fire
+                  // shows.
                   const ArtPicture(
                     asset: campfireArt,
-                    // Keep the fire and the ground beside it in the frame.
-                    alignment: Alignment(0, 0.6),
                     fallback: CustomPaint(painter: _CampPainter()),
                   ),
                   // Dark behind the heading, and where the picture meets

@@ -58,13 +58,13 @@ the design asks for. Each has a matching entry in section 3.
 |---|---|---|---|---|
 | Hero crests ×4 (hooded figure medallions) | `lib/ui/art/crests.dart` | Hero portraits | Phase 1 | replaced 14 Nov 2026 by the four illustrated portraits; the crest stays in the code as the fallback if a picture cannot be shown |
 | Companion crests ×6 (Hound, Cat, Fox, Owl, Hare, Clockwork Sprite) | `lib/ui/art/crests.dart` | Companion portraits | Phase 1 | replaced 14 Nov 2026 by the six illustrated portraits; the crest stays in the code as the fallback |
-| Dawn valley vista (sky, sun, ridges, mist, lanterns) | `lib/ui/art/vista.dart` | Dawn header scene, onboarding scene | Phase 1 | placeholder |
+| Dawn valley vista (sky, sun, ridges, mist, lanterns) | `lib/ui/art/vista.dart` | Dawn header scene, onboarding scene | Phase 1 | replaced 14 Nov 2026 behind the Today board by the painted valley (section 7); the coded vista stays for the welcome screen and as the stand-in if a painting cannot be shown |
 | The Vale map: 86 hand-laid shapes on a 400×500 grid (peaks, ruins, river, hills, village, woods), each region draining to grey when asleep | `lib/ui/map/map_art.dart` | Painted map, asleep and awake | Phase 2 | placeholder |
 | Fog banks over sleeping regions | `lib/ui/map/vale_map.dart` | Painted fog | Phase 2 | placeholder (may simply stay coded) |
 | Place medallions ×20 (an icon in a ring, grey when asleep, gold-lit when restored) | `lib/ui/map/vale_map.dart` | Building art, asleep and restored | Phase 2 | replaced 14 Nov 2026 by the 20 place pictures where a place is shown in a list or on a card (section 6); the markers on the map itself stay coded |
 | Villager medallions ×20 (the villager's icon on a green roundel) | `lib/ui/board/board_screen.dart` | Villager portraits | Phase 2 | replaced 14 Nov 2026 by the 20 villager pictures (section 6) |
-| Campfire night scene (stars, ridges, fire glow) with the two portraits | `lib/ui/campfire/campfire_screen.dart` | Campfire scene | Phase 2 | placeholder |
-| Lantern roundel on the Discovery card (the same for the 19 scenes not yet illustrated) | `lib/ui/celebrations.dart` | Discovery scene art | Phase 1 | placeholder; the standing stone shows its illustration |
+| Campfire night scene (stars, ridges, fire glow) with the two portraits | `lib/ui/campfire/campfire_screen.dart` | Campfire scene | Phase 2 | replaced 14 Nov 2026 by the painted camp (section 7); the coded night stays as the stand-in |
+| Lantern roundel on the Discovery card (the same for the 19 scenes not yet illustrated) | `lib/ui/celebrations.dart` | Discovery scene art | Phase 1 | replaced 14 Nov 2026: all 20 Discoveries show a painting (section 7) |
 | Still creatures: a sleepy grey blob on the map, a small icon on the card (same for all 6) | `lib/ui/map/vale_map.dart`, `v_icon.dart` | Still creature art | Phase 2 | the board row shows the six pictures since 14 Nov 2026 (section 6); the blob on the map stays coded |
 | Companion gear: a slot icon (collar, bell, cloak, blanket) as a badge on the portrait | `lib/ui/art/crests.dart` | Gear art per kind | Phase 2 | the Inventory shows the 11 pictures since 14 Nov 2026 (section 6); the badge on the portrait stays a coded icon |
 | Portrait frames: the portrait ring in a different colour | `lib/ui/art/crests.dart` | Frame art | Phase 2 | placeholder (may simply stay coded) |
@@ -113,9 +113,9 @@ the Fold.
 
 | File | Size | Subject | Status |
 |---|---|---|---|
-| `scenes/dawn_header.png` | 1600×1100 | wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, low sun, mist | generated 14 Nov 2026 (section 6); waiting for the full-size file |
-| `scenes/campfire.png` | 1600×1000 | a small camp beside a country road at dusk: a fire, a bedroll, a lantern on a post; space left and right of the fire for two figures | generated 14 Nov 2026 (section 6); waiting for the full-size file |
-| `scenes/old_friends.png` | 1600×1000 | a traveller and their animal companion sitting side by side on a hill at dusk, seen from behind, lanterns of a valley below | generated 14 Nov 2026 (section 6); the take shows one traveller, without a companion, so it is a first look |
+| `scenes/dawn_header.png` | 1600×1100 | wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, low sun, mist | in the app since 0.5.2 as `assets/art/scenes/dawn_<part of day>.jpg`, 1152×896, four lights from the one painting (section 7) |
+| `scenes/campfire.png` | 1600×1000 | a small camp beside a country road at dusk: a fire, a bedroll, a lantern on a post; space left and right of the fire for two figures | in the app since 0.5.2 as `assets/art/scenes/campfire.jpg`, 1152×896 (section 7) |
+| `scenes/old_friends.png` | 1600×1000 | a traveller and their animal companion sitting side by side on a hill at dusk, seen from behind, lanterns of a valley below | generated 14 Nov 2026 (section 6); a first look, not in the app: the take shows one traveller, without a companion |
 
 ### The map (portrait, 4:5, to match the coded layout)
 
@@ -128,7 +128,7 @@ coded map (`docs/screenshots/phase-2/map-cover.png`) is the layout guide.
 | File | Size | Subject | Status |
 |---|---|---|---|
 | `map/vale_asleep.png` | 1600×2000 | hand-drawn-feeling painted map of a valley seen from above: snowy peaks top-left, pale stone ruins top-right, a river crossing the middle, rolling hills centre-right, a village bottom-left; muted, grey, misted, asleep; no road, no labels | not needed: the sleeping state will be the awake painting drained in code (section 6) |
-| `map/vale_awake.png` | 1600×2000 | the same map, same composition exactly, fully coloured and warmly lit | a first look was generated 14 Nov 2026 (section 6) |
+| `map/vale_awake.png` | 1600×2000 | the same map, same composition exactly, fully coloured and warmly lit | a first look was generated 14 Nov 2026 (section 6); not in the app (section 7) |
 
 Regions wake one at a time, so the app will fade from the asleep painting to
 the awake one inside each region's outline (the outlines are already in
@@ -193,24 +193,25 @@ Firefly in Adam's Chrome, with his go-ahead, using Adobe's own Firefly Image
 line per piece. Each piece costs 10 of Adam's Firefly credits. Images are
 bundled at build time; the app stays offline.
 
-**What is in the way of the larger pieces.** A portrait is small enough to
-come across through the Adobe connector's 600-pixel preview. Discovery
-cards, scenes and the map are shown larger than that, so they need the
-full-size file. Either of these unblocks it:
-
-- Adam connects a folder on his PC to the session in the Claude desktop app
-  (his Downloads folder, or a new `Valebound art` folder). Claude then saves
-  each piece from Firefly into it and reads it from there.
-- Adam downloads the pieces from Firefly and attaches them in chat.
+**How the larger pieces come across.** A portrait is small enough to come
+through the Adobe connector's 600-pixel preview. Discovery cards, scenes,
+story pictures and the map are shown larger than that, so they need the
+full-size file. The route that works (used on 14 Nov 2026, section 7): the
+originals are fetched in Adam's Chrome, packed into one zip, and Adam moves
+that zip into a folder on his PC that he has connected to the chat in the
+Claude desktop app (`Downloads\Valebound Downloads`). Attaching the files in
+chat would also do.
 
 **Showing them.** Every portrait is drawn by one widget (`HeroPortrait`,
 `CompanionPortrait`) and every Discovery picture by another
 (`DiscoveryPicture`), all listed in `lib/ui/art/painted.dart`. A piece that
 has no file yet falls back to its code-drawn stand-in, so adding one is a
 file and one line. Places, villagers, the Still and gear are shown through
-`ArtMedallion`, and the story pages through `StoryPicture`. The scenes and
-the map do not have their picture widgets yet; each arrives with its first
-file.
+`ArtMedallion`, and the story pages through `StoryPicture`. The valley
+behind the Today board is `PaintedVista` (`lib/ui/art/vista.dart`) and the
+camp is in `CampScene` (`lib/ui/campfire/campfire_screen.dart`); every large
+painting is drawn by `ArtPicture`, which fades it in. The map has no
+painted version yet.
 
 ## 5. Order
 
@@ -218,9 +219,13 @@ Done: the reference board (3), the remaining portraits (8), and on 14 Nov
 2026 the whole list generated (section 6), with the 57 small pieces in the
 app.
 
-Next, once full-size files can come across: the story pictures (15) →
-Discoveries (19) → the Dawn and Campfire scenes → the map. One to redo: the
-clockwork sprite.
+Done in 0.5.2 (section 7): the story pictures (15), the Discovery cards
+(19), and the Dawn and Campfire scenes.
+
+Still open: the map (the first look does not line up with the coded road
+and markers, section 7), the "old friends" scene (the take has no
+companion in it), and the clockwork sprite portrait, which wants a third
+try.
 
 ## 6. The full run of 14 Nov 2026 (version 0.5.1)
 
@@ -234,8 +239,8 @@ takes). Every generation is still in his Firefly history.
 came in through the Adobe connector's preview, which is capped at 600
 pixels: enough for a medallion, so those are in the app now. Pieces shown
 large (Discovery cards, scenes, story pictures, the map) need the full-size
-file, and that needs a folder on Adam's PC connected to the chat. They are
-generated and waiting.
+file. Those came across later the same day, once Adam had connected a
+folder on his PC, and went into version 0.5.2 (section 7).
 
 Nothing here is drawn "in the style of" anyone, and none of it carries
 names, lettering or symbols from anyone else's work. Two first takes showed
@@ -332,71 +337,122 @@ Shown in the Inventory once a piece has been found.
 | `assets/art/gear/song_bell.jpg` | 256×256 | `Subject: a small bronze bell engraved with a songbird, on a red braided cord, by itself, centred, plain pale cream background.` | In the app. |
 | `assets/art/gear/old_road_cloak.jpg` | 256×256 | `Subject: a small well-worn travelling cloak in weathered brown with neat patches and a brass leaf pin, laid out flat, by itself, centred, plain pale cream background.` | In the app. |
 
-### Discovery cards, 19 (generated, waiting for full-size files)
+### Discovery cards, 19 (in the app since 0.5.2)
 
 | Key | Aspect | Subject | Status |
 |---|---|---|---|
-| `hot_spring` | 4:3 | `Subject: a small hot spring in a ring of mossy rocks beside a country road, soft steam rising in the dawn light.` | Generated; not in the app. |
-| `merchant_cart` | 4:3 | `Subject: an old travelling merchant’s cart resting beside a country road, wheels deep in clover, small brass bells hanging from its canopy.` | Generated; not in the app. |
-| `lantern_tree` | 4:3 | `Subject: a great old oak beside a country road with glass lanterns hung in its branches, one of them glowing warm gold.` | Generated; not in the app. |
-| `beehive_wall` | 4:3 | `Subject: an old dry-stone field wall with bees drifting in and out of a gap between the stones, wildflowers along its foot.` | Generated; not in the app. |
-| `wind_chimes` | 4:3 | `Subject: a grassy hollow in green hills where strings of sea shells hang from a bent hawthorn tree, swaying in the wind.` | Generated; not in the app. |
-| `shepherd_hut` | 4:3 | `Subject: a round stone shepherd’s hut with a turf roof on a green hillside, an iron kettle hook beside its small arched door.` | Generated; not in the app. |
-| `mile_marker` | 4:3 | `Subject: an old stone milestone painted faded blue beside a country road, a small carved arrow on it, tall grass around.` | Generated; not in the app. |
-| `stepping_stones` | 4:3 | `Subject: flat stepping stones across a clear shallow river, each stone carved with a small bird, reeds on the far bank.` | Generated; not in the app. |
-| `reed_flute` | 4:3 | `Subject: a stand of tall river reeds bending in the wind at the edge of a calm river, dragonflies above the water.` | Generated; not in the app. |
-| `star_pool` | 4:3 | `Subject: a small still pool among river stones in daylight, its surface showing a deep blue night sky full of stars.` | Generated; not in the app. |
-| `otter_slide` | 4:3 | `Subject: a smooth muddy slide worn into a grassy river bank, two otters playing at the water’s edge.` | Generated; not in the app. |
-| `cloud_bench` | 4:3 | `Subject: a simple stone bench on a high mountain pass, facing out over a wide valley filled with low cloud.` | Generated; not in the app. |
-| `watchtower` | 4:3 | `Subject: a broken old stone watchtower on a mountainside with swallows wheeling around it and nesting in its windows.` | Generated; not in the app. |
-| `echo_stone` | 4:3 | `Subject: a great rounded boulder on a mountain path, facing a far cliff across a deep valley, a small cairn beside it.` | Generated; not in the app. |
-| `snowbell` | 4:3 | `Subject: a ring of small white bell-shaped flowers around a patch of old snow in a high mountain meadow.` | Generated; not in the app. |
-| `garden_gate` | 4:3 | `Subject: a wooden garden gate standing ajar by itself in a meadow, no fence either side, among pale ruins and wildflowers.` | Generated; not in the app. |
-| `sundial` | 4:3 | `Subject: an old stone sundial in a small paved courtyard among pale ruins, its shadow lying across the dial, ivy on the walls.` | Generated; not in the app. |
-| `glass_stair` | 4:3 | `Subject: seven broad steps made of thick old glass, each a different soft colour, climbing between pale ruined walls.` | Generated; not in the app. |
-| `first_lantern` | 4:3 | `Subject: a small plain glass lantern on a low stone plinth in a ruined hall, just kindling with a first warm glow.` | Generated; not in the app. |
+| `hot_spring` | 4:3 | `Subject: a small hot spring in a ring of mossy rocks beside a country road, soft steam rising in the dawn light.` | In the app since 0.5.2 (section 7). |
+| `merchant_cart` | 4:3 | `Subject: an old travelling merchant’s cart resting beside a country road, wheels deep in clover, small brass bells hanging from its canopy.` | In the app since 0.5.2 (section 7). |
+| `lantern_tree` | 4:3 | `Subject: a great old oak beside a country road with glass lanterns hung in its branches, one of them glowing warm gold.` | In the app since 0.5.2 (section 7). |
+| `beehive_wall` | 4:3 | `Subject: an old dry-stone field wall with bees drifting in and out of a gap between the stones, wildflowers along its foot.` | In the app since 0.5.2 (section 7). |
+| `wind_chimes` | 4:3 | `Subject: a grassy hollow in green hills where strings of sea shells hang from a bent hawthorn tree, swaying in the wind.` | In the app since 0.5.2 (section 7). |
+| `shepherd_hut` | 4:3 | `Subject: a round stone shepherd’s hut with a turf roof on a green hillside, an iron kettle hook beside its small arched door.` | In the app since 0.5.2 (section 7). |
+| `mile_marker` | 4:3 | `Subject: an old stone milestone painted faded blue beside a country road, a small carved arrow on it, tall grass around.` | In the app since 0.5.2 (section 7). |
+| `stepping_stones` | 4:3 | `Subject: flat stepping stones across a clear shallow river, each stone carved with a small bird, reeds on the far bank.` | In the app since 0.5.2 (section 7). |
+| `reed_flute` | 4:3 | `Subject: a stand of tall river reeds bending in the wind at the edge of a calm river, dragonflies above the water.` | In the app since 0.5.2 (section 7). |
+| `star_pool` | 4:3 | `Subject: a small still pool among river stones in daylight, its surface showing a deep blue night sky full of stars.` | In the app since 0.5.2 (section 7). |
+| `otter_slide` | 4:3 | `Subject: a smooth muddy slide worn into a grassy river bank, two otters playing at the water’s edge.` | In the app since 0.5.2 (section 7). |
+| `cloud_bench` | 4:3 | `Subject: a simple stone bench on a high mountain pass, facing out over a wide valley filled with low cloud.` | In the app since 0.5.2 (section 7). |
+| `watchtower` | 4:3 | `Subject: a broken old stone watchtower on a mountainside with swallows wheeling around it and nesting in its windows.` | In the app since 0.5.2 (section 7). |
+| `echo_stone` | 4:3 | `Subject: a great rounded boulder on a mountain path, facing a far cliff across a deep valley, a small cairn beside it.` | In the app since 0.5.2 (section 7). |
+| `snowbell` | 4:3 | `Subject: a ring of small white bell-shaped flowers around a patch of old snow in a high mountain meadow.` | In the app since 0.5.2 (section 7). |
+| `garden_gate` | 4:3 | `Subject: a wooden garden gate standing ajar by itself in a meadow, no fence either side, among pale ruins and wildflowers.` | In the app since 0.5.2 (section 7). |
+| `sundial` | 4:3 | `Subject: an old stone sundial in a small paved courtyard among pale ruins, its shadow lying across the dial, ivy on the walls.` | In the app since 0.5.2 (section 7). |
+| `glass_stair` | 4:3 | `Subject: seven broad steps made of thick old glass, each a different soft colour, climbing between pale ruined walls.` | In the app since 0.5.2 (section 7). |
+| `first_lantern` | 4:3 | `Subject: a small plain glass lantern on a low stone plinth in a ruined hall, just kindling with a first warm glow.` | In the app since 0.5.2 (section 7). |
 
-### Scenes, 3 (generated, waiting for full-size files)
+### Scenes, 3 (two in the app since 0.5.2, one a first look)
 
 | Key | Aspect | Subject | Status |
 |---|---|---|---|
-| `dawn_header` | 4:3 | `Subject: a wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, a low sun and mist between the ridges, no people.` | Generated; not in the app. |
-| `campfire` | 4:3 | `Subject: a small camp beside a country road at dusk: a campfire, a bedroll and a lantern on a post, open ground to the left and right of the fire, no people.` | Generated; not in the app. |
-| `old_friends` | 4:3 | `Subject: a traveller in a green hooded cloak sitting on a hilltop at dusk, seen from behind, the lanterns of a valley glowing far below.` | Generated; not in the app. |
+| `dawn_header` | 4:3 | `Subject: a wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, a low sun and mist between the ridges, no people.` | In the app since 0.5.2, behind the Today board, in four lights (section 7). |
+| `campfire` | 4:3 | `Subject: a small camp beside a country road at dusk: a campfire, a bedroll and a lantern on a post, open ground to the left and right of the fire, no people.` | In the app since 0.5.2, behind the Campfire (section 7). |
+| `old_friends` | 4:3 | `Subject: a traveller in a green hooded cloak sitting on a hilltop at dusk, seen from behind, the lanterns of a valley glowing far below.` | Not in the app. The take shows a traveller alone, with no companion, and a face and hair that are not the player's chosen hero. A first look for Adam; the full-size file is kept with the others. |
 
-### Story pictures, 15 (generated, waiting for full-size files)
+### Story pictures, 15 (in the app since 0.5.2)
 
 New with the narrator (DECISIONS D-76): one for each page of the prologue,
 and each region asleep and awake for the chapter pages. Portrait, because
-the story pages are. Until they are in, the pages show a valley painted in
-code (`StoryPicture` in `lib/ui/story/story.dart`; keys go in `storyArt`).
+the story pages are. They are shown by `StoryPicture` in
+`lib/ui/story/story.dart`, listed in `storyArt`; a key with no painting
+shows a valley painted in code.
 
 | Key | Aspect | Subject | Status |
 |---|---|---|---|
-| `lastHill` | 3:4 | `Subject: a narrow footpath running over the crest of a grassy hill at first light, a wide valley opening beyond and below, seen from the path, no people.` | Generated; not in the app. |
-| `sleepingVale` | 3:4 | `Subject: a wide valley seen from a hilltop at dawn: a small village, a winding river and far peaks, everything muted grey under mist and very still, no lights anywhere, no people.` | Generated; not in the app. |
-| `gateLantern` | 3:4 | `Subject: a single glass lantern burning low and gold on a timber post beside a closed village gate of weathered stone, everything around it grey, misted and asleep, no people.` | Generated; not in the app. |
-| `stillness` | 3:4 | `Subject: a quiet village lane with shuttered windows and closed arched doors, soft grey mist lying over everything, a small round grey sleepy creature dozing on a doorstep, no people.` | Generated; not in the app. |
-| `road` | 3:4 | `Subject: a country road winding away from a village gate through green hills toward far peaks at sunrise, a row of lanterns on posts along it, the nearest one glowing gold, no people.` | Generated; not in the app. |
-| `hearthmere_asleep` | 3:4 | `Subject: a small village of stone and timber houses at the mouth of a valley, shutters closed and chimneys cold, muted grey under mist, no lights, no people.` | Generated; not in the app. |
-| `hearthmere_awake` | 3:4 | `Subject: a small village of stone and timber houses at the mouth of a valley in morning sun, windows lit, lanterns glowing, banners out and smoke rising from one chimney, no people.` | Generated; not in the app. |
-| `larkdown_asleep` | 3:4 | `Subject: rolling hills with a windmill whose sails hang still and a dry-stone sheepfold, muted grey under mist, very still, no people.` | Generated; not in the app. |
-| `larkdown_awake` | 3:4 | `Subject: rolling green hills in morning sun with a windmill turning, a golden beacon fire on a far hilltop, sheep on the slopes and an orchard in blossom, no people.` | Generated; not in the app. |
-| `silverrun_asleep` | 3:4 | `Subject: a slow glassy river through a valley with a water wheel standing still and a footbridge down to its posts, a heron asleep on one leg, muted grey under mist, no people.` | Generated; not in the app. |
-| `silverrun_awake` | 3:4 | `Subject: a bright river through a valley in morning sun with a water wheel turning, painted rowing boats on the water and a new wooden footbridge, no people.` | Generated; not in the app. |
-| `highcairn_asleep` | 3:4 | `Subject: a stone road climbing between grey mountain peaks with a small stone hut whose door stands open on a dark room, muted grey and very still, no people.` | Generated; not in the app. |
-| `highcairn_awake` | 3:4 | `Subject: a stone road climbing between sunlit mountain peaks with a small stone hut with a lit window, a ropeway basket crossing between crags and a tall cairn on the summit, no people.` | Generated; not in the app. |
-| `lanternhall_asleep` | 3:4 | `Subject: pale stone ruins in a high valley with a fallen archway and a great hall with dark empty windows, muted grey under mist, very still, no people.` | Generated; not in the app. |
-| `lanternhall_awake` | 3:4 | `Subject: pale stone ruins in a high valley in morning sun with a great archway standing whole and a great hall with every window glowing gold with lantern light, no people.` | Generated; not in the app. |
+| `lastHill` | 3:4 | `Subject: a narrow footpath running over the crest of a grassy hill at first light, a wide valley opening beyond and below, seen from the path, no people.` | In the app since 0.5.2 (section 7). |
+| `sleepingVale` | 3:4 | `Subject: a wide valley seen from a hilltop at dawn: a small village, a winding river and far peaks, everything muted grey under mist and very still, no lights anywhere, no people.` | In the app since 0.5.2 (section 7). |
+| `gateLantern` | 3:4 | `Subject: a single glass lantern burning low and gold on a timber post beside a closed village gate of weathered stone, everything around it grey, misted and asleep, no people.` | In the app since 0.5.2 (section 7). |
+| `stillness` | 3:4 | `Subject: a quiet village lane with shuttered windows and closed arched doors, soft grey mist lying over everything, a small round grey sleepy creature dozing on a doorstep, no people.` | In the app since 0.5.2 (section 7). |
+| `road` | 3:4 | `Subject: a country road winding away from a village gate through green hills toward far peaks at sunrise, a row of lanterns on posts along it, the nearest one glowing gold, no people.` | In the app since 0.5.2 (section 7). |
+| `hearthmere_asleep` | 3:4 | `Subject: a small village of stone and timber houses at the mouth of a valley, shutters closed and chimneys cold, muted grey under mist, no lights, no people.` | In the app since 0.5.2 (section 7). |
+| `hearthmere_awake` | 3:4 | `Subject: a small village of stone and timber houses at the mouth of a valley in morning sun, windows lit, lanterns glowing, banners out and smoke rising from one chimney, no people.` | In the app since 0.5.2 (section 7). |
+| `larkdown_asleep` | 3:4 | `Subject: rolling hills with a windmill whose sails hang still and a dry-stone sheepfold, muted grey under mist, very still, no people.` | In the app since 0.5.2 (section 7). |
+| `larkdown_awake` | 3:4 | `Subject: rolling green hills in morning sun with a windmill turning, a golden beacon fire on a far hilltop, sheep on the slopes and an orchard in blossom, no people.` | In the app since 0.5.2 (section 7). |
+| `silverrun_asleep` | 3:4 | `Subject: a slow glassy river through a valley with a water wheel standing still and a footbridge down to its posts, a heron asleep on one leg, muted grey under mist, no people.` | In the app since 0.5.2 (section 7). |
+| `silverrun_awake` | 3:4 | `Subject: a bright river through a valley in morning sun with a water wheel turning, painted rowing boats on the water and a new wooden footbridge, no people.` | In the app since 0.5.2 (section 7). |
+| `highcairn_asleep` | 3:4 | `Subject: a stone road climbing between grey mountain peaks with a small stone hut whose door stands open on a dark room, muted grey and very still, no people.` | In the app since 0.5.2 (section 7). |
+| `highcairn_awake` | 3:4 | `Subject: a stone road climbing between sunlit mountain peaks with a small stone hut with a lit window, a ropeway basket crossing between crags and a tall cairn on the summit, no people.` | In the app since 0.5.2 (section 7). |
+| `lanternhall_asleep` | 3:4 | `Subject: pale stone ruins in a high valley with a fallen archway and a great hall with dark empty windows, muted grey under mist, very still, no people.` | In the app since 0.5.2 (section 7). |
+| `lanternhall_awake` | 3:4 | `Subject: pale stone ruins in a high valley in morning sun with a great archway standing whole and a great hall with every window glowing gold with lantern light, no people.` | In the app since 0.5.2 (section 7). |
 
 ### The map, 1 (generated, for review)
 
 | Key | Aspect | Subject | Status |
 |---|---|---|---|
-| `vale_awake` | 3:4 | `Subject: a hand-drawn map of a valley seen from directly above: snowy peaks in the top left, pale stone ruins in the top right, a river crossing the middle from left to right, rolling green hills centre right, a small village bottom left; fully coloured and warmly lit, no road, no labels.` | Generated; not in the app. A painted map has to line up with the coded road and markers, so this one is a first look to choose a direction from, not a finished piece. One painting (awake) is planned, with the sleeping state drained in code as for the places; that replaces the two paintings listed above. |
+| `vale_awake` | 3:4 | `Subject: a hand-drawn map of a valley seen from directly above: snowy peaks in the top left, pale stone ruins in the top right, a river crossing the middle from left to right, rolling green hills centre right, a small village bottom left; fully coloured and warmly lit, no road, no labels.` | Not in the app; the full-size file is with Adam for a look. A painted map has to line up with the coded road and markers, so this one is a first look to choose a direction from, not a finished piece. One painting (awake) is planned, with the sleeping state drained in code as for the places; that replaces the two paintings listed above. |
 
 ### One that is still not right
 
 | Key | Subject | Status |
 |---|---|---|
 | `companion_clockwork_sprite` | `Subject: a small friendly clockwork sprite made of flat brass plates with a round head, a wind-up key on its back, two simple glass wings and gentle teal-lit eyes, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | Came out glossy and three-dimensional again, as it did on 13 Nov. The earlier portrait stays in the app. |
+
+## 7. The large pieces come in (version 0.5.2, 14 Nov 2026)
+
+The 38 pieces that are shown large were generated in section 6. This is how
+they reached the app.
+
+**The route.** Adam connected `Downloads\Valebound Downloads` on his PC to
+the chat. The 38 originals were fetched in his Chrome from his own Firefly
+history (PNG, 1152×896 for the 4:3 pieces and 896×1152 for the 3:4 ones)
+and packed into one file, `valebound-art-large.zip` (48 MB), which he moved
+into that folder. The zip stays there as the full-size masters, named by
+piece. Nothing was regenerated and no credits were used.
+
+**In the app (36 pieces, 41 files, 5.4 MB).**
+
+| Set | Files | Size | What was done |
+|---|---|---|---|
+| Story pictures, 15 | `assets/art/story/<key>.jpg` | 896×1152 | As painted, except the sleeping ones (below). |
+| Discovery cards, 19 | `assets/art/discoveries/<key>.jpg` | 960×747 | Scaled down from 1152×896. With the standing stone that makes all 20. |
+| The valley behind the Today board | `assets/art/scenes/dawn_morning.jpg`, `dawn_afternoon.jpg`, `dawn_evening.jpg`, `dawn_night.jpg` | 1152×896 | One painting (`dawn_header`) in four lights (below). |
+| The camp behind the Campfire | `assets/art/scenes/campfire.jpg` | 1152×896 | As painted. |
+
+**Two kinds of grading, both done once, offline, on the files.** No art is
+changed while the app runs, and nothing was repainted or added by another
+generator.
+
+- *The sleeping pictures.* The narrator calls the sleeping Vale grey, and
+  several takes came out greener or warmer than that. `sleepingVale`,
+  `gateLantern`, `stillness` and the five `<region>_asleep` pictures were
+  drawn part of the way toward the same grey the app uses for a sleeping
+  place (`asleepFilter`), by between 30% and 70% depending on the take. In
+  `gateLantern` the flame and its glow were left as painted, so it is the
+  one warm thing on the page.
+- *The valley in four lights.* The Today board's header follows the hour
+  (DECISIONS D-77). The morning file is the painting as it came. For the
+  other three the sky (a flat cream field, so it separates cleanly) was
+  replaced with a plain graded sky for that hour, the land was cooled or
+  darkened to match, and the lit windows and lanterns were kept warm, with
+  a soft glow at evening and night. The night sky has small stars.
+
+**Not in the app.**
+
+- `old_friends`: the take shows a traveller alone. The scene is meant to be
+  the hero and their companion together, and the hero is whichever of the
+  four portraits the player chose, so a painted figure with its own face
+  does not fit. A first look for Adam.
+- `vale_awake` (the map): painted as a picture of the valley, seen at an
+  angle, with a lake where the coded map has the river crossing. The coded
+  map's road, markers and regions would not sit on it. A first look for
+  Adam; a painted map would need a take made to the coded map's layout.

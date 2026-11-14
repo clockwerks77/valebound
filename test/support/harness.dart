@@ -351,6 +351,15 @@ class TestApp {
     // Decode the illustrated art before the first frame is judged, so
     // screenshots show the portraits and not an empty ring.
     final context = tester.element(find.byType(HabitAdventureApp));
+    if (largeArt) {
+      // Decoded, the whole set is larger than the image cache's usual
+      // 100 MB, and a painting that has been dropped cannot be read again
+      // inside a test. Give the cache room for all of it.
+      final cache = PaintingBinding.instance.imageCache;
+      final usual = cache.maximumSizeBytes;
+      cache.maximumSizeBytes = 512 << 20;
+      addTearDown(() => cache.maximumSizeBytes = usual);
+    }
     await tester.runAsync(() async {
       for (final asset in <String>[
         ...smallPaintedAssets,
