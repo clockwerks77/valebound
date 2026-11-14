@@ -59,6 +59,8 @@ Future<void> tour(WidgetTester tester, TestDevice device, String suffix) async {
 
 void main() {
   setUpAll(loadAppFonts);
+  // Screenshots show the paintings.
+  setUpAll(() => TestApp.largeArt = true);
 
   screenTest('The tour on the cover screen', (tester) async {
     await tour(tester, TestDevice.foldCover, 'cover');

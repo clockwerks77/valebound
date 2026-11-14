@@ -14,6 +14,7 @@ import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../motion.dart';
 import '../art/crests.dart';
+import '../art/painted.dart';
 import '../board/board_screen.dart' show VillagerCard;
 import '../celebrations.dart';
 import '../tour/tours.dart';
@@ -310,83 +311,135 @@ class CampScene extends StatelessWidget {
     }
     return ClipRRect(
       borderRadius: BorderRadius.circular(26),
-      child: CustomPaint(
-        painter: const _CampPainter(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'CAMPFIRE',
-                style: AppText.label.copyWith(color: Palette.goldBright),
-              ),
-              const SizedBox(height: 3),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  DayKey.friendly(game.day),
-                  maxLines: 1,
-                  style: AppText.display.copyWith(
-                    color: Palette.onDark,
-                    fontSize: 26,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
+      child: ColoredBox(
+        color: Palette.forestNight,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            // The painted camp, with the two of them either side of its
+            // fire.
+            AspectRatio(
+              aspectRatio: 1.7,
+              child: Stack(
+                fit: StackFit.expand,
                 children: <Widget>[
-                  _Camper(
-                    portrait: HeroPortrait(
-                      portraitId: hero.portraitId,
-                      size: 76,
-                      frame: game.frame,
-                    ),
-                    name: hero.name,
+                  const ArtPicture(
+                    asset: campfireArt,
+                    // Keep the fire and the ground beside it in the frame.
+                    alignment: Alignment(0, 0.6),
+                    fallback: CustomPaint(painter: _CampPainter()),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(14, 0, 14, 22),
-                    child: Roundel(icon: 'campfire', color: Palette.ember, size: 48),
-                  ),
-                  _Camper(
-                    portrait: CompanionPortrait(
-                      kind: companion.kind,
-                      size: 76,
-                      gearIcon: game.gearWorn?.icon,
+                  // Dark behind the heading, and where the picture meets
+                  // the card beneath it.
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: <Color>[
+                          Palette.forestNight.withValues(alpha: 0.72),
+                          Palette.forestNight.withValues(alpha: 0.0),
+                          Palette.forestNight.withValues(alpha: 0.0),
+                          Palette.forestNight.withValues(alpha: 0.88),
+                        ],
+                        stops: const <double>[0.0, 0.42, 0.7, 1.0],
+                      ),
                     ),
-                    name: companion.name,
+                  ),
+                  Positioned(
+                    left: 18,
+                    top: 16,
+                    right: 18,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'CAMPFIRE',
+                          style:
+                              AppText.label.copyWith(color: Palette.goldBright),
+                        ),
+                        const SizedBox(height: 3),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            DayKey.friendly(game.day),
+                            maxLines: 1,
+                            style: AppText.display.copyWith(
+                              color: Palette.onDark,
+                              fontSize: 26,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 4,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          _Camper(
+                            portrait: HeroPortrait(
+                              portraitId: hero.portraitId,
+                              size: 72,
+                              frame: game.frame,
+                            ),
+                            name: hero.name,
+                          ),
+                          // The fire burns here, in the picture.
+                          const SizedBox(width: 104),
+                          _Camper(
+                            portrait: CompanionPortrait(
+                              kind: companion.kind,
+                              size: 72,
+                              gearIcon: game.gearWorn?.icon,
+                            ),
+                            name: companion.name,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                where,
-                textAlign: TextAlign.center,
-                style: AppText.body.copyWith(color: Palette.onDark),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    where,
+                    textAlign: TextAlign.center,
+                    style: AppText.body.copyWith(color: Palette.onDark),
+                  ),
+                  const SizedBox(height: 8),
+                  // The narrator closes the day (DECISIONS D-76).
+                  Text(
+                    game.campfireStory,
+                    textAlign: TextAlign.center,
+                    style: AppText.narrator.copyWith(
+                      color: Palette.onDark,
+                      fontSize: 15.5,
+                    ),
+                  ),
+                  if (oldFriends) ...<Widget>[
+                    const SizedBox(height: 6),
+                    Text(
+                      'Old friends by now.',
+                      textAlign: TextAlign.center,
+                      style: AppText.small.copyWith(color: Palette.onDarkSoft),
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: 8),
-              // The narrator closes the day (DECISIONS D-76).
-              Text(
-                game.campfireStory,
-                textAlign: TextAlign.center,
-                style: AppText.narrator.copyWith(
-                  color: Palette.onDark,
-                  fontSize: 15.5,
-                ),
-              ),
-              if (oldFriends) ...<Widget>[
-                const SizedBox(height: 6),
-                Text(
-                  'Old friends by now.',
-                  textAlign: TextAlign.center,
-                  style: AppText.small.copyWith(color: Palette.onDarkSoft),
-                ),
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -421,7 +474,7 @@ class _Camper extends StatelessWidget {
 }
 
 /// Night over the camp: stars, two dark ridges and the fire's glow. Painted
-/// in code; a stand-in for the illustrated Campfire scene (ASSETS.md).
+/// in code; it stands in if the painted camp cannot be shown.
 class _CampPainter extends CustomPainter {
   const _CampPainter();
 

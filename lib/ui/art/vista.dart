@@ -4,10 +4,57 @@ import 'package:flutter/widgets.dart';
 
 import '../../rules/narrator.dart' show PartOfDay;
 import '../../theme/palette.dart';
+import '../motion.dart';
+import 'painted.dart';
+
+/// The painted valley behind [child], in the light of [part]: the picture at
+/// the top of the Today board. When the hour moves on, one light fades into
+/// the next. If the picture cannot be shown, the valley is drawn in code.
+class PaintedVista extends StatelessWidget {
+  const PaintedVista({
+    super.key,
+    required this.part,
+    this.child,
+    this.radius = 0,
+  });
+
+  final PartOfDay part;
+  final Widget? child;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = this.child;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: motion(context, const Duration(milliseconds: 900)),
+              child: SizedBox.expand(
+                key: ValueKey<PartOfDay>(part),
+                child: ArtPicture(
+                  asset: dawnArt(part),
+                  // The frame is wider than the painting: keep the sky and
+                  // the village, let the foreground path go.
+                  alignment: const Alignment(0, -0.3),
+                  fallback: Vista(part: part),
+                ),
+              ),
+            ),
+          ),
+          if (child != null) child,
+        ],
+      ),
+    );
+  }
+}
 
 /// A layered valley, painted in code: sky, sun or moon, four ridges with
-/// mist between them and a few lanterns. Used behind the Dawn header and the
-/// story pages until the illustrated scenes exist (see ASSETS.md).
+/// mist between them and a few lanterns. Stands in wherever a painted scene
+/// is missing or cannot be shown (see ASSETS.md).
 ///
 /// [wake] runs from 0 (asleep under the grey Still) to 1 (fully awake).
 /// [part] is the time of day: the sky, the light and the sun follow it, so

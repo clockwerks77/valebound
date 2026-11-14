@@ -289,6 +289,12 @@ class TestApp {
   late final GameRepository repo;
   late final GameController game;
 
+  /// Whether [start] also decodes the large paintings (story pages,
+  /// Discovery cards, the two scenes). The screenshot tests turn this on;
+  /// the rest leave it off, since nothing they check depends on a picture
+  /// having arrived.
+  static bool largeArt = false;
+
   static Future<TestApp> start(
     WidgetTester tester, {
     required DateTime now,
@@ -346,7 +352,10 @@ class TestApp {
     // screenshots show the portraits and not an empty ring.
     final context = tester.element(find.byType(HabitAdventureApp));
     await tester.runAsync(() async {
-      for (final asset in allPaintedAssets) {
+      for (final asset in <String>[
+        ...smallPaintedAssets,
+        if (largeArt) ...largePaintedAssets,
+      ]) {
         await precacheImage(AssetImage(asset), context);
       }
     });

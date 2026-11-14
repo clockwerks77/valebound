@@ -157,9 +157,9 @@ class DawnHeader extends StatelessWidget {
     final companionProgress = XpCurve.progress(companion.totalXp);
     final narration = game.narration;
 
-    return Vista(
+    return PaintedVista(
       radius: 26,
-      // The sky over the board keeps the same hours as the narrator.
+      // The light over the valley keeps the same hours as the narrator.
       part: partOfDay(game.now),
       child: DecoratedBox(
         decoration: BoxDecoration(

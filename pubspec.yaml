@@ -1,7 +1,7 @@
 name: habit_adventure
 description: "Valebound (working title): a habit adventure. Personal build, fully offline."
 publish_to: 'none'
-version: 0.5.1+7
+version: 0.5.2+8
 
 environment:
   sdk: ^3.8.0
@@ -37,6 +37,8 @@ flutter:
     - assets/art/villagers/
     - assets/art/still/
     - assets/art/gear/
+    - assets/art/story/
+    - assets/art/scenes/
 
   # Fonts are bundled so nothing is fetched at runtime. Both are SIL Open
   # Font License 1.1; licence texts sit beside the files.

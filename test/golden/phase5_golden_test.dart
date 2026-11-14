@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:habit_adventure/rules/journey.dart';
 import 'package:habit_adventure/rules/narrator.dart';
 import 'package:habit_adventure/ui/adaptive.dart';
+import 'package:habit_adventure/ui/art/painted.dart';
+import 'package:habit_adventure/ui/celebrations.dart';
 import 'package:habit_adventure/ui/shell/app_shell.dart';
 import 'package:habit_adventure/ui/story/story.dart';
 import 'package:habit_adventure/ui/widgets/common.dart';
@@ -82,11 +85,14 @@ Future<void> prologue(
   await tester.pumpAndSettle();
   await shot(tester, '93_prologue_lantern_$suffix');
 
-  for (var i = 0; i < 2; i++) {
-    await tester.tap(primary('Continue'));
-    await tester.pumpAndSettle();
-    if (open) expectStoryClearOfCrease(tester, device);
-  }
+  await tester.tap(primary('Continue'));
+  await tester.pumpAndSettle();
+  if (open) expectStoryClearOfCrease(tester, device);
+  await shot(tester, '93b_prologue_stillness_$suffix');
+
+  await tester.tap(primary('Continue'));
+  await tester.pumpAndSettle();
+  if (open) expectStoryClearOfCrease(tester, device);
   await shot(tester, '94_prologue_road_$suffix');
 
   await tester.tap(primary('Continue'));
@@ -126,6 +132,8 @@ Future<void> chapterTurn(
 
 void main() {
   setUpAll(loadAppFonts);
+  // Screenshots show the paintings.
+  setUpAll(() => TestApp.largeArt = true);
 
   screenTest('The prologue on the cover screen', (tester) async {
     await prologue(tester, TestDevice.foldCover, 'cover');
@@ -154,6 +162,56 @@ void main() {
     await shot(tester, '98_vale_awake_cover');
     await tester.tap(primary('The Vale is awake'));
     await app.settle(tester);
+  });
+
+  screenTest('Every chapter has its two paintings', (tester) async {
+    // Larkdown, the Silverrun and Highcairn; Hearthmere and Old Lanternhall
+    // are in the runs above.
+    for (final device in <TestDevice>[
+      TestDevice.foldCover,
+      TestDevice.foldOpen,
+    ]) {
+      useDevice(tester, device);
+      final suffix = device.crease ? 'open' : 'cover';
+      final app = await TestApp.start(tester, now: saturday, withHistory: true);
+      final context = tester.element(find.byType(AppShell));
+      for (final closed in chapters.sublist(1, 4)) {
+        final next = chapterAfter(closed)!;
+        showChapterTurn(context, closed);
+        await tester.pumpAndSettle();
+        expect(find.text(closed.label.toUpperCase()), findsOneWidget);
+        await shot(tester, '97b_${closed.region}_wakes_$suffix');
+        await tester.tap(primary('Continue'));
+        await tester.pumpAndSettle();
+        expect(find.text(next.regionName), findsOneWidget);
+        if (device.crease) expectStoryClearOfCrease(tester, device);
+        await shot(tester, '97c_${next.region}_opens_$suffix');
+        await tester.tap(primary('Onward'));
+        await app.settle(tester);
+      }
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.runAsync(() => app.db.close());
+    }
+  });
+
+  screenTest('Discovery cards carry their paintings', (tester) async {
+    useDevice(tester, TestDevice.foldCover);
+    final app = await TestApp.start(tester, now: saturday, withHistory: true);
+    final context = tester.element(find.byType(AppShell));
+    for (final key in <String>['hot_spring', 'star_pool', 'glass_stair']) {
+      final index = discoveryScenes.indexWhere((s) => s.key == key);
+      showDiscovery(
+        context,
+        scene: discoveryScenes[index],
+        number: index + 1,
+        companion: app.game.companion,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(DiscoveryPicture), findsOneWidget);
+      await shot(tester, '101_discovery_${key}_cover');
+      await tester.tap(find.text('Mark it with a lantern'));
+      await tester.pumpAndSettle();
+    }
   });
 
   screenTest('The sky over the board keeps the hours', (tester) async {

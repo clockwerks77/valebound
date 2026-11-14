@@ -86,6 +86,8 @@ void screenTest(String name, Future<void> Function(WidgetTester) body) {
 
 void main() {
   setUpAll(loadAppFonts);
+  // Screenshots show the paintings.
+  setUpAll(() => TestApp.largeArt = true);
 
   group('Cover screen (compact)', () {
     screenTest('Board', (tester) async {

@@ -173,6 +173,8 @@ Future<void> comebackAndReminder(
 
 void main() {
   setUpAll(loadAppFonts);
+  // Screenshots show the paintings.
+  setUpAll(() => TestApp.largeArt = true);
 
   screenTest('Phase 3 on the cover screen', (tester) async {
     await phase3Screens(tester, TestDevice.foldCover, 'cover');

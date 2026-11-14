@@ -40,8 +40,12 @@ class StoryPicture extends StatelessWidget {
   /// Key into [storyArt].
   final String artKey;
 
-  /// How awake the code-drawn valley is, 0 (grey and asleep) to 1.
+  /// How awake the code-drawn valley is, 0 (grey and asleep) to 1. Only
+  /// used when the page has no painting.
   final double wake;
+
+  /// The painting for this page, if it has one.
+  String? get asset => storyArt[artKey];
 
   @override
   Widget build(BuildContext context) {
@@ -66,15 +70,12 @@ class StoryPicture extends StatelessWidget {
           ),
       ],
     );
-    final asset = storyArt[artKey];
+    final asset = this.asset;
     if (asset == null) return fallback;
-    return Image.asset(
-      asset,
-      fit: BoxFit.cover,
-      filterQuality: FilterQuality.medium,
-      gaplessPlayback: true,
-      excludeFromSemantics: true,
-      errorBuilder: (context, error, stack) => fallback,
+    return ArtPicture(
+      asset: asset,
+      alignment: storyFocus(artKey),
+      fallback: fallback,
     );
   }
 }
@@ -209,6 +210,13 @@ Future<void> showStory(
   );
 }
 
+/// Between the picture and the words on the cover screen.
+const double _plateGap = 18;
+
+/// Room kept under the picture on the cover screen: a title and the five
+/// lines of the longest page.
+const double _wordsRoom = 204;
+
 class _StoryView extends StatefulWidget {
   const _StoryView({
     required this.leaves,
@@ -226,8 +234,22 @@ class _StoryView extends StatefulWidget {
 
 class _StoryViewState extends State<_StoryView> {
   int _index = 0;
+  bool _fetched = false;
 
   bool get _last => _index >= widget.leaves.length - 1;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_fetched) return;
+    _fetched = true;
+    // Have every page's painting ready before it is turned to.
+    for (final leaf in widget.leaves) {
+      final picture = leaf.picture;
+      final asset = picture is StoryPicture ? picture.asset : null;
+      if (asset != null) precacheImage(AssetImage(asset), context);
+    }
+  }
 
   void _next() {
     if (_last) {
@@ -359,7 +381,10 @@ class _StoryViewState extends State<_StoryView> {
       );
     } else {
       // The cover screen: the picture as a plate above, the words beneath
-      // it on the dark, so neither dims the other.
+      // it on the dark, so neither dims the other. The paintings are tall
+      // (3:4). A screen with room shows one whole; a shorter screen keeps
+      // room for the longest page of words and cuts the picture to its
+      // subject.
       body = SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
@@ -369,21 +394,35 @@ class _StoryViewState extends State<_StoryView> {
               top,
               const SizedBox(height: 10),
               Expanded(
-                flex: 6,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(26),
-                  child: picture,
-                ),
-              ),
-              const SizedBox(height: 18),
-              Expanded(
-                flex: 5,
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: words,
-                  ),
+                child: LayoutBuilder(
+                  builder: (context, box) {
+                    final whole = box.maxWidth * 4 / 3;
+                    final room = box.maxHeight - _plateGap - _wordsRoom;
+                    final plate = room.clamp(120.0, whole).toDouble();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        SizedBox(
+                          height: plate,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(26),
+                            child: picture,
+                          ),
+                        ),
+                        const SizedBox(height: _plateGap),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: SingleChildScrollView(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: words,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 12),
