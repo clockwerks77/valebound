@@ -7,14 +7,18 @@ import '../support/harness.dart';
 import 'screens_golden_test.dart' show expectCreaseClear, screenTest, shot;
 
 // Phase 3 screens at the cover-screen and opened-Fold sizes: calendar
-// suggestions, the comeback quest, the Health Log, the weekly Delve and the
-// new Settings cards. The opened-Fold runs also assert that nothing critical
+// suggestions, the comeback quest, the Health Log, the weekly Delve, the
+// reminder in the quest editor and the new Settings cards. The opened-Fold runs also assert that nothing critical
 // sits on the crease.
 
 final DateTime saturday = DateTime(2026, 11, 14, 9, 12);
 
 Finder primary(String label) => find.byWidgetPredicate(
       (w) => w is PrimaryButton && w.label == label,
+    );
+
+Finder quiet(String label) => find.byWidgetPredicate(
+      (w) => w is QuietButton && w.label == label,
     );
 
 Finder roundButton(String semanticLabel) => find.byWidgetPredicate(
@@ -126,6 +130,47 @@ Future<void> phase3Screens(
   if (open) expectCreaseClear(tester, device);
 }
 
+/// The comeback quest on the board after days away, then the quest editor
+/// with its completion types and the reminder set.
+Future<void> comebackAndReminder(
+  WidgetTester tester,
+  TestDevice device,
+  String suffix,
+) async {
+  useDevice(tester, device);
+  final open = device.crease;
+  final app = await TestApp.start(
+    tester,
+    now: saturday,
+    withHistory: true,
+    device: MemoryDevice(),
+  );
+  app.now = DateTime(2026, 11, 18, 8, 5);
+  await tester.runAsync(() => app.game.refresh());
+  await tester.pumpAndSettle();
+  expect(find.text('Return to the Vale'), findsOneWidget);
+  await shot(tester, '77_board_comeback_$suffix');
+  if (open) expectCreaseClear(tester, device);
+
+  await tester.tap(open ? find.text('Quest') : primary('Quest'));
+  await tester.pumpAndSettle();
+  expect(find.text('New quest'), findsOneWidget);
+  await tester.enterText(find.byType(TextField).first, 'Water the plants');
+  await tester.tap(find.widgetWithText(ChoicePill, 'Care'));
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(quiet('More options'));
+  await tester.pumpAndSettle();
+  await tester.tap(quiet('More options'));
+  await tester.pumpAndSettle();
+  final evening = find.widgetWithText(ChoicePill, '18:00');
+  await tester.ensureVisible(evening);
+  await tester.pumpAndSettle();
+  await tester.tap(evening);
+  await app.settle(tester);
+  await shot(tester, '78_editor_reminder_$suffix');
+  if (open) expectCreaseClear(tester, device);
+}
+
 void main() {
   setUpAll(loadAppFonts);
 
@@ -137,13 +182,11 @@ void main() {
     await phase3Screens(tester, TestDevice.foldOpen, 'open');
   });
 
-  screenTest('The comeback quest', (tester) async {
-    useDevice(tester, TestDevice.foldCover);
-    final app = await TestApp.start(tester, now: saturday, withHistory: true);
-    app.now = DateTime(2026, 11, 18, 8, 5);
-    await tester.runAsync(() => app.game.refresh());
-    await tester.pumpAndSettle();
-    expect(find.text('Return to the Vale'), findsOneWidget);
-    await shot(tester, '77_board_comeback_cover');
+  screenTest('Coming back, on the cover screen', (tester) async {
+    await comebackAndReminder(tester, TestDevice.foldCover, 'cover');
+  });
+
+  screenTest('Coming back, on the opened Fold', (tester) async {
+    await comebackAndReminder(tester, TestDevice.foldOpen, 'open');
   });
 }
