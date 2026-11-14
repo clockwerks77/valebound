@@ -430,7 +430,8 @@ piece. Nothing was regenerated and no credits were used.
 
 **Two kinds of grading, both done once, offline, on the files.** No art is
 changed while the app runs, and nothing was repainted or added by another
-generator.
+generator. The script is `tool/art/large_pieces.py`; run on the unpacked
+zip it writes the same 39 files again, byte for byte.
 
 - *The sleeping pictures.* The narrator calls the sleeping Vale grey, and
   several takes came out greener or warmer than that. `sleepingVale`,
