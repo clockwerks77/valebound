@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:habit_adventure/rules/classes.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
 import 'package:habit_adventure/data/seed.dart';
@@ -622,6 +623,34 @@ void main() {
       "INSERT INTO health_entries (id, day, field_key, value, unit) VALUES ('h-1', '2026-11-13', 'glucose', '5.9', 'mmol/L')",
       'PRAGMA user_version = 2',
     ];
+
+    test('gains a class column and an encounter column, both empty; a class '
+        'can then be chosen and nothing earned moves', () async {
+      final old = AppDatabase(
+        NativeDatabase.memory(
+          setup: (raw) {
+            for (final statement in v2) {
+              raw.execute(statement);
+            }
+          },
+        ),
+      );
+      addTearDown(old.close);
+      final upgraded = GameRepository(old, clock: () => now);
+      final hero = (await upgraded.hero())!;
+      expect(hero.classId, isNull);
+      expect((await upgraded.dayLog('2026-11-13'))!.encounter, isNull);
+      expect(await upgraded.encounterOn('2026-11-13'), isNull);
+
+      await upgraded.setHeroClass(HeroClass.sage);
+      final after = (await upgraded.hero())!;
+      expect(after.classId, 'sage');
+      expect(after.totalXp, hero.totalXp);
+      expect(after.level, hero.level);
+      expect(after.gold, hero.gold);
+      expect(after.materials, hero.materials);
+      expect(after.attributeXp, hero.attributeXp);
+    });
 
     test('opens, keeps every row, and gains what Phase 3 adds', () async {
       final old = AppDatabase(

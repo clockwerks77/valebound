@@ -3,6 +3,8 @@
 /// brings home, and what is written down either way.
 library;
 
+import 'dart:convert';
+
 import 'classes.dart';
 import 'combat.dart';
 import 'day_key.dart';
@@ -49,6 +51,13 @@ const List<EnemyTemplate> enemyTemplates = <EnemyTemplate>[
   EnemyTemplate('lantern_mistling', 'Lantern-eyed Mistling', EnemyType.arcane,
       'mistling', 'It looks at you, and you forget what you came for.'),
 ];
+
+/// "a Fogfinch", "an Old Yawnstone": [name] with the article it takes.
+String withArticle(String name, {bool capital = false}) {
+  final vowel = name.isNotEmpty && 'aeiouAEIOU'.contains(name[0]);
+  final article = vowel ? 'an' : 'a';
+  return '${capital ? article[0].toUpperCase() + article.substring(1) : article} $name';
+}
 
 int _dayIndex(String day) => DayKey.daysBetween('2026-01-01', day);
 
@@ -308,6 +317,17 @@ class EncounterRecord {
   }
 }
 
+/// Reads a record as it is stored with the day. Null for none, or for one
+/// that cannot be read.
+EncounterRecord? decodeEncounter(String? json) {
+  if (json == null || json.isEmpty) return null;
+  try {
+    return EncounterRecord.fromJson(jsonDecode(json));
+  } on FormatException {
+    return null;
+  }
+}
+
 /// Where the day's encounter stands, for the board.
 enum EncounterStatus {
   /// Not fought yet today.
@@ -363,6 +383,10 @@ const List<BossTemplate> bosses = <BossTemplate>[
       'Voice of Old Lanternhall',
       'In the great hall the quiet is so deep it has a shape.'),
 ];
+
+/// How a boss attempt is written in the week's Delve record.
+const String bossTierWoken = 'won';
+const String bossTierHeld = 'held';
 
 const int bossGold = 60;
 const int bossEachMaterial = 6;

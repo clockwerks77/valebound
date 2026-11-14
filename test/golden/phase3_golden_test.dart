@@ -120,14 +120,23 @@ Future<void> phase3Screens(
   await shot(tester, '74_campfire_delve_$suffix');
   await tester.tap(primary('Enter the Delve'));
   await tester.pumpAndSettle();
+  // Since 0.7 the Delve is a boss fight: the scout's report, the fight,
+  // and how it came out.
   await shot(tester, '75_delve_$suffix');
-  if (open) expectCreaseClear(tester, device);
-  await tester.ensureVisible(primary('Enter the Delve'));
+  await tester.tap(primary('Go in'));
   await tester.pumpAndSettle();
-  await tester.tap(primary('Enter the Delve'));
+  await tester.tap(find.text('Defend'));
   await app.settle(tester);
-  await shot(tester, '76_delve_result_$suffix');
+  await shot(tester, '76_delve_fight_$suffix');
   if (open) expectCreaseClear(tester, device);
+  for (var turn = 0; turn < 7 && find.text('Defend').evaluate().isNotEmpty;
+      turn++) {
+    await tester.tap(find.text('Defend'));
+    await app.settle(tester);
+  }
+  await shot(tester, '76_delve_result_$suffix');
+  await tester.tap(primary('Back to the fire'));
+  await app.settle(tester);
 }
 
 /// The comeback quest on the board after days away, then the quest editor

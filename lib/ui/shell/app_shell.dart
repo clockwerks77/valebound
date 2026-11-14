@@ -8,6 +8,7 @@ import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../board/board_screen.dart';
 import '../celebrations.dart';
+import '../encounter/class_choice.dart';
 import '../feel.dart';
 import '../health/health_note.dart';
 import '../log/quest_log_screen.dart';
@@ -109,9 +110,12 @@ class _AppShellState extends State<AppShell>
     if (!_touring && game.hasProfile) {
       final prologue = game.takePrologueRequest();
       final tour = game.takeTourRequest();
-      if (prologue || tour) {
+      // A hero with no class yet, new or from before 0.7, chooses one
+      // (Amendment v0.3 §2).
+      final choose = game.needsClass;
+      if (prologue || tour || choose) {
         _touring = true;
-        _welcome(prologue: prologue, tour: tour);
+        _welcome(prologue: prologue, tour: tour, chooseClass: choose);
       }
     }
     if (_marking) return;
@@ -139,7 +143,11 @@ class _AppShellState extends State<AppShell>
 
   /// Tells the prologue (DECISIONS D-76), then walks the board with a
   /// bubble on each part (DECISIONS D-72). Either may be asked for alone.
-  Future<void> _welcome({required bool prologue, required bool tour}) async {
+  Future<void> _welcome({
+    required bool prologue,
+    required bool tour,
+    bool chooseClass = false,
+  }) async {
     final game = _game;
     try {
       if (!mounted || game == null) return;
@@ -149,6 +157,10 @@ class _AppShellState extends State<AppShell>
         if (!mounted) return;
         await showPrologue(context, companionName: game.companionName);
         await game.finishPrologue();
+      }
+      if (chooseClass) {
+        if (!mounted) return;
+        await showClassChoice(context, mustChoose: true);
       }
       if (tour) {
         if (!mounted) return;

@@ -73,6 +73,10 @@ void main() {
       expect(find.text('Add Five-Minute Reset'), findsOneWidget);
       await tester.tap(find.text('Begin at Dawn'));
       await app.settle(tester);
+      // A new hero chooses a class before anything else (Amendment v0.3).
+      expect(find.text('CHOOSE YOUR CLASS'), findsOneWidget);
+      await tester.tap(find.text('Become a Ranger'));
+      await app.settle(tester);
 
       expect(find.byType(AppShell), findsOneWidget);
       expect(app.game.hero!.name, 'Adam');
@@ -101,6 +105,10 @@ void main() {
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Begin at Dawn'));
+      await app.settle(tester);
+      // A new hero chooses a class before anything else (Amendment v0.3).
+      expect(find.text('CHOOSE YOUR CLASS'), findsOneWidget);
+      await tester.tap(find.text('Become a Ranger'));
       await app.settle(tester);
       expect(app.game.companion!.kind, CompanionKind.clockworkSprite);
       expect(app.game.companion!.name, 'Tock');

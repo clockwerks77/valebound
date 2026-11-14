@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../rules/classes.dart';
+import '../../rules/combat.dart' show ItemKind;
 import '../../rules/companion_rules.dart';
 import '../../rules/enums.dart';
 import '../../rules/gear.dart';
@@ -10,6 +12,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../art/crests.dart';
+import '../encounter/class_choice.dart' show ClassFacts;
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'inventory.dart';
@@ -175,6 +178,11 @@ class HeroPane extends StatelessWidget {
     final companion = game.companion!;
     final progress = XpCurve.progress(hero.totalXp);
     final title = titleForLevel(progress.level);
+    final cls = game.heroClass;
+    final carried = <String>[
+      for (final kind in ItemKind.values)
+        if ((game.pouch[kind] ?? 0) > 0) '${game.pouch[kind]} ${kind.label}',
+    ];
 
     return ParchmentCard(
       radius: 24,
@@ -282,7 +290,11 @@ class HeroPane extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: <Widget>[
-              for (final t in game.titles.isEmpty ? <String>[title] : game.titles)
+              for (final t in <String>[
+                ...(game.titles.isEmpty ? <String>[title] : game.titles),
+                // Won from the bosses of the weekly Delve.
+                ...game.bossTitles,
+              ])
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: t == title
@@ -306,6 +318,17 @@ class HeroPane extends StatelessWidget {
                 ),
             ],
           ),
+          if (cls != null) ...<Widget>[
+            const PaneHeading('Class'),
+            ClassFacts(cls: cls),
+            const SizedBox(height: 10),
+            Text(
+              '${cls.resource} ${game.resourceNow} of $resourceCap from '
+              'today’s quests · Boss Marks ${game.bossState.marks} · '
+              '${carried.isEmpty ? 'Pouch empty' : 'Pouch: ${carried.join(', ')}'}',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+          ],
         ],
       ),
     );

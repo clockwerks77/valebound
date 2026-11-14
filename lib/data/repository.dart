@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../rules/classes.dart';
+import '../rules/combat.dart';
 import '../rules/companion_rules.dart';
 import '../rules/daily_still.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
 import '../rules/delve.dart';
+import '../rules/encounter.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/health_fields.dart';
@@ -69,8 +72,6 @@ MaterialKind? dailyStillGiftOf(CompletionRow c) {
   }
   return null;
 }
-
-bool _wokeDailyStill(CompletionRow c) => dailyStillGiftOf(c) != null;
 
 /// The day's Still creature as it stands, with its gift once it has woken.
 class DailyStillToday {
@@ -247,6 +248,56 @@ class DelveResult {
 
   /// Zero-based indexes of the places the Delve's materials restored.
   final List<int> newRestorationIndexes;
+}
+
+/// What came of a day's fight, once it is written down.
+class EncounterOutcome {
+  const EncounterOutcome({
+    required this.record,
+    required this.enemy,
+    required this.newRestorationIndexes,
+    required this.heroLevel,
+    required this.heroLevelBefore,
+    required this.companionLevel,
+    required this.companionLevelBefore,
+    required this.marks,
+  });
+
+  final EncounterRecord record;
+  final EnemyTemplate enemy;
+
+  /// Zero-based indexes of the places the chest's materials restored.
+  final List<int> newRestorationIndexes;
+  final int heroLevel;
+  final int heroLevelBefore;
+  final int companionLevel;
+  final int companionLevelBefore;
+
+  /// Boss Marks in hand afterwards.
+  final int marks;
+}
+
+/// What came of the week's attempt on the boss.
+class BossOutcome {
+  const BossOutcome({
+    required this.boss,
+    required this.woken,
+    required this.left,
+    required this.newRestorationIndexes,
+    this.title,
+  });
+
+  final BossTemplate boss;
+
+  /// It has been worn all the way down and has woken.
+  final bool woken;
+
+  /// What it has left for next week.
+  final int left;
+  final List<int> newRestorationIndexes;
+
+  /// The title its waking earned, the first time.
+  final String? title;
 }
 
 /// Calendar choices, as stored.
@@ -539,11 +590,9 @@ class GameRepository {
                 companionRow.level >= comfortLevel
             ? comfortBonusBond
             : 0,
-        // The day's Still creature wakes on the third quest (D-70).
-        wakeDailyStill: wakesDailyStill(
-          doneBefore: doneToday.length,
-          giftGiven: doneToday.any(_wokeDailyStill),
-        ),
+        // Since 0.7 the day's creature is met in a fight, not woken by
+        // the third quest (Amendment v0.3; D-70 is retired).
+        wakeDailyStill: false,
       );
       final after = outcome.after;
 
@@ -704,6 +753,32 @@ class GameRepository {
         await (db.update(db.quests)..where((q) => q.id.equals(quest.id)))
             .write(
           QuestsCompanion(active: const Value(false), updatedAt: Value(now)),
+        );
+      }
+
+      // Amendment v0.3 §5: when today's creature has held the road, any
+      // finished quest opens another try and brings a Salve for it.
+      final fought = decodeEncounter(log?.encounter);
+      if (log != null && fought != null && !fought.won && !fought.retryReady) {
+        await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id))).write(
+          DayLogsCompanion(
+            encounter: Value(
+              jsonEncode(fought.copyWith(retryReady: true).toJson()),
+            ),
+          ),
+        );
+        await _addToPouch(ItemKind.salve);
+      }
+      // An Artificer's Craft quests also stock the pouch (§2).
+      if (HeroClass.byId(heroRow.classId) == HeroClass.artificer &&
+          quest.attribute == Attribute.craft) {
+        final craftedBefore = doneToday
+            .where((c) => c.attributeSnapshot == Attribute.craft)
+            .length;
+        await _addToPouch(
+          artificerStock(
+            DayKey.daysBetween('2026-01-01', day).abs() + craftedBefore,
+          ),
         );
       }
       return outcome;
@@ -1286,6 +1361,245 @@ class GameRepository {
     });
     if (result != null) {
       // Cosmetics that come with restored places, and today's file again.
+      await syncWorld();
+      await _touchDay(today, const DayLogsCompanion());
+    }
+    return result;
+  }
+
+  // ---- Classes and fights (Amendment v0.3) ----------------------------
+
+  /// Sets the hero's class. Nothing else about the hero changes: XP,
+  /// levels, attributes and everything gathered stay exactly as they are.
+  Future<void> setHeroClass(HeroClass cls) async {
+    final heroRow = await hero();
+    if (heroRow == null) return;
+    await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+        .write(CharactersCompanion(classId: Value(cls.name)));
+    await _touchDay(DayKey.of(clock()), const DayLogsCompanion());
+  }
+
+  /// How [day]'s encounter went, or null if it has not been fought.
+  Future<EncounterRecord?> encounterOn(String day) async =>
+      decodeEncounter((await dayLog(day))?.encounter);
+
+  /// The quests finished on [day], as a class counts them.
+  Future<List<QuestDone>> questsDoneOn(String day) async => <QuestDone>[
+        for (final c in await completionsOn(day))
+          QuestDone(c.attributeSnapshot, c.trackSnapshot, c.difficultySnapshot),
+      ];
+
+  /// Bonus XP from every chest won on or before [day], so a later export
+  /// of a past day shows the level as it stood.
+  Future<int> chestXpThrough(String day) async {
+    final logs = await (db.select(db.dayLogs)
+          ..where((d) => d.day.isSmallerOrEqualValue(day) & d.encounter.isNotNull()))
+        .get();
+    var xp = 0;
+    for (final log in logs) {
+      final record = decodeEncounter(log.encounter);
+      if (record != null && record.won) xp += record.chest?.xp ?? 0;
+    }
+    return xp;
+  }
+
+  Future<void> _addToPouch(ItemKind kind) async {
+    final pouch = Map<ItemKind, int>.of((await settings()).pouch);
+    final have = pouch[kind] ?? 0;
+    pouch[kind] = have >= pouchCap ? pouchCap : have + 1;
+    await setSetting(SettingKey.pouch, encodePouch(pouch));
+  }
+
+  /// Writes down today's fight. A win brings the chest home: gold,
+  /// materials (which may wake a place), a consumable, bonus XP for hero
+  /// and companion, and a Boss Mark. When the creature holds, nothing at
+  /// all is taken (Amendment v0.3 §§1, 5): only the record changes, and
+  /// what was used from the pouch stays used. Null if there is no class
+  /// yet, or today's encounter is already won.
+  Future<EncounterOutcome?> recordEncounter({
+    required bool won,
+    required bool heroic,
+    required int turns,
+    required Map<ItemKind, int> pouchAfter,
+  }) async {
+    final now = clock();
+    final day = DayKey.of(now);
+    final outcome = await db.transaction(() async {
+      final heroRow = await hero();
+      final companionRow = await companion();
+      final worldRow = await world();
+      final cls = HeroClass.byId(heroRow?.classId);
+      if (heroRow == null ||
+          companionRow == null ||
+          worldRow == null ||
+          cls == null) {
+        return null;
+      }
+      await db.into(db.dayLogs).insert(
+            DayLogsCompanion.insert(id: newId(), day: day, dawnGeneratedAt: now),
+            mode: InsertMode.insertOrIgnore,
+          );
+      final before = decodeEncounter((await dayLog(day))?.encounter);
+      if (before != null && before.won) return null;
+
+      final enemy = enemyFor(day);
+      final pouch = Map<ItemKind, int>.of(pouchAfter);
+      final current = await settings();
+      Chest? chest;
+      var restoredBefore = 0;
+      var restoredAfter = 0;
+      var heroLevel = heroRow.level;
+      var companionLevel = companionRow.level;
+      var marks = current.boss.marks;
+      if (won) {
+        final gathered = decodeMaterials(heroRow.materials);
+        restoredBefore = restoredCount(gathered);
+        final prize = chestFor(day, stillNeeded(gathered), heroic: heroic);
+        chest = prize;
+        gathered[prize.material] = (gathered[prize.material] ?? 0) + prize.materials;
+        restoredAfter = restoredCount(gathered);
+        final heroXp = heroRow.totalXp + prize.xp;
+        final reached = XpCurve.levelForXp(heroXp);
+        if (reached > heroLevel) heroLevel = reached;
+        await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+            .write(
+          CharactersCompanion(
+            totalXp: Value(heroXp),
+            level: Value(heroLevel),
+            gold: Value(heroRow.gold + prize.gold),
+            materials: Value(encodeMaterials(gathered)),
+            titles: Value(jsonEncode(titlesEarned(heroLevel))),
+          ),
+        );
+        final companionXp = companionRow.totalXp + prize.xp;
+        final companionReached = XpCurve.levelForXp(companionXp);
+        if (companionReached > companionLevel) {
+          companionLevel = companionReached;
+        }
+        await (db.update(db.companions)
+              ..where((c) => c.id.equals(companionRow.id)))
+            .write(
+          CompanionsCompanion(
+            totalXp: Value(companionXp),
+            level: Value(companionLevel),
+            tricksUnlocked: Value(jsonEncode(tricksUnlockedAt(companionLevel))),
+            gearUnlocked: Value(
+              jsonEncode(
+                gearUnlockedAt(level: companionLevel, bond: companionRow.bond),
+              ),
+            ),
+          ),
+        );
+        if (restoredAfter > restoredBefore) {
+          await _recordRestorations(worldRow, restoredAfter, day);
+        }
+        final have = pouch[prize.item] ?? 0;
+        pouch[prize.item] = have >= pouchCap ? pouchCap : have + 1;
+        final boss = current.boss.withMark();
+        marks = boss.marks;
+        await setSetting(SettingKey.boss, jsonEncode(boss.toJson()));
+      }
+      await setSetting(SettingKey.pouch, encodePouch(pouch));
+      final record = EncounterRecord(
+        enemyKey: enemy.key,
+        heroic: heroic,
+        won: won,
+        attempts: (before?.attempts ?? 0) + 1,
+        turns: turns,
+        classId: cls.name,
+        chest: chest,
+      );
+      await _touchDay(
+        day,
+        DayLogsCompanion(encounter: Value(jsonEncode(record.toJson()))),
+      );
+      return EncounterOutcome(
+        record: record,
+        enemy: enemy,
+        newRestorationIndexes: <int>[
+          for (var i = restoredBefore; i < restoredAfter; i++) i,
+        ],
+        heroLevel: heroLevel,
+        heroLevelBefore: heroRow.level,
+        companionLevel: companionLevel,
+        companionLevelBefore: companionRow.level,
+        marks: marks,
+      );
+    });
+    if (outcome != null && outcome.record.won) await syncWorld();
+    return outcome;
+  }
+
+  /// Writes down the week's attempt on the boss, which left it with [left]
+  /// HP. What was taken off it stays off (Amendment v0.3 §5). At zero it
+  /// wakes: the week's big restoration, and its title the first time. Null
+  /// if no Delve is waiting.
+  Future<BossOutcome?> recordBossAttempt({
+    required int left,
+    required bool spentMarks,
+    required int turns,
+    required Map<ItemKind, int> pouchAfter,
+  }) async {
+    final now = clock();
+    final today = DayKey.of(now);
+    final result = await db.transaction(() async {
+      final waiting = await delveWaiting();
+      final heroRow = await hero();
+      final worldRow = await world();
+      if (waiting == null || heroRow == null || worldRow == null) return null;
+      final state = (await settings()).boss;
+      final boss = state.boss;
+      final woken = left <= 0;
+      var restoredBefore = 0;
+      var restoredAfter = 0;
+      if (woken) {
+        final gathered = decodeMaterials(heroRow.materials);
+        restoredBefore = restoredCount(gathered);
+        for (final kind in MaterialKind.values) {
+          gathered[kind] = (gathered[kind] ?? 0) + bossEachMaterial;
+        }
+        restoredAfter = restoredCount(gathered);
+        await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+            .write(
+          CharactersCompanion(
+            gold: Value(heroRow.gold + bossGold),
+            materials: Value(encodeMaterials(gathered)),
+          ),
+        );
+        if (restoredAfter > restoredBefore) {
+          await _recordRestorations(worldRow, restoredAfter, today);
+        }
+      }
+      await setSetting(
+        SettingKey.boss,
+        jsonEncode(
+          state.afterAttempt(left: left, spentMarks: spentMarks).toJson(),
+        ),
+      );
+      await setSetting(SettingKey.pouch, encodePouch(pouchAfter));
+      await db.into(db.delves).insert(
+            DelvesCompanion.insert(
+              id: newId(),
+              weekEnd: waiting.delveDay,
+              resolvedAt: now,
+              site: boss.name,
+              tier: woken ? bossTierWoken : bossTierHeld,
+              daysActive: Value(turns),
+              gold: Value(woken ? bossGold : 0),
+              eachMaterial: Value(woken ? bossEachMaterial : 0),
+            ),
+          );
+      return BossOutcome(
+        boss: boss,
+        woken: woken,
+        left: left < 0 ? 0 : left,
+        newRestorationIndexes: <int>[
+          for (var i = restoredBefore; i < restoredAfter; i++) i,
+        ],
+        title: woken && !state.woken.contains(boss.key) ? boss.title : null,
+      );
+    });
+    if (result != null) {
       await syncWorld();
       await _touchDay(today, const DayLogsCompanion());
     }

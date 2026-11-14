@@ -10,9 +10,12 @@ import '../data/settings.dart';
 import '../device/device_port.dart';
 import '../export/export_service.dart';
 import '../export/vault_port.dart';
+import '../rules/classes.dart';
+import '../rules/combat.dart';
 import '../rules/companion_rules.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
+import '../rules/encounter.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/health_fields.dart';
@@ -116,6 +119,11 @@ class GameController extends ChangeNotifier {
 
   /// The day's Still creature and how far along it is (DECISIONS D-70).
   DailyStillToday? dailyStillToday;
+
+  /// Today's finished quests as a class counts them, and how today's
+  /// encounter stands (Amendment v0.3).
+  List<QuestDone> questsDone = const <QuestDone>[];
+  EncounterRecord? encounterToday;
 
   bool notificationsAllowed = false;
 
@@ -299,6 +307,8 @@ class GameController extends ChangeNotifier {
     this.today = await repo.dayLog(day);
     healthToday = await repo.healthEntriesByKey(day);
     dailyStillToday = await repo.dailyStillOn(day);
+    questsDone = await repo.questsDoneOn(day);
+    encounterToday = decodeEncounter(this.today?.encounter);
     delve = await repo.delveWaiting();
     if (readDevice) await _readCalendar();
     await _filterSuggestions();
@@ -537,6 +547,114 @@ class GameController extends ChangeNotifier {
     await refresh();
   }
 
+  // ---- Classes and fights (Amendment v0.3) ------------------------------
+
+  /// The hero's class, or null until one has been chosen.
+  HeroClass? get heroClass => HeroClass.byId(hero?.classId);
+
+  /// True for a hero with no class yet: a new one, or one from before 0.7.
+  bool get needsClass => hasProfile && heroClass == null;
+
+  /// Chooses or changes the class. XP, levels and everything gathered are
+  /// untouched.
+  Future<void> chooseClass(HeroClass cls) async {
+    await repo.setHeroClass(cls);
+    await _reload();
+    notifyListeners();
+    _exportSoon();
+  }
+
+  /// A change of class is free at the weekly Campfire (the Delve's day).
+  bool get respecOpen =>
+      day.isNotEmpty && DayKey.weekday(day) == settings.delveWeekday;
+
+  /// The creature holding the road today.
+  EnemyTemplate get enemyToday => enemyFor(day);
+  EncounterStatus get encounterStatus => statusOf(encounterToday);
+
+  /// The class resource in hand for a fight now, from today's quests.
+  int get resourceNow {
+    final cls = heroClass;
+    return cls == null ? baseResource : resourceToday(cls, questsDone);
+  }
+
+  Map<ItemKind, int> get pouch => settings.pouch;
+  BossState get bossState => settings.boss;
+
+  /// The titles won from bosses, oldest first.
+  List<String> get bossTitles => bossState.titles;
+
+  /// Today's fight as it would start now, or null without a class.
+  FightSetup? encounterSetup({required bool heroic}) {
+    final cls = heroClass;
+    final h = hero;
+    final c = companion;
+    if (cls == null || h == null || c == null) return null;
+    return FightSetup(
+      heroClass: cls,
+      level: h.level,
+      companionLevel: c.level,
+      bond: c.bond,
+      type: enemyToday.type,
+      seed: encounterSeed(day),
+      resource: resourceNow,
+      heroic: heroic,
+      items: pouch,
+    );
+  }
+
+  /// Writes down a finished fight with today's creature.
+  Future<EncounterOutcome?> finishEncounter(Fight fight) async {
+    final outcome = await repo.recordEncounter(
+      won: fight.outcome == FightOutcome.won,
+      heroic: fight.heroic,
+      turns: fight.turn,
+      pouchAfter: fight.items,
+    );
+    await _reload();
+    notifyListeners();
+    _exportSoon();
+    return outcome;
+  }
+
+  /// The week's boss fight as it would start now, or null when no Delve is
+  /// waiting or there is no class.
+  FightSetup? bossSetup({Advantage? advantage}) {
+    final cls = heroClass;
+    final h = hero;
+    final c = companion;
+    final waiting = delve;
+    if (cls == null || h == null || c == null || waiting == null) return null;
+    return FightSetup(
+      heroClass: cls,
+      level: h.level,
+      companionLevel: c.level,
+      bond: c.bond,
+      type: bossState.boss.type,
+      seed: bossSeed(waiting.delveDay),
+      resource: resourceNow,
+      items: pouch,
+      boss: true,
+      bossHp: bossState.hpLeft,
+      advantage: advantage,
+    );
+  }
+
+  /// Writes down the week's attempt on the boss.
+  Future<BossOutcome?> finishBoss(Fight fight, {required bool spentMarks}) async {
+    final pouchAfter = Map<ItemKind, int>.of(fight.items);
+    final outcome = await repo.recordBossAttempt(
+      left: fight.enemyHp,
+      spentMarks: spentMarks,
+      turns: fight.turn,
+      pouchAfter: pouchAfter,
+    );
+    await _reload();
+    notifyListeners();
+    _exportSoon();
+    return outcome;
+  }
+
   // ---- The weekly Delve (DESIGN §4.2) -----------------------------------
 
   Future<DelveResult?> enterDelve() async {
@@ -642,14 +760,13 @@ class GameController extends ChangeNotifier {
 
   /// What the narrator says at tonight's Campfire.
   String get campfireStory {
-    final creature = dailyStillToday;
     return campfireNarration(
       day: day,
       questsDone: board.where((b) => b.isDone && !_isCampfire(b)).length,
       wokeToday: wokeToday,
-      creatureWoke: (creature != null && creature.still.awake)
-          ? creature.still.creature.name
-          : null,
+      // The day's creature, once it has been met and woken in the fight.
+      creatureWoke:
+          (encounterToday?.won ?? false) ? enemyToday.name : null,
       companionName: companionName,
       next: target,
     );

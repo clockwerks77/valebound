@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import '../rules/combat.dart' show ItemKind;
 import '../rules/delve.dart';
+import '../rules/encounter.dart';
 import '../rules/health_fields.dart';
 
 /// Keys of the simple settings kept in the database (so the JSON backup
@@ -36,6 +38,44 @@ abstract final class SettingKey {
 
   /// `1` once the prologue has been read or skipped (DECISIONS D-76).
   static const String prologueSeen = 'prologue_seen';
+
+  /// JSON map of consumable to how many are in the shared pouch
+  /// (Amendment v0.3 §3).
+  static const String pouch = 'pouch';
+
+  /// The boss campaign as a `BossState` in JSON (Amendment v0.3 §5).
+  static const String boss = 'boss';
+}
+
+/// Reads the pouch as stored. Anything unreadable is an empty pouch.
+Map<ItemKind, int> decodePouch(String? json) {
+  if (json == null || json.isEmpty) return const <ItemKind, int>{};
+  final Object? raw;
+  try {
+    raw = jsonDecode(json);
+  } on FormatException {
+    return const <ItemKind, int>{};
+  }
+  if (raw is! Map) return const <ItemKind, int>{};
+  return <ItemKind, int>{
+    for (final kind in ItemKind.values)
+      if (raw[kind.name] is int && (raw[kind.name] as int) > 0)
+        kind: raw[kind.name] as int,
+  };
+}
+
+String encodePouch(Map<ItemKind, int> pouch) => jsonEncode(<String, int>{
+      for (final e in pouch.entries)
+        if (e.value > 0) e.key.name: e.value > pouchCap ? pouchCap : e.value,
+    });
+
+BossState decodeBoss(String? json) {
+  if (json == null || json.isEmpty) return const BossState();
+  try {
+    return BossState.fromJson(jsonDecode(json));
+  } on FormatException {
+    return const BossState();
+  }
 }
 
 /// The settings as the app uses them.
@@ -51,6 +91,8 @@ class GameSettings {
     this.tourDone = false,
     this.hintsSeen = const <String>{},
     this.prologueSeen = false,
+    this.pouch = const <ItemKind, int>{},
+    this.boss = const BossState(),
   });
 
   factory GameSettings.fromMap(Map<String, String> raw) {
@@ -68,6 +110,8 @@ class GameSettings {
       tourDone: raw[SettingKey.tourDone] == '1',
       hintsSeen: _stringSet(raw[SettingKey.hintsSeen]),
       prologueSeen: raw[SettingKey.prologueSeen] == '1',
+      pouch: decodePouch(raw[SettingKey.pouch]),
+      boss: decodeBoss(raw[SettingKey.boss]),
     );
   }
 
@@ -81,6 +125,12 @@ class GameSettings {
   final bool tourDone;
   final Set<String> hintsSeen;
   final bool prologueSeen;
+
+  /// Consumables in the shared pouch.
+  final Map<ItemKind, int> pouch;
+
+  /// The weekly boss: which one, what it has left, Marks, titles.
+  final BossState boss;
 
   static Set<String> _stringSet(String? json) {
     if (json == null || json.isEmpty) return const <String>{};

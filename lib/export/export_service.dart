@@ -1,7 +1,10 @@
 import '../data/database.dart';
 import '../data/repository.dart';
 import '../data/seed.dart';
+import '../rules/classes.dart';
 import '../rules/companion_rules.dart';
+import '../rules/day_key.dart';
+import '../rules/encounter.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/journey.dart';
@@ -250,6 +253,26 @@ class ExportService {
       }
     }
     final pacesTotal = pacesBefore + pacesToday;
+    // A won encounter's chest carries a little XP too.
+    xpThroughDay += await repo.chestXpThrough(day);
+    final fought = decodeEncounter(log?.encounter);
+    final enemy = fought?.enemy;
+    final encounter = <String>[
+      if (fought != null && enemy != null) ...<String>[
+        'Creature: ${enemy.name} (${enemy.type.label}'
+            '${fought.heroic ? ', Heroic' : ''})',
+        fought.won
+            ? 'Result: woke it in ${fought.turns} '
+                '${fought.turns == 1 ? 'turn' : 'turns'}'
+            : 'Result: it held the road',
+        'Class: ${HeroClass.byId(fought.classId)?.label ?? fought.classId}',
+      ],
+      for (final d in await repo.delves())
+        if (DayKey.of(d.resolvedAt) == day && d.tier == bossTierWoken)
+          'Boss: ${d.site} woke'
+        else if (DayKey.of(d.resolvedAt) == day && d.tier == bossTierHeld)
+          'Boss: ${d.site} held',
+    ];
     final health = await repo.healthEntriesOn(day);
     // A field the user named keeps the name they gave it.
     final labels = <String, String>{
@@ -305,6 +328,7 @@ class ExportService {
         for (final i in restoredToday)
           if (i >= 0) '${targetAt(i).name} (${regionByKey(targetAt(i).region).name})',
       ],
+      encounter: encounter,
       note: log?.dayNote ?? '',
     );
   }

@@ -265,6 +265,7 @@ class DayData {
     this.discoveries = const <String>[],
     this.health = const <HealthLine>[],
     this.restorations = const <String>[],
+    this.encounter = const <String>[],
     this.note = '',
   });
 
@@ -292,6 +293,11 @@ class DayData {
 
   /// e.g. `The Bakehouse (Hearthmere)`.
   final List<String> restorations;
+
+  /// The day's fight, when there was one: the creature, how it went and
+  /// the class it was fought as (Amendment v0.3 §6). The boss too, on the
+  /// day it was met.
+  final List<String> encounter;
   final String note;
 }
 
@@ -351,6 +357,12 @@ String dailyMarkdown(DayData d) {
       'The Vale rests.'
     else
       for (final r in d.restorations) '- Restored: $r',
+    if (d.encounter.isNotEmpty) ...<String>[
+      '',
+      '## Encounter',
+      '',
+      for (final line in d.encounter) '- $line',
+    ],
     if (note.trim().isNotEmpty) ...<String>[
       '',
       '## Notes',

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/device/device_port.dart';
-import 'package:habit_adventure/rules/daily_still.dart';
 import 'package:habit_adventure/rules/health_fields.dart';
 import 'package:habit_adventure/ui/widgets/common.dart';
 
@@ -37,47 +36,6 @@ Future<void> finish(WidgetTester tester, TestApp app, String name) async {
 
 void main() {
   setUpAll(loadAppFonts);
-
-  group('The day’s Still creature (DECISIONS D-70)', () {
-    testWidgets('dozes on the board, stirs with each quest, wakes on the third',
-        (tester) async {
-      useDevice(tester, TestDevice.foldCover);
-      final app = await TestApp.start(tester, now: saturday);
-      final creature = dailyStillFor('2026-11-14');
-      final dozing = find.text('A ${creature.name} dozes by The Gate Lantern');
-      expect(dozing, findsOneWidget);
-      expect(app.game.dailyStillToday!.still.stirs, 0);
-
-      await finish(tester, app, 'Morning Health Check');
-      await finish(tester, app, '7,000 Steps');
-      expect(app.game.dailyStillToday!.still.stirs, 2);
-      expect(app.game.dailyStillToday!.still.awake, isFalse);
-      expect(dozing, findsOneWidget);
-
-      await finish(tester, app, 'Walk Babs');
-      expect(app.game.dailyStillToday!.still.awake, isTrue);
-      expect(dozing, findsNothing);
-      expect(
-        find.text('The ${creature.name} woke: +$dailyStillGold gold, +1 Timber'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('the Campfire names it once it has woken', (tester) async {
-      useDevice(tester, TestDevice.foldCover);
-      final app = await TestApp.start(tester, now: saturday);
-      final creature = dailyStillFor('2026-11-14');
-      await finish(tester, app, 'Morning Health Check');
-      await finish(tester, app, '7,000 Steps');
-      await finish(tester, app, 'Walk Babs');
-
-      await reveal(tester, roundButton('Open the Campfire'));
-      await tester.tap(roundButton('Open the Campfire'));
-      await tester.pumpAndSettle();
-      await reveal(tester, find.text('Woke: the ${creature.name}.'));
-      expect(find.text('Woke: the ${creature.name}.'), findsOneWidget);
-    });
-  });
 
   group('Glucose from Health Connect (DECISIONS D-71)', () {
     Future<void> openSettings(WidgetTester tester) async {
@@ -218,7 +176,7 @@ void main() {
       'You and Babs',
       'A place to wake',
       'The road',
-      'Today’s sleeper',
+      'Today’s encounter',
       'A quest',
       'With Babs',
       'The Campfire',
@@ -322,7 +280,7 @@ void main() {
         await tester.tap(primary('Next'));
         await tester.pumpAndSettle();
       }
-      expect(find.text('Today’s sleeper'), findsOneWidget);
+      expect(find.text('Today’s encounter'), findsOneWidget);
       await tester.tap(primary('Next'));
       await tester.pumpAndSettle();
       // Straight on to the companion: there is no quest card to point at.

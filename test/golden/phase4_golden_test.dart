@@ -93,7 +93,6 @@ void main() {
       await app.game.refresh();
     });
     await app.settle(tester);
-    expect(app.game.dailyStillToday!.still.awake, isTrue);
     await shot(tester, '86_board_creature_awake_cover');
 
     await tester.tap(roundButton('Health Log'));

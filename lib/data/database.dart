@@ -136,6 +136,10 @@ class Characters extends Table {
   /// Added in schema 2.
   TextColumn get equippedCosmetics =>
       text().withDefault(const Constant('{}'))();
+
+  /// The hero's class, by `HeroClass` name; null until one is chosen
+  /// (Amendment v0.3 §2). Added in schema 4.
+  TextColumn get classId => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -205,6 +209,10 @@ class DayLogs extends Table {
   /// Quests on the board that day, kept so a later export of the day is
   /// exact. Added in schema 2.
   IntColumn get questsTotal => integer().nullable()();
+
+  /// How the day's encounter went, as an `EncounterRecord` in JSON; null
+  /// if it was never fought (Amendment v0.3 §3). Added in schema 4.
+  TextColumn get encounter => text().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -305,8 +313,9 @@ class AppDatabase extends _$AppDatabase {
   /// 1: Phase 1. 2: Phase 2 (completion extras, Fetch flag, the day's quest
   /// total, equipped cosmetics and gear). 3: Phase 3 (Delves, calendar
   /// choices, settings; system keys on the two seeded health quests).
+  /// 4: version 0.7 (the hero's class, the day's encounter).
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   /// Data survives every update (DESIGN §9.2): an older database is carried
   /// forward step by step and nothing in it is rewritten or dropped.
@@ -326,6 +335,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(calendarChoices);
             await m.createTable(appSettings);
             await tagSeededHealthQuests();
+          }
+          if (from < 4) {
+            await m.addColumn(characters, characters.classId);
+            await m.addColumn(dayLogs, dayLogs.encounter);
           }
         },
       );

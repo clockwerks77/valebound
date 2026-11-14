@@ -404,15 +404,27 @@ void main() {
       await reveal(tester, primary('Enter the Delve'));
       await tester.tap(primary('Enter the Delve'));
       await tester.pumpAndSettle();
-      expect(find.text('WHAT THE WEEK GATHERED'), findsOneWidget);
-      await reveal(tester, primary('Enter the Delve'));
-      await tester.tap(primary('Enter the Delve'));
+      // Since 0.7 the Delve is a boss fight (Amendment v0.3 §5).
+      expect(find.text('The Long Doze'), findsOneWidget);
+      expect(find.text('SCOUT’S REPORT'), findsOneWidget);
+      await tester.tap(primary('Go in'));
+      await tester.pumpAndSettle();
+      final xp = app.game.hero!.totalXp;
+      for (var turn = 0; turn < 7 && find.text('Defend').evaluate().isNotEmpty;
+          turn++) {
+        await tester.tap(find.text('Defend'));
+        await app.settle(tester);
+      }
+      expect(find.text('The Long Doze held'), findsOneWidget);
+      await tester.tap(primary('Back to the fire'));
       await app.settle(tester);
 
-      expect(find.text('RESTED'), findsOneWidget);
       expect(app.game.delve, isNull);
-      // Walk 5 gold, Campfire Review 2, and the Delve's 8.
-      expect(app.game.hero!.gold, 15);
+      // Walk 5 gold and Campfire Review 2. A boss that holds gives nothing
+      // and takes nothing.
+      expect(app.game.hero!.gold, 7);
+      expect(app.game.hero!.totalXp, xp);
+      expect(app.game.bossState.hpLeft, isNotNull);
       expect((await tester.runAsync(() => app.repo.delves()))!.length, 1);
     });
   });

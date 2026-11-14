@@ -11,6 +11,7 @@ import 'package:habit_adventure/app.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
 import 'package:habit_adventure/data/settings.dart';
+import 'package:habit_adventure/rules/classes.dart';
 import 'package:habit_adventure/device/device_port.dart';
 import 'package:habit_adventure/export/vault_port.dart';
 import 'package:habit_adventure/rules/enums.dart';
@@ -305,6 +306,7 @@ class TestApp {
     bool tour = false,
     bool hints = false,
     bool prologue = false,
+    HeroClass? heroClass = HeroClass.warden,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
@@ -343,6 +345,13 @@ class TestApp {
             activateFiveMinuteReset: true,
           );
         }
+      }
+      // A class is already chosen unless a test asks to choose one
+      // ([heroClass] null), as the tour and the prologue are already seen.
+      if (withProfile && heroClass != null) {
+        await app.db.customStatement(
+          "UPDATE characters SET class_id = '${heroClass.name}'",
+        );
       }
       await app.game.init();
     });

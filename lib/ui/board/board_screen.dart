@@ -5,9 +5,9 @@ import '../../data/repository.dart';
 import '../../data/seed.dart';
 import '../../device/device_port.dart';
 import '../../export/markdown.dart' show thousands;
-import '../../rules/daily_still.dart';
 import '../../rules/day_cycle.dart';
 import '../../rules/day_key.dart';
+import '../../rules/encounter.dart';
 import '../../rules/enums.dart';
 import '../../rules/journey.dart';
 import '../../rules/narrator.dart';
@@ -20,6 +20,7 @@ import '../../theme/palette.dart';
 import '../art/crests.dart';
 import '../art/painted.dart';
 import '../art/vista.dart';
+import '../encounter/encounter_screen.dart';
 import '../campfire/campfire_screen.dart';
 import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
@@ -470,11 +471,10 @@ class _JourneyStrip extends StatelessWidget {
     final toNext = pacesToNextDiscovery(paces);
     final target = game.target;
     final progress = targetProgress(game.materials);
-    final still = game.dailyStillToday;
     return Semantics(
       label: 'Restoring ${target.name}, ${(progress * 100).round()} percent. '
-          '$paces Paces on the road, $toNext to the next discovery'
-          '${still == null ? '' : '. ${_dailyStillSpoken(still, target.name)}'}',
+          '$paces Paces on the road, $toNext to the next discovery. '
+          '${encounterLine(game)}',
       child: ExcludeSemantics(
         child: _Frost(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 9),
@@ -560,13 +560,11 @@ class _JourneyStrip extends StatelessWidget {
                   ],
                 ),
               ),
-              if (still != null) ...<Widget>[
-                const SizedBox(height: 8),
-                KeyedSubtree(
-                  key: TourMark.sleeper,
-                  child: _DailyStillRow(today: still, place: target.name),
-                ),
-              ],
+              const SizedBox(height: 8),
+              KeyedSubtree(
+                key: TourMark.sleeper,
+                child: _EncounterRow(game: game),
+              ),
             ],
           ),
         ),
@@ -575,44 +573,44 @@ class _JourneyStrip extends StatelessWidget {
   }
 }
 
-/// What the day's Still creature is doing, in a line.
-String _dailyStillLine(DailyStillToday today, String place) {
-  final name = today.still.creature.name;
-  if (!today.still.awake) return 'A $name dozes by $place';
-  final gift = today.gift;
-  return gift == null
-      ? 'The $name woke and wandered off'
-      : 'The $name woke: +$dailyStillGold gold, '
-          '+$dailyStillMaterials ${gift.label}';
+/// Today's encounter in a line: the creature, and where things stand
+/// with it (Amendment v0.3 §3).
+String encounterLine(GameController game) {
+  final enemy = game.enemyToday;
+  return switch (game.encounterStatus) {
+    EncounterStatus.ready =>
+      'Today’s encounter: ${withArticle(enemy.name)} (${enemy.type.label})',
+    EncounterStatus.won => 'The ${enemy.name} woke. The road is clear',
+    EncounterStatus.holding =>
+      'The ${enemy.name} holds the road. Any quest opens another try',
+    EncounterStatus.retry =>
+      'The ${enemy.name} holds the road. Another try is open',
+  };
 }
 
-String _dailyStillSpoken(DailyStillToday today, String place) =>
-    today.still.awake
-        ? '${_dailyStillLine(today, place)}.'
-        : '${_dailyStillLine(today, place)}. ${today.still.stirs} of '
-            '$dailyStillStirs quests have stirred it.';
+/// Today's encounter on the board: the creature, its type, and a way in.
+class _EncounterRow extends StatelessWidget {
+  const _EncounterRow({required this.game});
 
-/// The day's Still creature (DECISIONS D-70): where it dozes, a pip for each
-/// quest that has stirred it, and what it left once it has woken.
-class _DailyStillRow extends StatelessWidget {
-  const _DailyStillRow({required this.today, required this.place});
-
-  final DailyStillToday today;
-  final String place;
+  final GameController game;
 
   @override
   Widget build(BuildContext context) {
-    final awake = today.still.awake;
-    return Row(
+    final enemy = game.enemyToday;
+    final status = game.encounterStatus;
+    final won = status == EncounterStatus.won;
+    final open =
+        status == EncounterStatus.ready || status == EncounterStatus.retry;
+    final row = Row(
       children: <Widget>[
         ArtMedallion(
-          asset: stillArt(today.still.creature.key),
-          size: 22,
-          ring: awake ? Palette.goldBright : Palette.onDarkSoft,
+          asset: stillArt(enemy.art),
+          size: 24,
+          ring: won ? Palette.goldBright : Palette.onDarkSoft,
           fallback: VIcon(
-            awake ? 'sun' : 'still',
+            won ? 'sun' : 'still',
             size: 15,
-            color: awake ? Palette.goldBright : Palette.onDarkSoft,
+            color: won ? Palette.goldBright : Palette.onDarkSoft,
           ),
         ),
         const SizedBox(width: 7),
@@ -621,7 +619,7 @@ class _DailyStillRow extends StatelessWidget {
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
-              _dailyStillLine(today, place),
+              encounterLine(game),
               maxLines: 1,
               style: AppText.small.copyWith(
                 color: Palette.onDark,
@@ -630,36 +628,28 @@ class _DailyStillRow extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        for (var i = 0; i < dailyStillStirs; i++)
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: _StirPip(lit: awake || i < today.still.stirs),
+        if (open) ...<Widget>[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: Palette.gold,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Text(
+              status == EncounterStatus.retry ? 'Try again' : 'Fight',
+              style: AppText.label.copyWith(color: Palette.forestNight),
+            ),
           ),
+        ],
       ],
     );
-  }
-}
-
-class _StirPip extends StatelessWidget {
-  const _StirPip({required this.lit});
-
-  final bool lit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 9,
-      height: 9,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: lit ? Palette.goldBright : Colors.transparent,
-        border: Border.all(
-          color: lit
-              ? Palette.goldBright
-              : Palette.onDark.withValues(alpha: 0.45),
-          width: 1.2,
-        ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => openEncounter(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: row,
       ),
     );
   }

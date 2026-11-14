@@ -37,10 +37,10 @@ List<TourStep> boardTour(String companion) => <TourStep>[
         target: TourMark.road,
       ),
       TourStep(
-        title: 'Today’s sleeper',
-        body: 'A Still creature dozes somewhere in the Vale each day. Every '
-            'quest you finish stirs it. The third wakes it, and it leaves a '
-            'gift.',
+        title: 'Today’s encounter',
+        body: 'One of the Still holds the road each day. Tap here to meet '
+            'it: a short fight, with a chest if you wake it. Every quest '
+            'you finish first makes you stronger there.',
         target: TourMark.sleeper,
       ),
       TourStep(

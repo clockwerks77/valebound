@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../export/export_service.dart';
 import '../../rules/companion_rules.dart';
 import '../../rules/day_key.dart';
+import '../../rules/encounter.dart' show withArticle;
 import '../../rules/journey.dart';
 import '../../rules/world.dart';
 import '../../rules/xp_curve.dart';
@@ -17,10 +18,11 @@ import '../art/crests.dart';
 import '../art/painted.dart';
 import '../board/board_screen.dart' show VillagerCard;
 import '../celebrations.dart';
+import '../encounter/class_choice.dart';
+import '../encounter/encounter_screen.dart';
 import '../tour/tours.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
-import 'delve_screen.dart';
 
 /// Opens the Campfire over whatever screen is showing.
 Future<void> openCampfire(BuildContext context) {
@@ -143,6 +145,10 @@ class _CampfireScreenState extends State<CampfireScreen> {
         const SizedBox(height: 12),
         _DelveCard(open: done),
       ],
+      if (game.respecOpen) ...<Widget>[
+        const SizedBox(height: 12),
+        const _RespecCard(),
+      ],
       const SizedBox(height: 12),
       const _ExportLine(),
       const SizedBox(height: 16),
@@ -229,8 +235,12 @@ class _DelveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final delve = GameScope.of(context).delve;
+    final game = GameScope.of(context);
+    final delve = game.delve;
     if (delve == null) return const SizedBox.shrink();
+    final state = game.bossState;
+    final boss = state.boss;
+    final met = state.hpLeft != null;
     return ParchmentCard(
       edge: Palette.gold,
       child: Column(
@@ -242,15 +252,17 @@ class _DelveCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            delve.site,
+            boss.name,
             style: AppText.cardTitle.copyWith(color: Palette.slate),
           ),
           const SizedBox(height: 4),
           Text(
             open
-                ? 'The week’s quests are its supplies. Go in whenever you '
-                    'like; it will keep.'
-                : 'It opens when you close the day, so all of today counts.',
+                ? '${met ? 'It is still worn down from last time. ' : ''}'
+                    'Seven turns to wear it down further. Boss Marks in '
+                    'hand: ${state.marks}.'
+                : 'It opens when you close the day, so all of today’s '
+                    'quests count toward your strength.',
             style: AppText.small.copyWith(color: Palette.slateSoft),
           ),
           if (open) ...<Widget>[
@@ -259,9 +271,49 @@ class _DelveCard extends StatelessWidget {
               label: 'Enter the Delve',
               icon: 'cave',
               color: Palette.moss,
-              onPressed: () => openDelve(context),
+              onPressed: () => openBoss(context),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// On the Delve's day the fire is where a class can be changed, for
+/// nothing (Amendment v0.3 §2).
+class _RespecCard extends StatelessWidget {
+  const _RespecCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final cls = GameScope.of(context).heroClass;
+    if (cls == null) return const SizedBox.shrink();
+    return ParchmentCard(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'YOUR CLASS',
+                  style: AppText.label.copyWith(color: Palette.goldDeep),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'You are ${withArticle(cls.label)}. Tonight you may take up another '
+                  'for nothing. Everything you have earned stays.',
+                  style: AppText.small.copyWith(color: Palette.slate),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          QuietButton(
+            label: 'Change',
+            onPressed: () => showClassChoice(context),
+          ),
         ],
       ),
     );
@@ -755,12 +807,13 @@ class _WorldCard extends StatelessWidget {
               color: Palette.companionDeep,
               text: 'Discovered: ${sceneFor(i).title}.',
             ),
-          if (game.dailyStillToday?.still.awake ?? false)
+          if (game.encounterToday != null)
             _WorldRow(
               icon: 'still',
               color: Palette.slateSoft,
-              text: 'Woke: the '
-                  '${game.dailyStillToday!.still.creature.name}.',
+              text: game.encounterToday!.won
+                  ? 'Woke: the ${game.enemyToday.name}.'
+                  : 'The ${game.enemyToday.name} held the road today.',
             ),
         ],
       ),
