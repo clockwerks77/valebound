@@ -17,10 +17,12 @@ analytics, no network calls.
   and backup were confirmed on the Fold ([report](docs/PHASE-2.md),
   [sample export files](docs/samples)). Branch `phase-2`. Share… and
   restoring from a backup have not been tried on a phone yet.
-- **Phase 3, real life connects:** built and tested, version 0.3.0
-  ([report](docs/PHASE-3.md), [acceptance checklist](docs/ACCEPTANCE.md)).
-  Branch `phase-3`. The calendar, Health Connect steps and the reminder
-  need their first run on a real phone.
+- **Phase 3, real life connects:** built, tested and run on the Fold,
+  version 0.3.1 ([report](docs/PHASE-3.md),
+  [acceptance checklist](docs/ACCEPTANCE.md)). Branch `phase-3`. The
+  calendar, the reminder and the Health Log were confirmed on the Fold on
+  14 Nov 2026; a real step count from Health Connect is the one check
+  still open.
 
 ## Getting the app
 

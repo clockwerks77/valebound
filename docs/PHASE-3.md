@@ -1,7 +1,9 @@
 # Phase 3 report: real life connects
 
 Branch `phase-3` (built on `phase-2`). Built and tested on GitHub Actions
-with Flutter 3.47.9 (Dart 3.13.7). App version 0.3.0.
+with Flutter 3.47.9 (Dart 3.13.7). App version 0.3.0, then 0.3.1 the same
+night after Adam's first run on the Fold (calendar suggestions offered
+once, and flagged when they repeat a quest already on the board).
 
 The acceptance checklist from DESIGN §15, item by item with evidence, is in
 [`ACCEPTANCE.md`](ACCEPTANCE.md).
@@ -17,7 +19,11 @@ The acceptance checklist from DESIGN §15, item by item with evidence, is in
   dismissed one is gone for the day. Events you declined or that were
   cancelled are not offered. The app only reads the calendar. Settings has a
   tick per calendar, so any of them can be left out, and a button to stop
-  using the calendar altogether.
+  using the calendar altogether. From 0.3.1: an event that sits in two
+  calendars is offered once, and an event that repeats a quest already on
+  today's board says so on its card ("Looks like “Weekly Injection
+  (Mounjaro)”, which is already on today’s board.") with Dismiss as the
+  main button.
 - **Steps from Health Connect.** Connect from Settings or from the steps
   quest itself. Today's step count then shows on the quest ("3,200 of 7,000
   steps so far") and the quest completes by itself at its target, with the
@@ -67,7 +73,7 @@ Install over the top of the Phase 2 app; your data stays.
 
 1. On the Fold, open the repository's **Releases** page, download
    `app-debug.apk` from **Latest debug build** (`latest-debug`) and install
-   it. Settings → About should read version 0.3.0.
+   it. Settings → About should read version 0.3.1.
 2. **Portraits.** Look at the board header and the Character tab. In
    Settings → Your party → Change, step through the six companion kinds.
 3. **Calendar.** Scroll the board to "Today’s calendar, as quests?" and tap
@@ -108,7 +114,7 @@ and step counter. Half-size copies:
 
 | | Cover screen (compact) | Opened Fold (expanded) |
 |---|---|---|
-| Calendar suggestions on the board | [board](screenshots/phase-3/board-calendar-cover.png) | [board + Map](screenshots/phase-3/board-calendar-open.png) |
+| Calendar suggestions on the board | [board](screenshots/phase-3/board-calendar-cover.png), [an event that repeats a quest](screenshots/phase-3/board-calendar-match-cover.png) | [board + Map](screenshots/phase-3/board-calendar-open.png) |
 | Comeback quest | [board](screenshots/phase-3/board-comeback-cover.png) | [board + Map](screenshots/phase-3/board-comeback-open.png) |
 | Health Log | [form](screenshots/phase-3/health-log-cover.png) | [form + note](screenshots/phase-3/health-log-open.png) |
 | Reminder in the quest editor | [editor](screenshots/phase-3/editor-reminder-cover.png) | [editor, in one pane](screenshots/phase-3/editor-reminder-open.png) |
@@ -124,9 +130,10 @@ on the crease.
 | Check | Result |
 |---|---|
 | `flutter analyze` | No issues |
-| `flutter test` | 304 tests, all passing |
+| `flutter test` | 317 tests, all passing |
 | `flutter build apk --debug` | See [`ACCEPTANCE.md`](ACCEPTANCE.md), item 1 |
 | Delve, comeback, reminder and Health Log rules | `test/rules/phase3_rules_test.dart` |
+| One event offered once; an event that repeats a quest recognised | `test/rules/suggestions_test.dart`, `test/ui/phase3_flows_test.dart` |
 | Comeback, Delve, steps, calendar choices, Health Log, settings, backup | `test/data/phase3_test.dart` |
 | **A Phase 2 database opens under this build with every row intact** | `test/data/phase3_test.dart`, on a database built from the Phase 2 table definitions |
 | Calendar, comeback, Health Log, steps, Delve, settings and reminder flows on screen | `test/ui/phase3_flows_test.dart`, against a stand-in device |
@@ -134,9 +141,23 @@ on the crease.
 | Both postures; nothing critical on the crease | `test/golden/phase3_golden_test.dart` |
 | No guilt copy, no banned names, no network packages | `test/copy/copy_audit_test.dart` |
 
-**Not yet run on a device:** version 0.3.0 itself; reading the real
-calendar; reading steps from Health Connect; a reminder arriving; and, left
-over from Phase 2, Share… and restoring from a backup.
+**Confirmed on the Galaxy Z Fold 8 by Adam, 14 November 2026 (version
+0.3.0):** installed over the Phase 2 app with the data intact; connected
+the calendar and accepted two of today's events as quests; connected Health
+Connect; set a reminder, was asked for notification permission at that
+point, and the reminder arrived; saved the Health Log. He sent back the
+three files the app wrote (`Character Sheet.md`, `Quests.md`,
+`Daily/2026-11-14.md`): they match §11, the `## Health` section carries his
+entries under the field names with their units, and the numbers add up
+against the rules (a Shared quest reads `13 XP + 25 Companion XP`; XP,
+attribute XP, gold, materials, Bond and Paces all agree with the six quests
+completed).
+
+**Still to see on a device:** a real step count on the steps quest (the
+day note sent at 01:46 has no `steps:` line, which is what the app writes
+when Health Connect has no steps for the day yet); version 0.3.1's two
+calendar changes; and, left over from Phase 2, Share… and restoring from a
+backup.
 
 Also worth knowing:
 

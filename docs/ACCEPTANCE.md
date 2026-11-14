@@ -2,26 +2,30 @@
 
 Run by Claude on 14 November 2026 against version 0.3.0, commit `de85a1a`
 on branch `phase-3`, GitHub Actions run 43565195441 (Flutter 3.47.9).
+Updated the same night with Adam's run of 0.3.0 on his Galaxy Z Fold 8 and
+the three files the app wrote into his vault. Version 0.3.1 followed
+(commit `008449d`, run 43568359044, 317 tests passing, published as the
+`latest-debug` release); it changes only how calendar suggestions are offered.
 
 **How it was run.** Claude's workspace cannot build Flutter, so the build,
-the analyser and all 304 tests ran on GitHub Actions and the results were
+the analyser and all the tests ran on GitHub Actions and the results were
 read back from the `ci-results` branch. Claude has no phone. Anything that
-needs a real device is marked **needs the Fold** and is not counted as a
-pass; where Adam has already confirmed something on his Fold, that is said,
-with the date and the version it was confirmed on.
+needs a real device is counted as a pass only where Adam has confirmed it
+on his Fold, and that is said, with the date and the version.
 
 ## Result
 
 | | |
 |---|---|
-| Items passing in full | 9 of 12 (items 1, 3, 4, 5, 6, 7, 8, 11, 12) |
-| Items passing in everything that can be run here, with a device check still open | 3 of 12 (items 2, 9, 10) |
+| Items passing in full | 11 of 12 (items 1 to 8 and 10 to 12) |
+| Items with one device check still open | 1 of 12 (item 9: a real step count has not been seen yet) |
 | Items failing | 0 |
 
-So by the checklist's own rule ("not done until all are true") the build is
-**not yet done**: three items wait on a short session with the Fold. The
-steps are in [`PHASE-3.md`](PHASE-3.md), section (b), and the open checks
-are listed at the foot of this page.
+So by the checklist's own rule ("not done until all are true") one thing
+is left: seeing today's steps arrive on the steps quest. Items 2 and 10
+moved to a full pass on 14 November 2026 with Adam's run on the Fold, and
+the calendar half of item 9 with them. The open checks are listed at the
+foot of this page.
 
 ## The twelve items
 
@@ -35,8 +39,11 @@ are listed at the foot of this page.
   `8dcf398e…7a3b61`, the same as the Phase 2 build), so it installs over the
   top and keeps the data.
 - Published as `app-debug.apk` on the `latest-debug` release.
+- Version 0.3.1 built the same way: 162,883,967 bytes, SHA-256
+  `8cfa18afaad66826a12d8fd48dedfc84aae75f975cff6ec271432147600fa161`, same
+  signing key. It is the build on the release now.
 
-### 2. App installs and runs fully offline; data persists across restart — **Pass in tests; needs the Fold for this version**
+### 2. App installs and runs fully offline; data persists across restart — **Pass**
 
 - **Offline, pass.** No network package is bundled and no file in `lib/`
   imports `dart:io`, uses `HttpClient` or contains a web address:
@@ -53,9 +60,10 @@ are listed at the foot of this page.
   every row: Phase 1 to 2 in `test/data/phase2_test.dart`, Phase 2 to 3 in
   `test/data/phase3_test.dart` ("opens, keeps every row, and gains what
   Phase 3 adds").
-- **Installs and runs: needs the Fold.** The Phase 1 and Phase 2 builds
-  were installed and used on the Galaxy Z Fold 8 by Adam on 13 November
-  2026. Version 0.3.0 has not been installed on any device yet.
+- **Installs and runs, pass: confirmed on the Fold by Adam, 14 November
+  2026.** Version 0.3.0 installed over the Phase 2 app and his data was
+  still there. The character sheet the app then wrote still counts
+  the day played before the upgrade (two days visited, six quests, 96 XP).
 
 ### 3. Board is usable one-handed on compact width and uses two panes when open; nothing critical sits on the crease — **Pass**
 
@@ -114,6 +122,10 @@ are listed at the foot of this page.
   the first Discovery, in order".
 - In a file the app wrote: the sample day note shows Walk Babs as
   `13 XP + 25 Companion XP`.
+- In a file the app wrote on the Fold (Adam's `Daily/2026-11-14.md`): Walk
+  Babs reads `13 XP + 25 Companion XP`, with `companion_xp_earned: 25` and
+  `paces: 1`. His character sheet has Companion XP 50, Bond 2 and Paces 2
+  after two walks.
 
 ### 7. XP, level-up (incl. the L1→2 = 100 XP step), and attribute XP are correct — **Pass**
 
@@ -124,6 +136,10 @@ are listed at the foot of this page.
   on the same curve".
 - `test/data/repository_test.dart`: "level-up at 100 XP, with the title
   list kept current".
+- On the Fold: Adam's character sheet is level 1 at 96 XP, with Vitality
+  60, Care 26 and Mind 10, which sum to 96. Gold 24 and six materials are
+  what those six quests give under D-08, and the stores hold exactly what
+  is left after the Gate Lantern's cost.
 
 ### 8. Missing a day changes nothing except that day; the comeback quest appears after 2+ days away — **Pass**
 
@@ -140,7 +156,7 @@ are listed at the foot of this page.
   [cover](screenshots/phase-3/board-comeback-cover.png),
   [open](screenshots/phase-3/board-comeback-open.png).
 
-### 9. Calendar suggestions appear (with permission) and are ignorable; Health Connect steps fill the Auto quest, manual fallback works without permission — **Pass in tests; needs the Fold**
+### 9. Calendar suggestions appear (with permission) and are ignorable; Health Connect steps fill the Auto quest, manual fallback works without permission — **Calendar: pass. Steps: pass in tests, connected on the Fold, a real count not yet seen**
 
 - **App behaviour, pass**, against a stand-in calendar and step counter:
   - `test/ui/phase3_flows_test.dart`: "asked for on the board, then offered
@@ -152,13 +168,26 @@ are listed at the foot of this page.
   - Steps: "connected, the day’s steps complete the quest by themselves",
     "below the target they show as progress", "refused, the quest still
     completes with a tap".
-- **The Android side: needs the Fold.** The code that reads Android's
-  calendar and asks Health Connect for the day's steps compiles and is in
-  the APK, and it is written so that any problem reads as "not connected".
-  It has never run on a real device, and a stand-in cannot prove it. This
-  is the largest open check in the build.
+- **Calendar on the Fold, pass: confirmed by Adam, 14 November 2026
+  (0.3.0).** He connected the calendar from the board and today's events
+  were offered. His `Quests.md` shows the two he accepted, each as the
+  design asks: `Order · Standard · Once, 2026-11-14 · Confirm`.
+- **What that run turned up.** One accepted event, "Mounjaro", repeats the
+  seeded Weekly Injection (Mounjaro), which was on the board the same day.
+  Version 0.3.1 flags such an event on its card and offers an event that
+  sits in two calendars only once (D-68, D-69;
+  `test/rules/suggestions_test.dart` and three tests in
+  `test/ui/phase3_flows_test.dart`).
+- **Steps on the Fold: connected, count not yet seen.** Adam connected
+  Health Connect on 14 November 2026 and reports that it worked. The day
+  note written at 01:46 that night has no `steps:` line, and its 7,000
+  Steps row was completed at 01:34, so no count had reached the app by
+  then. That is what the app does when Health Connect has no steps for the
+  day yet, which is likely an hour and a half after midnight. The proof
+  still wanted is a count on the quest ("3,200 of 7,000 steps so far") and
+  `steps:` in a day note, later in a day.
 
-### 10. Campfire produces Markdown files matching §11 exactly (sample files delivered) — **Pass; one new field to see on the Fold**
+### 10. Campfire produces Markdown files matching §11 exactly (sample files delivered) — **Pass**
 
 - `test/export/markdown_test.dart` checks each file field by field against
   §11. `test/export/export_service_test.dart` regenerates the three sample
@@ -170,7 +199,13 @@ are listed at the foot of this page.
   back the three files the app wrote into his vault and they matched §11.
 - New in this version: the `## Health` section uses the field names chosen
   in Settings (`test/data/phase3_test.dart`, "what was logged reaches the
-  day’s Markdown, named as chosen"). Worth one look in a real day note.
+  day’s Markdown, named as chosen").
+- **Confirmed on the Fold by Adam, 14 November 2026 (0.3.0):** the three
+  files he sent back match §11 field for field. The day note has the
+  frontmatter in order, with `steps` left out because there was no figure;
+  the six-column quest table; Journey, Health, World in that order; and no
+  Notes section because no note was written. `## Health` lists his three
+  entries under their field names with their units.
 
 ### 11. No banned IP terms or guilt-copy terms appear in user-facing strings — **Pass**
 
@@ -194,22 +229,27 @@ are listed at the foot of this page.
 
 | Asked for | Result | Evidence |
 |---|---|---|
-| READ_CALENDAR requested in context | Pass in tests | Asked from a card on the Dawn board, never at launch (`phase3_flows_test.dart`, calendar group) |
-| Today's events as Accept/Dismiss Confirm quests | Pass in tests | Same group; `phase3_test.dart`, "accepting one makes today’s commitment, a Confirm quest" |
+| READ_CALENDAR requested in context | Pass; on the Fold 14 Nov 2026 | Asked from a card on the Dawn board, never at launch (`phase3_flows_test.dart`, calendar group) |
+| Today's events as Accept/Dismiss Confirm quests | Pass; on the Fold 14 Nov 2026 | Same group; `phase3_test.dart`, "accepting one makes today’s commitment, a Confirm quest"; two accepted events in Adam's `Quests.md` |
 | Never auto-completed | Pass | `phase3_test.dart`, "it is never completed for you" |
 | Excluded-calendar setting | Pass in tests | "an excluded calendar is left out" |
-| Steps fill the 7,000-steps Auto quest | Pass in tests; needs the Fold | Item 9 |
+| Steps fill the 7,000-steps Auto quest | Pass in tests; connected on the Fold, a real count not yet seen | Item 9 |
 | Manual fallback when permission is denied | Pass | "refused, the quest still completes with a tap" |
-| Health Log with user-chosen fields, feeding the Markdown Health section | Pass | `phase3_flows_test.dart`, Health Log group and "a Health Log field can be switched off"; `phase3_test.dart`, Health Log group |
+| Health Log with user-chosen fields, feeding the Markdown Health section | Pass; on the Fold 14 Nov 2026 | `phase3_flows_test.dart`, Health Log group and "a Health Log field can be switched off"; `phase3_test.dart`, Health Log group; the `## Health` section of Adam's day note |
 | Weekly Delve resolved at the chosen day's Campfire | Pass | `phase3_rules_test.dart` and `phase3_test.dart`, Delve groups; `phase3_flows_test.dart`, "opens at the Campfire once the day is closed" and "the Delve day can be chosen" |
 | Comeback quest | Pass | Item 8 |
-| Local quest reminder, optional, off by default, the only notification | Pass in tests; needs the Fold to see one arrive | `phase3_rules_test.dart`, reminders group ("off by default: no time, no reminders"); `phase3_flows_test.dart`, "a reminder is planned for its quest and stops once done". The app has one notification channel and nothing else posts to it |
+| Local quest reminder, optional, off by default, the only notification | Pass; on the Fold 14 Nov 2026 (permission asked when the reminder was set, and the reminder arrived) | `phase3_rules_test.dart`, reminders group ("off by default: no time, no reminders"); `phase3_flows_test.dart`, "a reminder is planned for its quest and stops once done". The app has one notification channel and nothing else posts to it |
 
 ## Open device checks, in one place
 
-1. Install 0.3.0 over 0.2 and confirm the data is still there.
-2. Connect the calendar; see today's events; accept one and dismiss one.
-3. Connect Health Connect; see today's steps on the steps quest.
-4. Set a reminder a few minutes ahead and see it arrive.
-5. Look at `## Health` in a day note after saving the Health Log.
-6. Left over from Phase 2: Share… and restoring from a backup.
+1. A real step count: later in a day, the steps quest should read
+   something like "3,200 of 7,000 steps so far", and that day's note should
+   carry `steps:`. If it stays empty after a walk, Samsung Health may not
+   be sharing steps with Health Connect.
+2. Version 0.3.1: a calendar event that repeats a quest on the board should
+   say so on its card.
+3. Dismissing a suggestion (covered by tests; not reported from the Fold).
+4. Left over from Phase 2: Share… and restoring from a backup.
+
+Done on the Fold, 14 November 2026: installing over the Phase 2 app with
+the data intact; the calendar; the reminder; the Health Log in a day note.
