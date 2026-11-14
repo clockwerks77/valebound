@@ -138,9 +138,13 @@ the app:
 - **Paintings fade in** if they were not ready at once; a story loads all
   its pages as it opens.
 
-Screenshots: `91`–`98` (story pages, both layouts, every chapter),
-`100_board_*` (the four lights), `45_campfire_cover_scene`,
-`101_discovery_*`.
+Screenshots of these screens as they are in 0.5.2 are in
+`docs/screenshots/phase-5/paintings/` (JPEG, at three fifths of full size):
+`91`–`98` (story pages on both layouts, every chapter), `01`, `20` and
+`100_board_*` (the valley in its four lights), `45_campfire_cover_scene`
+and `62_campfire_open`, `12`, `24` and `101_discovery_*`. The PNGs beside
+that folder are the 0.5.1 screens; the full-size set from every build is on
+the `ci-results` branch.
 
 Two of the 38 are not in the app, on purpose: the map and the "old
 friends" scene (see below).
@@ -180,6 +184,15 @@ Version 0.5.1, commit `8a91928` on `phase-5`, GitHub Actions run
 | `Valebound-0.5.1.apk` (release) | 24,804,349 bytes | `2d76547a5d5853fd55c07a3ee60632dec7eaea819b4d696f4e4196986002ff8c` |
 | `Valebound-0.5.1-debug.apk` | 164,170,583 bytes | `32d8e83cc5d5d6552ed08b8002f18b9dd467338c0d49fe83fa668e6be6258ad5` |
 
-Both are signed with the fixed personal key (certificate SHA-256
-`8dcf398e…7a3b61`). The release file declares no `INTERNET` permission.
+Version 0.5.2, commit `c7c8835` on `phase-5`, GitHub Actions run
+43644183258, 14 Nov 2026. 429 tests passed. This is the build on the
+`latest` release.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `Valebound-0.5.2.apk` (release) | 29,935,133 bytes | `336cff711503bc3e0b4349a80a5c36de224866fa6a9f26eb5966f173c82dffc4` |
+| `Valebound-0.5.2-debug.apk` | 169,238,611 bytes | `5483d55d3f45b6a877ec6873e741ec77a856a644d06077685df4082642ecae52` |
+
+All are signed with the fixed personal key (certificate SHA-256
+`8dcf398e…7a3b61`). The release files declare no `INTERNET` permission.
 

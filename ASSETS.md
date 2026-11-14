@@ -15,7 +15,7 @@ followed by its own `Subject:` line.
 | Vector drawing in code | Yes | Flutter `CustomPaint`, SVG path data. |
 | Code-painted raster | Yes | Python (Pillow), ImageMagick, rsvg. Good for textures, gradients, terrain and light. Not good enough for premium portraits or scenes. |
 | Fonts | Yes | Fraunces and Figtree, SIL OFL 1.1, bundled. |
-| Adam's PC and Chrome | With per-app / per-site approval | Chrome is used to run Firefly, with Adam's go-ahead. No folder on the PC is connected, so files cannot be fetched from it. |
+| Adam's PC and Chrome | With per-app / per-site approval | Chrome is used to run Firefly, with Adam's go-ahead. Since 14 Nov 2026 the folder `Downloads\\Valebound Downloads` is connected to the chat, so files he puts there can be read (section 7). |
 | Adobe connector | Connected 13 Nov 2026 | Finds Firefly generations, previews them (up to 600 pixels), crops, resizes, grades, removes backgrounds. **Cannot generate.** |
 | Hugging Face connector | Connected 13 Nov 2026 | Browsing only; running a model is switched off in the built-in connector. Not used. |
 
@@ -27,9 +27,9 @@ the app is a grey box.
 
 **Getting files into the project.** The cloud workspace cannot reach Adobe's
 servers. Portraits come through the connector's preview (600 pixels, shipped
-at 512×512). Anything larger needs the full-size file from Adam's PC: a
-folder connected to the session in the Claude desktop app, or the files
-attached in chat.
+at 512×512). Anything larger needs the full-size file by way of Adam's PC:
+fetched in his Chrome and moved into the folder he has connected to the
+chat (section 7), or attached in chat.
 
 Status values: `generated` · `coded` · `placeholder` · `needed-from-Adam`.
 
@@ -142,7 +142,7 @@ description there. Keys: standing_stone, hot_spring, merchant_cart,
 lantern_tree, beehive_wall, wind_chimes, shepherd_hut, mile_marker,
 stepping_stones, reed_flute, star_pool, otter_slide, cloud_bench, watchtower,
 echo_stone, snowbell, garden_gate, sundial, glass_stair, first_lantern.
-Status: the other 19 were generated 14 Nov 2026 and wait for full-size files (section 6); `standing_stone` is in the app as a working copy.
+Status: all 20 are in the app. The 19 generated on 14 Nov 2026 came in at 960×747 with version 0.5.2 (section 7); `standing_stone` is still its 600-pixel working copy.
 
 ### Places (20, shown as a medallion on the map and on the restoration card)
 
