@@ -6,7 +6,7 @@ import 'package:habit_adventure/rules/still.dart';
 import 'package:habit_adventure/rules/world.dart';
 import 'package:habit_adventure/ui/art/painted.dart';
 
-// The illustrated set (ASSETS.md section 4): every drafted place, villager,
+// The illustrated set (ASSETS.md section 6): every drafted place, villager,
 // Still creature and piece of gear has a picture, under the key the rules
 // use for it, and the file is really there.
 

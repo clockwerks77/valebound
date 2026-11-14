@@ -102,7 +102,7 @@ story; a test checks that no words or buttons sit on the crease.
 ## Added in 0.5.1: the first of the new art
 
 All 96 pieces on the art list were generated in Firefly on 14 Nov 2026
-(ASSETS.md section 4 lists every one with its Subject line). The 57 that
+(ASSETS.md section 6 lists every one with its Subject line). The 57 that
 are shown small are in the app:
 
 - **Villagers:** the villager who speaks on the board now has a face, and

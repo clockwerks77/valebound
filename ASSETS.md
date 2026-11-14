@@ -46,7 +46,7 @@ Status values: `generated` · `coded` · `placeholder` · `needed-from-Adam`.
 | Map motion: fog lifting as a region wakes, the camp walking to its new spot, gold road dots | `lib/ui/map/vale_map.dart` | `CustomPaint` animation | coded |
 | Journey road, Discovery lanterns, camp marker, place medallions, Scout marker | `lib/ui/map/vale_map.dart` | `CustomPaint` | coded (these stay coded on top of any painted map) |
 | Undo ring (five-second countdown) | `lib/ui/board/quest_actions.dart` | `CustomPaint` animation | coded |
-| Fonts: Fraunces SemiBold/Bold, Figtree Regular–Bold | `assets/fonts/` | TTF, OFL 1.1 | bundled |
+| Fonts: Fraunces SemiBold/Bold and Italic (the narrator), Figtree Regular–Bold | `assets/fonts/` | TTF, OFL 1.1 | bundled |
 | Launcher icon: gold lantern on forest green (adaptive + legacy) | `android/app/src/main/res/` | PNG rendered from SVG, 432×432 foreground | coded |
 
 ## 2. Stand-ins (code-drawn, to be replaced by painted art)
@@ -61,12 +61,12 @@ the design asks for. Each has a matching entry in section 3.
 | Dawn valley vista (sky, sun, ridges, mist, lanterns) | `lib/ui/art/vista.dart` | Dawn header scene, onboarding scene | Phase 1 | placeholder |
 | The Vale map: 86 hand-laid shapes on a 400×500 grid (peaks, ruins, river, hills, village, woods), each region draining to grey when asleep | `lib/ui/map/map_art.dart` | Painted map, asleep and awake | Phase 2 | placeholder |
 | Fog banks over sleeping regions | `lib/ui/map/vale_map.dart` | Painted fog | Phase 2 | placeholder (may simply stay coded) |
-| Place medallions ×20 (an icon in a ring, grey when asleep, gold-lit when restored) | `lib/ui/map/vale_map.dart` | Building art, asleep and restored | Phase 2 | replaced 14 Nov 2026 by the 20 place pictures where a place is shown in a list or on a card (section 4); the markers on the map itself stay coded |
-| Villager medallions ×20 (the villager's icon on a green roundel) | `lib/ui/board/board_screen.dart` | Villager portraits | Phase 2 | replaced 14 Nov 2026 by the 20 villager pictures (section 4) |
+| Place medallions ×20 (an icon in a ring, grey when asleep, gold-lit when restored) | `lib/ui/map/vale_map.dart` | Building art, asleep and restored | Phase 2 | replaced 14 Nov 2026 by the 20 place pictures where a place is shown in a list or on a card (section 6); the markers on the map itself stay coded |
+| Villager medallions ×20 (the villager's icon on a green roundel) | `lib/ui/board/board_screen.dart` | Villager portraits | Phase 2 | replaced 14 Nov 2026 by the 20 villager pictures (section 6) |
 | Campfire night scene (stars, ridges, fire glow) with the two portraits | `lib/ui/campfire/campfire_screen.dart` | Campfire scene | Phase 2 | placeholder |
 | Lantern roundel on the Discovery card (the same for the 19 scenes not yet illustrated) | `lib/ui/celebrations.dart` | Discovery scene art | Phase 1 | placeholder; the standing stone shows its illustration |
-| Still creatures: a sleepy grey blob on the map, a small icon on the card (same for all 6) | `lib/ui/map/vale_map.dart`, `v_icon.dart` | Still creature art | Phase 2 | the board row shows the six pictures since 14 Nov 2026 (section 4); the blob on the map stays coded |
-| Companion gear: a slot icon (collar, bell, cloak, blanket) as a badge on the portrait | `lib/ui/art/crests.dart` | Gear art per kind | Phase 2 | the Inventory shows the 11 pictures since 14 Nov 2026 (section 4); the badge on the portrait stays a coded icon |
+| Still creatures: a sleepy grey blob on the map, a small icon on the card (same for all 6) | `lib/ui/map/vale_map.dart`, `v_icon.dart` | Still creature art | Phase 2 | the board row shows the six pictures since 14 Nov 2026 (section 6); the blob on the map stays coded |
+| Companion gear: a slot icon (collar, bell, cloak, blanket) as a badge on the portrait | `lib/ui/art/crests.dart` | Gear art per kind | Phase 2 | the Inventory shows the 11 pictures since 14 Nov 2026 (section 6); the badge on the portrait stays a coded icon |
 | Portrait frames: the portrait ring in a different colour | `lib/ui/art/crests.dart` | Frame art | Phase 2 | placeholder (may simply stay coded) |
 | Village decorations: small flags, dots and lights on the map | `lib/ui/map/vale_map.dart` | Painted into the awake map | Phase 2 | placeholder |
 | "Old Friends" scene: the two portraits side by side | `lib/ui/party/party_sheet.dart` | Hero + companion portrait scene (companion L10) | Phase 2 | placeholder |
@@ -113,9 +113,9 @@ the Fold.
 
 | File | Size | Subject | Status |
 |---|---|---|---|
-| `scenes/dawn_header.png` | 1600×1100 | wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, low sun, mist | needed-from-Adam |
-| `scenes/campfire.png` | 1600×1000 | a small camp beside a country road at dusk: a fire, a bedroll, a lantern on a post; space left and right of the fire for two figures | needed-from-Adam |
-| `scenes/old_friends.png` | 1600×1000 | a traveller and their animal companion sitting side by side on a hill at dusk, seen from behind, lanterns of a valley below | needed-from-Adam (companion L10; far off) |
+| `scenes/dawn_header.png` | 1600×1100 | wide view down a sleeping valley at dawn: layered hills, a small village with a few lit lanterns, low sun, mist | generated 14 Nov 2026 (section 6); waiting for the full-size file |
+| `scenes/campfire.png` | 1600×1000 | a small camp beside a country road at dusk: a fire, a bedroll, a lantern on a post; space left and right of the fire for two figures | generated 14 Nov 2026 (section 6); waiting for the full-size file |
+| `scenes/old_friends.png` | 1600×1000 | a traveller and their animal companion sitting side by side on a hill at dusk, seen from behind, lanterns of a valley below | generated 14 Nov 2026 (section 6); the take shows one traveller, without a companion, so it is a first look |
 
 ### The map (portrait, 4:5, to match the coded layout)
 
@@ -127,8 +127,8 @@ coded map (`docs/screenshots/phase-2/map-cover.png`) is the layout guide.
 
 | File | Size | Subject | Status |
 |---|---|---|---|
-| `map/vale_asleep.png` | 1600×2000 | hand-drawn-feeling painted map of a valley seen from above: snowy peaks top-left, pale stone ruins top-right, a river crossing the middle, rolling hills centre-right, a village bottom-left; muted, grey, misted, asleep; no road, no labels | needed-from-Adam |
-| `map/vale_awake.png` | 1600×2000 | the same map, same composition exactly, fully coloured and warmly lit | needed-from-Adam |
+| `map/vale_asleep.png` | 1600×2000 | hand-drawn-feeling painted map of a valley seen from above: snowy peaks top-left, pale stone ruins top-right, a river crossing the middle, rolling hills centre-right, a village bottom-left; muted, grey, misted, asleep; no road, no labels | not needed: the sleeping state will be the awake painting drained in code (section 6) |
+| `map/vale_awake.png` | 1600×2000 | the same map, same composition exactly, fully coloured and warmly lit | a first look was generated 14 Nov 2026 (section 6) |
 
 Regions wake one at a time, so the app will fade from the asleep painting to
 the awake one inside each region's outline (the outlines are already in
@@ -142,7 +142,7 @@ description there. Keys: standing_stone, hot_spring, merchant_cart,
 lantern_tree, beehive_wall, wind_chimes, shepherd_hut, mile_marker,
 stepping_stones, reed_flute, star_pool, otter_slide, cloud_bench, watchtower,
 echo_stone, snowbell, garden_gate, sundial, glass_stair, first_lantern.
-Status: needed-from-Adam (all 20; `standing_stone` is on the reference board).
+Status: the other 19 were generated 14 Nov 2026 and wait for full-size files (section 6); `standing_stone` is in the app as a working copy.
 
 ### Places (20, shown as a medallion on the map and on the restoration card)
 
@@ -153,21 +153,21 @@ village_well, bakehouse, moot_hall, sheepfold, larkdown_mill, hill_beacon,
 orchard, heron_bridge, wheelhouse, boathouse, ford_bell, waystation, ropeway,
 star_loft, summit_cairn, great_arch, reading_room, glasshouse, lanternhall.
 Subject: the place by name, small and centred, in its region's setting.
-Status: needed-from-Adam.
+Status: all 20 in the app since 0.5.1, at 384×384 (section 6).
 
 ### Villagers (20, shown at 40dp on the board and at the Campfire)
 
 512×512 each, `villagers/<key>.png`, head-and-shoulders. Names and roles are
 in `lib/rules/world.dart` (Wick the lamplighter, Marla the well-keeper, Bryn
-the baker, …). Status: needed-from-Adam. Low priority: at 40dp the coded
-medallion reads well.
+the baker, …). Status: all 20 in the app since 0.5.1, at 256×256 (section 6).
 
 ### The Still (6 creatures)
 
 512×512 each, transparent background, `still/<key>.png`: drowsel, mistling,
 hushmoth, yawnstone, dozewisp, fogfinch. Subject: a small, round, grey,
 sleepy creature, soft and harmless, eyes closed. Never frightening.
-Status: needed-from-Adam.
+Status: all six in the app since 0.5.1, at 320×320 on a cream ground and
+shown as medallions, so no transparency was needed (section 6).
 
 ### Companion gear (11 pieces)
 
@@ -176,7 +176,7 @@ brass_bell, hearth_blanket, trail_cloak, lantern_charm, silver_bell,
 star_blanket, dawn_cloak, golden_tag, song_bell, old_road_cloak. One
 painting per piece, shown beside the portrait. DESIGN §7A.3 asks for
 variants per companion kind (66 paintings); that is a later pass if wanted.
-Status: needed-from-Adam.
+Status: all 11 in the app since 0.5.1, on a cream ground (section 6).
 
 ### App icon
 
@@ -207,18 +207,22 @@ full-size file. Either of these unblocks it:
 `CompanionPortrait`) and every Discovery picture by another
 (`DiscoveryPicture`), all listed in `lib/ui/art/painted.dart`. A piece that
 has no file yet falls back to its code-drawn stand-in, so adding one is a
-file and one line. Scenes, the map, places, villagers, the Still and gear
-do not have their picture widgets yet; each arrives with its first file.
+file and one line. Places, villagers, the Still and gear are shown through
+`ArtMedallion`, and the story pages through `StoryPicture`. The scenes and
+the map do not have their picture widgets yet; each arrives with its first
+file.
 
 ## 5. Order
 
-Done: the reference board (3) and the remaining portraits (8).
+Done: the reference board (3), the remaining portraits (8), and on 14 Nov
+2026 the whole list generated (section 6), with the 57 small pieces in the
+app.
 
-Next, once full-size files can come across: Discoveries (19 more) →
-Campfire and Dawn scenes → the two map paintings → places (20) → the Still
-(6) → gear (11) → villagers (20). One to redo: the clockwork sprite.
+Next, once full-size files can come across: the story pictures (15) →
+Discoveries (19) → the Dawn and Campfire scenes → the map. One to redo: the
+clockwork sprite.
 
-## 4. The full run of 14 Nov 2026 (version 0.5.1)
+## 6. The full run of 14 Nov 2026 (version 0.5.1)
 
 Adam asked for "everything on the list" on 14 Nov 2026. Every piece below
 was generated in Adobe Firefly (Firefly Image 5, 1K) in Adam's Chrome, with
