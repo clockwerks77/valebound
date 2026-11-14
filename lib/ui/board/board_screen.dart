@@ -159,15 +159,22 @@ class DawnHeader extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
+                  // Narrow beside the Map on the opened Fold: the line
+                  // shrinks a little to fit, it is never cut short.
                   Expanded(
-                    child: Text(
-                      'DAWN IN THE VALE · ${game.questsDoneToday} OF '
-                      '${game.questsTotalToday} DONE',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.label.copyWith(color: Palette.goldBright),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'DAWN IN THE VALE · ${game.questsDoneToday} OF '
+                        '${game.questsTotalToday} DONE',
+                        maxLines: 1,
+                        style:
+                            AppText.label.copyWith(color: Palette.goldBright),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   RoundIconButton(
                     icon: 'sprig',
                     semanticLabel: 'Health Log',

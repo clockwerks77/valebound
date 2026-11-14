@@ -154,25 +154,32 @@ class SectionHeader extends StatelessWidget {
             VIcon(icon!, size: 18, color: color),
             const SizedBox(width: 8),
           ],
-          Flexible(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppText.title.copyWith(color: color),
+          // The title takes whatever room the row has; only a title too
+          // long for the whole row is shortened.
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.title.copyWith(color: color),
+                  ),
+                ),
+                if (count != null) ...<Widget>[
+                  const SizedBox(width: 8),
+                  Text(
+                    '$count',
+                    style: AppText.small.copyWith(
+                      color: color.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          if (count != null) ...<Widget>[
-            const SizedBox(width: 8),
-            Text(
-              '$count',
-              style: AppText.small.copyWith(
-                color: color.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-          const Spacer(),
           ?trailing,
         ],
       ),

@@ -138,8 +138,11 @@ class _HealthLogScreenState extends State<HealthLogScreen> {
             : TextInputType.text,
         textCapitalization: TextCapitalization.sentences,
         style: AppText.body.copyWith(color: Palette.slate),
+        // The label sits on the edge whether or not the field is in use, so
+        // the unit is always in view and never has to be guessed.
         decoration: InputDecoration(
           labelText: field.label,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
           suffixText: field.unit.isEmpty ? null : field.unit,
         ),
       ),

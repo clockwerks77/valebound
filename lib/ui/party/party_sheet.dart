@@ -803,14 +803,6 @@ class TrickRow extends StatelessWidget {
                           fontSize: 12.5,
                         ),
                       ),
-                      if (unlocked && !tricksInPlay.contains(trick.key))
-                        Text(
-                          'Learned. It joins the game with the comeback quest.',
-                          style: AppText.small.copyWith(
-                            color: Palette.companionDeep,
-                            fontSize: 12.5,
-                          ),
-                        ),
                     ],
                   ),
                 ),
