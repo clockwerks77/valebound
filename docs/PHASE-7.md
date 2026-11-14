@@ -18,6 +18,14 @@ average, so the fights were retuned the same day and 0.7.1 replaced it
 
 Nothing here has been run on a phone yet.
 
+**The build:** commit `45d3613`, run 43655165315, 458 tests passing.
+`Valebound-0.7.1.apk` is 30,066,205 bytes, SHA-256
+`301e7692b2fb476b9dc1146aeb1b12218baed10080a228481ec964ff2a2d33d9`
+(release build, arm64, no internet permission).
+`Valebound-0.7.1-debug.apk` is 169,358,371 bytes, SHA-256
+`465beded0eff72d7faa59a9465f48c11c453c468b417682bbffe30c42dd9afa8`.
+Both install over 0.5.2 and keep the data.
+
 ## (a) What works now
 
 - **Four classes.** Ranger, Warden, Sage and Artificer, each with a home
