@@ -9,7 +9,10 @@ import android.health.connect.AggregateRecordsRequest
 import android.health.connect.AggregateRecordsResponse
 import android.health.connect.HealthConnectException
 import android.health.connect.HealthConnectManager
+import android.health.connect.ReadRecordsRequestUsingFilters
+import android.health.connect.ReadRecordsResponse
 import android.health.connect.TimeInstantRangeFilter
+import android.health.connect.datatypes.BloodGlucoseRecord
 import android.health.connect.datatypes.StepsRecord
 import android.os.Build
 import android.os.OutcomeReceiver
@@ -37,7 +40,16 @@ class DeviceChannel(private val activity: FlutterActivity) {
         const val REQUEST_CALENDAR = 4201
         const val REQUEST_STEPS = 4202
         const val REQUEST_NOTIFICATIONS = 4203
+        const val REQUEST_GLUCOSE = 4204
         const val READ_STEPS = "android.permission.health.READ_STEPS"
+        const val READ_GLUCOSE = "android.permission.health.READ_BLOOD_GLUCOSE"
+
+        /// Health Connect hands back at most this many records at a time.
+        const val GLUCOSE_PAGE = 5000
+
+        /// A sensor that reports every minute makes 1,440 readings a day, so
+        /// a day fits in one page; a few more are allowed for good measure.
+        const val GLUCOSE_PAGES = 4
         const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
         const val VIEW_PERMISSION_USAGE = "android.intent.action.VIEW_PERMISSION_USAGE"
     }
@@ -79,6 +91,22 @@ class DeviceChannel(private val activity: FlutterActivity) {
                     val end = (call.argument<Number>("end") ?: 0).toLong()
                     if (Build.VERSION.SDK_INT >= 34 && stepsAccess() == "connected" && end > start) {
                         readSteps(start, end, result)
+                    } else {
+                        result.success(null)
+                    }
+                }
+                "glucoseAccess" -> result.success(glucoseAccess())
+                "requestGlucose" ->
+                    if (glucoseAccess() != "notConnected") {
+                        result.success(glucoseAccess())
+                    } else {
+                        ask(result, READ_GLUCOSE, REQUEST_GLUCOSE)
+                    }
+                "glucose" -> {
+                    val start = (call.argument<Number>("start") ?: 0).toLong()
+                    val end = (call.argument<Number>("end") ?: 0).toLong()
+                    if (Build.VERSION.SDK_INT >= 34 && glucoseAccess() == "connected" && end > start) {
+                        readGlucose(start, end, result)
                     } else {
                         result.success(null)
                     }
@@ -141,13 +169,14 @@ class DeviceChannel(private val activity: FlutterActivity) {
     private fun answerFor(code: Int): Any = when (code) {
         REQUEST_CALENDAR -> calendarGranted()
         REQUEST_STEPS -> stepsAccess()
+        REQUEST_GLUCOSE -> glucoseAccess()
         else -> notificationsAllowed()
     }
 
     /** True if [requestCode] was one of ours. */
     fun onPermissionsResult(requestCode: Int): Boolean {
         if (requestCode != REQUEST_CALENDAR && requestCode != REQUEST_STEPS &&
-            requestCode != REQUEST_NOTIFICATIONS
+            requestCode != REQUEST_NOTIFICATIONS && requestCode != REQUEST_GLUCOSE
         ) {
             return false
         }
@@ -246,12 +275,17 @@ class DeviceChannel(private val activity: FlutterActivity) {
 
     // ---- Health Connect steps (Android 14 and later, read only) -----------
 
-    private fun stepsAccess(): String {
+    private fun stepsAccess(): String = healthAccess(READ_STEPS)
+
+    private fun glucoseAccess(): String = healthAccess(READ_GLUCOSE)
+
+    /** Where one Health Connect read permission stands. */
+    private fun healthAccess(permission: String): String {
         if (Build.VERSION.SDK_INT < 34) return "unavailable"
         return try {
             if (activity.getSystemService(HealthConnectManager::class.java) == null) {
                 "unavailable"
-            } else if (activity.checkSelfPermission(READ_STEPS) == PackageManager.PERMISSION_GRANTED) {
+            } else if (activity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
                 "connected"
             } else {
                 "notConnected"
@@ -292,6 +326,73 @@ class DeviceChannel(private val activity: FlutterActivity) {
             )
         } catch (e: Throwable) {
             result.success(null)
+        }
+    }
+
+    /**
+     * The average of the blood glucose readings in the span, in mmol/L, with
+     * how many there were. Whatever app took the readings put them in Health
+     * Connect; this only reads them. Answers null when there are none.
+     */
+    @RequiresApi(34)
+    private fun readGlucose(start: Long, end: Long, result: MethodChannel.Result) {
+        var sum = 0.0
+        var count = 0
+        var pages = 0
+        var answered = false
+
+        fun answer() {
+            if (answered) return
+            answered = true
+            result.success(
+                if (count == 0) null else mapOf("average" to sum / count, "count" to count)
+            )
+        }
+
+        try {
+            val manager = activity.getSystemService(HealthConnectManager::class.java)
+            if (manager == null) {
+                answer()
+                return
+            }
+            val span = TimeInstantRangeFilter.Builder()
+                .setStartTime(Instant.ofEpochMilli(start))
+                .setEndTime(Instant.ofEpochMilli(end))
+                .build()
+
+            fun page(token: Long) {
+                val request = ReadRecordsRequestUsingFilters.Builder(BloodGlucoseRecord::class.java)
+                    .setTimeRangeFilter(span)
+                    .setPageSize(GLUCOSE_PAGE)
+                if (token != -1L) request.setPageToken(token)
+                manager.readRecords(
+                    request.build(),
+                    activity.mainExecutor,
+                    object : OutcomeReceiver<ReadRecordsResponse<BloodGlucoseRecord>, HealthConnectException> {
+                        override fun onResult(response: ReadRecordsResponse<BloodGlucoseRecord>) {
+                            try {
+                                for (record in response.records) {
+                                    sum += record.level.inMillimolesPerLiter
+                                    count++
+                                }
+                                pages++
+                                val next = response.nextPageToken
+                                if (next != -1L && pages < GLUCOSE_PAGES) page(next) else answer()
+                            } catch (e: Throwable) {
+                                answer()
+                            }
+                        }
+
+                        override fun onError(error: HealthConnectException) {
+                            answer()
+                        }
+                    },
+                )
+            }
+
+            page(-1L)
+        } catch (e: Throwable) {
+            answer()
         }
     }
 

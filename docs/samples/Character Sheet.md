@@ -30,9 +30,9 @@ bond: 36
 
 - Total XP: 1122
 - Quests completed: 78
-- Gold: 290
-- Materials in the stores: Timber 1, Stone 3, Star Shards 22
-- Materials gathered in all: Timber 32, Stone 27, Star Shards 30
+- Gold: 332
+- Materials in the stores: Timber 11, Stone 7, Star Shards 22
+- Materials gathered in all: Timber 42, Stone 31, Star Shards 30
 - Days visited the Vale: 14
 
 ## Companion
@@ -52,4 +52,4 @@ bond: 36
 - Places restored: 6 of 20
 - Hearthmere: The Gate Lantern, The Village Well, The Bakehouse, The Moot Hall
 - Larkdown: The Sheepfold, Larkdown Mill
-- Working toward: The Hill Beacon (Timber 1 of 6, Stone 3 of 8, Star Shards 3 of 3)
+- Working toward: The Hill Beacon (Timber 6 of 6, Stone 7 of 8, Star Shards 3 of 3)

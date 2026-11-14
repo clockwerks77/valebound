@@ -157,7 +157,7 @@ so the format cannot drift without the change being made here on purpose.
 | `## Journey`: Paces today, any Discovery, camp position | `Paces today: 2`, `Discovery: The Quiet Cart`, `Camp: 30 Paces…` |
 | Journey omitted only if zero Paces and no Discovery | Covered by a test |
 | `## Health`: only what was logged, a simple list; omitted if empty | Three lines; omission covered by a test |
-| `## World`: that day's restorations, or "The Vale rests." | `Restored: Larkdown Mill (Larkdown)`; the other wording covered by a test |
+| `## World`: that day's restorations, or "The Vale rests." | `The Vale rests.`; a restoration line is covered by a test. (When this report was written the sample read `Restored: Larkdown Mill (Larkdown)`. Since version 0.4.0 the day's Still creature leaves a material on a three-quest day, so in the scripted fortnight the mill wakes a day earlier.) |
 | `## Notes`: the Campfire note verbatim; omitted if empty | The note with its blank line kept; omission covered by a test |
 | Sections in that order | Quests Completed, Journey, Health, World, Notes |
 

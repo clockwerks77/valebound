@@ -1,7 +1,7 @@
 name: habit_adventure
 description: "Valebound (working title): a habit adventure. Personal build, fully offline."
 publish_to: 'none'
-version: 0.3.1+4
+version: 0.4.0+5
 
 environment:
   sdk: ^3.8.0

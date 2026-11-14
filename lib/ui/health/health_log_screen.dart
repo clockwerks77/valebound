@@ -149,6 +149,21 @@ class _HealthLogScreenState extends State<HealthLogScreen> {
     );
   }
 
+  /// The day's average glucose as Health Connect has it. A number and its
+  /// unit: nothing is said about what it means.
+  String _glucoseLine(GameController game) {
+    final entry = game.glucoseAverageToday;
+    if (entry == null) {
+      return 'Average glucose: nothing from Health Connect yet today.';
+    }
+    final readings = game.glucoseToday?.readings;
+    final from = readings == null
+        ? 'from Health Connect'
+        : 'from ${thousands(readings)} '
+            '${readings == 1 ? 'reading' : 'readings'} in Health Connect';
+    return 'Average glucose today: ${entry.value} ${entry.unit}, $from.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final game = GameScope.of(context);
@@ -194,6 +209,23 @@ class _HealthLogScreenState extends State<HealthLogScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // Read from Health Connect, never typed here (DECISIONS D-71).
+            if (game.glucoseConnected)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: <Widget>[
+                    const VIcon('vial', size: 20, color: Palette.moss),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _glucoseLine(game),
+                        style: AppText.body.copyWith(color: Palette.slate),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (fields.isEmpty)
               Text(
                 'No fields are chosen yet. Pick the ones you want in '

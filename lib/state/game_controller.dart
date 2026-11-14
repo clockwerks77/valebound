@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 
@@ -101,6 +102,11 @@ class GameController extends ChangeNotifier {
 
   StepsAccess stepsAccess = StepsAccess.unavailable;
 
+  /// Glucose from Health Connect (DECISIONS D-71): whether it can be read,
+  /// and today's readings so far when it is.
+  StepsAccess glucoseAccess = StepsAccess.unavailable;
+  GlucoseSpan? glucoseToday;
+
   /// Today's Health Log entries by field key.
   Map<String, HealthEntryRow> healthToday = const <String, HealthEntryRow>{};
 
@@ -131,6 +137,12 @@ class GameController extends ChangeNotifier {
 
   bool get stepsConnected =>
       settings.stepsOn && stepsAccess == StepsAccess.connected;
+
+  bool get glucoseConnected =>
+      settings.glucoseOn && glucoseAccess == StepsAccess.connected;
+
+  /// Today's average glucose as kept in the Health Log, when there is one.
+  HealthEntryRow? get glucoseAverageToday => healthToday[glucoseAverageFieldKey];
 
   /// Today's steps as recorded, from Health Connect or typed by hand.
   int? get stepsToday {
@@ -189,6 +201,7 @@ class GameController extends ChangeNotifier {
     launchReason = await device.takeLaunchReason();
     if (hasProfile) {
       await _reload(fromDevice: true);
+      _tourWanted = !settings.tourDone;
     }
     await export.refreshStatus();
     loading = false;
@@ -218,7 +231,10 @@ class GameController extends ChangeNotifier {
     final readDevice = fromDevice || today != day;
     day = today;
     settings = await repo.settings();
-    if (readDevice) await _readSteps();
+    if (readDevice) {
+      await _readSteps();
+      await _readGlucose();
+    }
     await repo.syncWorld();
     hero = await repo.hero();
     companion = await repo.companion();
@@ -263,9 +279,34 @@ class GameController extends ChangeNotifier {
   Future<void> _readSteps() async {
     stepsAccess = await device.stepsAccess();
     if (!stepsConnected) return;
-    final steps = await device.stepsBetween(DayKey.parse(day), repo.clock());
+    final dawn = DayKey.parse(day);
+    // Yesterday's count is only whole once the day is over.
+    final yesterday = DayKey.addDays(day, -1);
+    final whole = await device.stepsBetween(DayKey.parse(yesterday), dawn);
+    if (whole != null) await repo.recordStepsFor(yesterday, whole);
+    final steps = await device.stepsBetween(dawn, repo.clock());
     if (steps == null) return;
     _autoCompleted.addAll(await repo.recordSteps(steps));
+  }
+
+  /// Reads the day's glucose readings from Health Connect, when connected,
+  /// and keeps their average in the Health Log (DECISIONS D-71). Numbers
+  /// only: nothing is judged, and nothing is written back.
+  Future<void> _readGlucose() async {
+    glucoseAccess = await device.glucoseAccess();
+    if (!glucoseConnected) {
+      glucoseToday = null;
+      return;
+    }
+    final dawn = DayKey.parse(day);
+    final yesterday = DayKey.addDays(day, -1);
+    final whole = await device.glucoseBetween(DayKey.parse(yesterday), dawn);
+    if (whole != null) {
+      await repo.recordGlucoseAverage(yesterday, whole.average);
+    }
+    glucoseToday = await device.glucoseBetween(dawn, repo.clock());
+    final today = glucoseToday;
+    if (today != null) await repo.recordGlucoseAverage(day, today.average);
   }
 
   Future<void> _readCalendar() async {
@@ -422,6 +463,22 @@ class GameController extends ChangeNotifier {
     await refresh(fromDevice: true);
   }
 
+  Future<StepsAccess> connectGlucose() async {
+    final access = await device.requestGlucose();
+    await repo.setSetting(
+      SettingKey.glucoseOn,
+      access == StepsAccess.connected ? '1' : '0',
+    );
+    await refresh(fromDevice: true);
+    _exportSoon();
+    return access;
+  }
+
+  Future<void> disconnectGlucose() async {
+    await repo.setSetting(SettingKey.glucoseOn, '0');
+    await refresh(fromDevice: true);
+  }
+
   /// Saves the Health Log's form: field key to exactly what was typed. An
   /// empty value clears that entry. Steps typed here fill the Auto quest
   /// just as steps from Health Connect do.
@@ -499,7 +556,44 @@ class GameController extends ChangeNotifier {
     );
     hasProfile = true;
     await _reload();
+    _tourWanted = !settings.tourDone;
     notifyListeners();
+  }
+
+  // ---- The tour and the screen hints (DECISIONS D-72) -------------------
+
+  bool _tourWanted = false;
+
+  /// True once, when the tour of the board should be shown: on the first
+  /// run, and whenever it is asked for again in Settings.
+  bool takeTourRequest() {
+    final wanted = _tourWanted;
+    _tourWanted = false;
+    return wanted;
+  }
+
+  /// The tour has been seen, or left early. Either way it is not shown
+  /// again unless asked for.
+  Future<void> finishTour() async {
+    await repo.setSetting(SettingKey.tourDone, '1');
+    await refresh();
+  }
+
+  /// "Show the tour again": the board's tour, and each screen's hint.
+  Future<void> requestTour() async {
+    await repo.setSetting(SettingKey.tourDone, null);
+    await repo.setSetting(SettingKey.hintsSeen, null);
+    _tourWanted = true;
+    await refresh();
+  }
+
+  bool hintDue(String id) => !settings.hintsSeen.contains(id);
+
+  Future<void> markHintSeen(String id) async {
+    if (!hintDue(id)) return;
+    final seen = <String>[...settings.hintsSeen, id]..sort();
+    await repo.setSetting(SettingKey.hintsSeen, jsonEncode(seen));
+    await refresh();
   }
 
   // ---- Board groups (DESIGN §8.1) -------------------------------------

@@ -801,6 +801,38 @@ class _HealthCard extends StatelessWidget {
               ),
             ],
           ),
+          if (game.glucoseAccess != StepsAccess.unavailable) ...<Widget>[
+            const SizedBox(height: 16),
+            Text(
+              'GLUCOSE',
+              style: AppText.label.copyWith(color: Palette.goldDeep),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _glucoseStatus(game),
+              style: AppText.cardTitle.copyWith(color: Palette.slate),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'If another app puts your sensor’s readings into Health '
+              'Connect, $appName can show the day’s average in the Health '
+              'Log and your day note. It is a number only: no targets and no '
+              'advice. $appName reads the readings and never writes any.',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+            const SizedBox(height: 10),
+            if (game.glucoseConnected)
+              QuietButton(
+                label: 'Disconnect glucose',
+                onPressed: () => game.disconnectGlucose(),
+              )
+            else
+              PrimaryButton(
+                label: 'Connect glucose',
+                icon: 'vial',
+                onPressed: () => game.connectGlucose(),
+              ),
+          ],
           const SizedBox(height: 14),
           Text(
             'HEALTH LOG FIELDS',
@@ -866,6 +898,14 @@ class _HealthCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Where glucose from Health Connect stands, in a line (DECISIONS D-71).
+String _glucoseStatus(GameController game) {
+  if (!game.glucoseConnected) return 'Glucose is not connected';
+  final entry = game.glucoseAverageToday;
+  if (entry == null) return 'Connected. No readings yet today.';
+  return 'Today’s average: ${entry.value} ${entry.unit}';
 }
 
 Future<void> _addHealthField(BuildContext context) async {
@@ -1072,6 +1112,17 @@ class _AboutCard extends StatelessWidget {
             'An original work. Its world, names, creatures, icons and art '
             'were made for this app and belong to no other game.',
             style: AppText.small.copyWith(color: Palette.slateSoft),
+          ),
+          const SizedBox(height: 12),
+          QuietButton(
+            label: 'Show the tour again',
+            icon: 'info',
+            onPressed: () {
+              // Back to the board first: the tour points at what is on it.
+              final game = GameScope.read(context);
+              Navigator.of(context).pop();
+              game.requestTour();
+            },
           ),
         ],
       ),

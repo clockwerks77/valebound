@@ -24,6 +24,15 @@ abstract final class SettingKey {
 
   /// `1` while steps are read from Health Connect.
   static const String stepsOn = 'steps_on';
+
+  /// `1` while glucose is read from Health Connect (DECISIONS D-71).
+  static const String glucoseOn = 'glucose_on';
+
+  /// `1` once the first-run tour of the board has been seen or skipped.
+  static const String tourDone = 'tour_done';
+
+  /// JSON list of the screens whose one-time hint has been shown.
+  static const String hintsSeen = 'hints_seen';
 }
 
 /// The settings as the app uses them.
@@ -35,6 +44,9 @@ class GameSettings {
     this.excludedCalendars = const <String>{},
     this.healthFields = healthPresets,
     this.stepsOn = false,
+    this.glucoseOn = false,
+    this.tourDone = false,
+    this.hintsSeen = const <String>{},
   });
 
   factory GameSettings.fromMap(Map<String, String> raw) {
@@ -48,6 +60,9 @@ class GameSettings {
       excludedCalendars: _stringSet(raw[SettingKey.calendarExcluded]),
       healthFields: decodeHealthFields(raw[SettingKey.healthFields]),
       stepsOn: raw[SettingKey.stepsOn] == '1',
+      glucoseOn: raw[SettingKey.glucoseOn] == '1',
+      tourDone: raw[SettingKey.tourDone] == '1',
+      hintsSeen: _stringSet(raw[SettingKey.hintsSeen]),
     );
   }
 
@@ -57,6 +72,9 @@ class GameSettings {
   final Set<String> excludedCalendars;
   final List<HealthField> healthFields;
   final bool stepsOn;
+  final bool glucoseOn;
+  final bool tourDone;
+  final Set<String> hintsSeen;
 
   static Set<String> _stringSet(String? json) {
     if (json == null || json.isEmpty) return const <String>{};

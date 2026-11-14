@@ -25,22 +25,34 @@ Future<void> showHealthNote(BuildContext context) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Steps and $appName',
+                  'Health Connect and $appName',
                   style: AppText.heading.copyWith(color: Palette.slate),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'If you connect Health Connect, $appName reads one thing: '
-                  'today’s step count. It fills your steps quest and is '
-                  'written into today’s note in your vault.',
+                  '$appName reads at most two things from Health Connect, '
+                  'each only if you turn it on.',
+                  style: AppText.body.copyWith(color: Palette.slateSoft),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Steps: the day’s step count. It fills your steps quest '
+                  'and goes into the day’s note in your vault.',
+                  style: AppText.body.copyWith(color: Palette.slateSoft),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Glucose: the readings another app has put there. $appName '
+                  'shows their average for the day in the Health Log and '
+                  'the day’s note. It is a number only, with no targets and '
+                  'no advice.',
                   style: AppText.body.copyWith(color: Palette.slateSoft),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Nothing else is read, nothing is written back, and nothing '
                   'leaves this device: the app makes no network calls. You '
-                  'can disconnect at any time in Settings, and the quest '
-                  'still works with a tap.',
+                  'can disconnect either one at any time in Settings.',
                   style: AppText.body.copyWith(color: Palette.slateSoft),
                 ),
                 const SizedBox(height: 16),

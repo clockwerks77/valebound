@@ -74,6 +74,14 @@ class ReminderRequest {
 /// notifications (DESIGN §9.3, §6.1). Everything here is optional: each
 /// answer has a "not available" form and the app works without any of it.
 /// Nothing here touches the network.
+/// The glucose readings Health Connect holds for a span: their average in
+/// mmol/L, and how many there were. Read only (DECISIONS D-71).
+class GlucoseSpan {
+  const GlucoseSpan({required this.average, required this.readings});
+  final double average;
+  final int readings;
+}
+
 abstract class DevicePort {
   Future<bool> calendarGranted();
 
@@ -91,6 +99,18 @@ abstract class DevicePort {
 
   /// Total steps in the span, or null if they cannot be read.
   Future<int?> stepsBetween(DateTime start, DateTime end);
+
+  /// Whether glucose can be read from Health Connect. The same three
+  /// answers as for steps.
+  Future<StepsAccess> glucoseAccess();
+
+  /// Asks Health Connect for permission to read blood glucose.
+  Future<StepsAccess> requestGlucose();
+
+  /// The glucose readings in the span, or null if there are none or they
+  /// cannot be read. Whatever app took the readings put them there; this
+  /// app only reads.
+  Future<GlucoseSpan?> glucoseBetween(DateTime start, DateTime end);
 
   Future<bool> notificationsAllowed();
   Future<bool> requestNotifications();
@@ -130,6 +150,16 @@ class NoDevice implements DevicePort {
 
   @override
   Future<int?> stepsBetween(DateTime start, DateTime end) async => null;
+
+  @override
+  Future<StepsAccess> glucoseAccess() async => StepsAccess.unavailable;
+
+  @override
+  Future<StepsAccess> requestGlucose() async => StepsAccess.unavailable;
+
+  @override
+  Future<GlucoseSpan?> glucoseBetween(DateTime start, DateTime end) async =>
+      null;
 
   @override
   Future<bool> notificationsAllowed() async => false;
@@ -231,6 +261,26 @@ class ChannelDevice implements DevicePort {
   @override
   Future<int?> stepsBetween(DateTime start, DateTime end) =>
       _call<int>('steps', _span(start, end));
+
+  @override
+  Future<StepsAccess> glucoseAccess() async =>
+      _access(await _call<String>('glucoseAccess'));
+
+  @override
+  Future<StepsAccess> requestGlucose() async =>
+      _access(await _call<String>('requestGlucose'));
+
+  @override
+  Future<GlucoseSpan?> glucoseBetween(DateTime start, DateTime end) async {
+    final raw = await _call<Map<Object?, Object?>>(
+      'glucose',
+      _span(start, end),
+    );
+    final average = raw?['average'];
+    final count = raw?['count'];
+    if (average is! num || count is! int || count <= 0) return null;
+    return GlucoseSpan(average: average.toDouble(), readings: count);
+  }
 
   @override
   Future<bool> notificationsAllowed() async =>

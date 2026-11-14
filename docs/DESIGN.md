@@ -129,6 +129,7 @@ New quest in ≤15 seconds: name, tap attribute, tap difficulty, tap schedule pr
 - **The Map** is the home of Hook A: a rich, illustrated valley with distinct regions (village, hills, river, peaks, ruins — original names, builder to draft). Regions start muted/fogged and gain colour, light, buildings, and inhabitants as Restoration points accumulate.
 - **NPCs** are villagers who return as buildings are restored. In v1 they are flavour and quest-givers in presentation only: an NPC portrait + one line of warm dialogue on the Dawn board and in Campfire. No dialogue trees, no NPC simulation.
 - **Obstacles ("the Still"):** Heroic and Boss quests may be presented with a Still-creature on the map/board — a grey, sleepy obstacle, not a horror monster. Completing the quest clears it in a short animation. Tone: clearing fog, waking things up — not killing.
+- **Amendment, 14 Nov 2026 (Adam): the day's Still creature.** Besides the creatures on Heroic and Boss quests, one Still creature appears each Dawn as a small daily challenge. Every quest finished that day stirs it; the third wakes it and it leaves a small gift. If it sleeps on, it is simply elsewhere tomorrow: nothing is lost and nothing is recorded, so §6.4 holds. Numbers and details are in `DECISIONS.md` D-70.
 - **Companion:** a full second character, not a decoration — see §7A in full. The companion appears with the hero on the Party Sheet, Map, Journey road, and Campfire, and has their own XP, levels, gear, and quest track.
 
 ## 7A. The Companion System — Hunter & Pet (LOCKED, core pillar)
@@ -180,6 +181,8 @@ Modelled on the WoW Hunter structure Adam loves: a hero and a loyal partner who 
 7. **Health Log (quick entry):** The user-chosen stat fields (§9.3) in one fast form.
 8. **Settings:** Vault folder picker + export controls, calendar source toggle, Health Connect permission, notifications, data import/export (JSON), about/IP note.
 
+**Amendment, 14 Nov 2026 (Adam): a tour.** The first run shows a short tour of the board in bubbles, one on each part, and each other screen explains itself once the first time it is opened. The tour can be left at any point and shown again from Settings. See `DECISIONS.md` D-72.
+
 ## 9. Platform, tech, and integrations
 
 ### 9.1 Android APK on a foldable (LOCKED)
@@ -202,6 +205,7 @@ Modelled on the WoW Hunter structure Adam loves: a hero and a loyal partner who 
 
 - **Calendar:** `READ_CALENDAR` (runtime permission, requested in context from the Dawn board, not at first launch). Read *today's* device-calendar events; present each as a suggested Confirm quest with the event's title and time. Never modify calendar events. Never auto-complete. User can exclude specific calendars in Settings.
 - **Health / steps:** Health Connect API. Daily step total drives Auto quests (seeded target: 7,000). If Health Connect is unavailable or denied, Auto quests fall back to manual tap — the quest must still work.
+- **Amendment, 14 Nov 2026 (Adam): glucose may be read from Health Connect.** If the user turns it on, the app reads the day's blood glucose readings that another app has put in Health Connect and shows their **average** as a number in the Health Log and the day note. Read only, on the device, no targets, no advice, no judgement copy; everything else in the next bullet stands. See `DECISIONS.md` D-71.
 - **Medical stats are manual and user-defined:** Settings lets the user choose which quick-entry fields appear (examples the builder may offer as presets: glucose reading, Libre time-in-range %, weight, a weekly injection checkbox with dose note). The app stores exactly what the user types, shows no medical advice, no targets, no judgement copy, and includes those fields in the Markdown export *only* (§11). Never transmit them anywhere — there is no network anyway.
 
 ## 10. Data model (minimum)

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -9,11 +10,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/app.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
+import 'package:habit_adventure/data/settings.dart';
 import 'package:habit_adventure/device/device_port.dart';
 import 'package:habit_adventure/export/vault_port.dart';
 import 'package:habit_adventure/rules/enums.dart';
 import 'package:habit_adventure/state/game_controller.dart';
 import 'package:habit_adventure/ui/art/painted.dart';
+import 'package:habit_adventure/ui/tour/tours.dart';
 
 /// Screen sizes for the test matrix in DESIGN §9.1. The two Fold sizes come
 /// from the Galaxy Z Fold 8's published panel resolutions (1248×1972 cover,
@@ -147,6 +150,11 @@ class MemoryDevice implements DevicePort {
     this.steps = StepsAccess.notConnected,
     this.grantSteps = true,
     this.stepCount,
+    this.stepCountYesterday,
+    this.glucose = StepsAccess.notConnected,
+    this.grantGlucose = true,
+    this.glucoseToday,
+    this.glucoseYesterday,
     this.notifications = false,
     this.grantNotifications = true,
     this.launchReason,
@@ -167,7 +175,17 @@ class MemoryDevice implements DevicePort {
   /// What the user answers when asked for steps.
   bool grantSteps;
   int? stepCount;
+
+  /// The whole of yesterday's steps, asked for once a day is over.
+  int? stepCountYesterday;
   int stepReads = 0;
+
+  StepsAccess glucose;
+
+  /// What the user answers when asked for glucose.
+  bool grantGlucose;
+  GlucoseSpan? glucoseToday;
+  GlucoseSpan? glucoseYesterday;
 
   bool notifications;
   bool grantNotifications;
@@ -208,10 +226,33 @@ class MemoryDevice implements DevicePort {
     return steps;
   }
 
+  /// A span of a whole day or more is "yesterday"; anything shorter is
+  /// today so far. (A day is 23 hours once a year; no test sits on it.)
+  bool _wholeDay(DateTime start, DateTime end) =>
+      end.difference(start) >= const Duration(hours: 24);
+
   @override
   Future<int?> stepsBetween(DateTime start, DateTime end) async {
     stepReads++;
-    return steps == StepsAccess.connected ? stepCount : null;
+    if (steps != StepsAccess.connected) return null;
+    return _wholeDay(start, end) ? stepCountYesterday : stepCount;
+  }
+
+  @override
+  Future<StepsAccess> glucoseAccess() async => glucose;
+
+  @override
+  Future<StepsAccess> requestGlucose() async {
+    if (glucose == StepsAccess.notConnected && grantGlucose) {
+      glucose = StepsAccess.connected;
+    }
+    return glucose;
+  }
+
+  @override
+  Future<GlucoseSpan?> glucoseBetween(DateTime start, DateTime end) async {
+    if (glucose != StepsAccess.connected) return null;
+    return _wholeDay(start, end) ? glucoseYesterday : glucoseToday;
   }
 
   @override
@@ -254,6 +295,8 @@ class TestApp {
     bool withHistory = false,
     VaultPort? vault,
     DevicePort? device,
+    bool tour = false,
+    bool hints = false,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
@@ -267,6 +310,15 @@ class TestApp {
     addTearDown(app.db.close);
 
     await tester.runAsync(() async {
+      // The first-run tour and the one-time screen hints would sit on top
+      // of every other test, so they are marked as seen unless asked for.
+      if (!tour) await app.repo.setSetting(SettingKey.tourDone, '1');
+      if (!hints) {
+        await app.repo.setSetting(
+          SettingKey.hintsSeen,
+          jsonEncode(HintId.all),
+        );
+      }
       if (withProfile) {
         if (withHistory) {
           await app._seedHistory();

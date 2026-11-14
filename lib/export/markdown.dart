@@ -439,6 +439,7 @@ String healthLabel(String fieldKey) {
   const known = <String, String>{
     'steps': 'Steps',
     'glucose': 'Glucose',
+    'glucose_average': 'Average glucose',
     'time_in_range': 'Time in range',
     'weight': 'Weight',
     'injection': 'Weekly injection',

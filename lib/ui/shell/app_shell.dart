@@ -11,6 +11,8 @@ import '../log/quest_log_screen.dart';
 import '../map/map_panel.dart';
 import '../party/party_sheet.dart';
 import '../settings/settings_screen.dart';
+import '../tour/tour.dart';
+import '../tour/tours.dart';
 import '../widgets/v_icon.dart';
 
 class _Destination {
@@ -45,6 +47,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   int _index = 0;
   GameController? _game;
   bool _marking = false;
+  bool _touring = false;
 
   @override
   void initState() {
@@ -73,7 +76,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   /// target, or being opened from Health Connect's "why" link.
   void _onGame() {
     final game = _game;
-    if (!mounted || game == null || _marking) return;
+    if (!mounted || game == null) return;
+    // The tour of the board: on the first run, and when asked for again.
+    if (!_touring && game.hasProfile && game.takeTourRequest()) {
+      _touring = true;
+      _tour();
+    }
+    if (_marking) return;
     final done = game.takeAutoCompletions();
     final reason = game.launchReason;
     if (done.isEmpty && reason == null) return;
@@ -93,6 +102,40 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       } finally {
         _marking = false;
       }
+    });
+  }
+
+  /// Walks the board with a bubble on each part (DECISIONS D-72).
+  Future<void> _tour() async {
+    final game = _game;
+    try {
+      if (!mounted || game == null) return;
+      if (_index != 0) setState(() => _index = 0);
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      await runTour(
+        context,
+        boardTour(game.companionName),
+        leaveLabel: 'Skip the tour',
+      );
+      await game.finishTour();
+    } finally {
+      _touring = false;
+    }
+  }
+
+  /// Moves to a destination and, the first time, says what it is.
+  void _select(int index) {
+    setState(() => _index = index);
+    final hint = switch (index) {
+      1 => HintId.map,
+      2 => HintId.party,
+      3 => HintId.log,
+      _ => null,
+    };
+    if (hint == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showHintOnce(context, hint);
     });
   }
 
@@ -131,9 +174,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       ),
       bottomNavigationBar: expanded
           ? null
-          : _BottomNav(
-              index: _index,
-              onSelect: (i) => setState(() => _index = i),
+          : KeyedSubtree(
+              key: TourMark.nav,
+              child: _BottomNav(index: _index, onSelect: _select),
             ),
     );
   }
@@ -170,9 +213,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       children: <Widget>[
         SizedBox(
           width: railWidth,
-          child: _Rail(
-            index: _index,
-            onSelect: (i) => setState(() => _index = i),
+          child: KeyedSubtree(
+            key: TourMark.nav,
+            child: _Rail(index: _index, onSelect: _select),
           ),
         ),
         Expanded(child: page),

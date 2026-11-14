@@ -22,6 +22,7 @@ import '../campfire/campfire_screen.dart';
 import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
 import '../settings/settings_screen.dart';
+import '../tour/tour.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'quest_actions.dart';
@@ -56,8 +57,15 @@ class BoardScreen extends StatelessWidget {
             const _Suggestions(),
             if (now.isNotEmpty) ...<Widget>[
               SectionHeader('Now', icon: 'sun', count: now.length),
-              for (final entry in now) ...<Widget>[
-                QuestCard(entry: entry),
+              for (var i = 0; i < now.length; i++) ...<Widget>[
+                // The tour points at the first quest on the board.
+                if (i == 0)
+                  KeyedSubtree(
+                    key: TourMark.quest,
+                    child: QuestCard(entry: now[i]),
+                  )
+                else
+                  QuestCard(entry: now[i]),
                 const SizedBox(height: 10),
               ],
             ] else
@@ -78,10 +86,12 @@ class BoardScreen extends StatelessWidget {
             ],
             if (campfire != null) ...<Widget>[
               const SectionHeader('Day’s end', icon: 'campfire'),
-              if (campfire.isDone)
-                const _CampfireLit()
-              else
-                QuestCard(entry: campfire),
+              KeyedSubtree(
+                key: TourMark.campfire,
+                child: campfire.isDone
+                    ? const _CampfireLit()
+                    : QuestCard(entry: campfire),
+              ),
             ],
             if (done.isNotEmpty) ...<Widget>[
               SectionHeader('Done', icon: 'check', count: done.length),
@@ -96,10 +106,13 @@ class BoardScreen extends StatelessWidget {
           right: 0,
           bottom: 14,
           child: Center(
-            child: PrimaryButton(
-              label: 'Quest',
-              icon: 'plus',
-              onPressed: () => openQuestEditor(context),
+            child: KeyedSubtree(
+              key: TourMark.newQuest,
+              child: PrimaryButton(
+                label: 'Quest',
+                icon: 'plus',
+                onPressed: () => openQuestEditor(context),
+              ),
             ),
           ),
         ),
@@ -176,24 +189,34 @@ class DawnHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  RoundIconButton(
-                    icon: 'sprig',
-                    semanticLabel: 'Health Log',
-                    size: 34,
-                    background: Palette.forestNight.withValues(alpha: 0.55),
-                    foreground: Palette.onDark,
-                    edge: Palette.onDark.withValues(alpha: 0.25),
-                    onPressed: () => openHealthLog(context),
-                  ),
-                  const SizedBox(width: 8),
-                  RoundIconButton(
-                    icon: 'settings',
-                    semanticLabel: 'Settings',
-                    size: 34,
-                    background: Palette.forestNight.withValues(alpha: 0.55),
-                    foreground: Palette.onDark,
-                    edge: Palette.onDark.withValues(alpha: 0.25),
-                    onPressed: () => openSettings(context),
+                  KeyedSubtree(
+                    key: TourMark.tools,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        RoundIconButton(
+                          icon: 'sprig',
+                          semanticLabel: 'Health Log',
+                          size: 34,
+                          background:
+                              Palette.forestNight.withValues(alpha: 0.55),
+                          foreground: Palette.onDark,
+                          edge: Palette.onDark.withValues(alpha: 0.25),
+                          onPressed: () => openHealthLog(context),
+                        ),
+                        const SizedBox(width: 8),
+                        RoundIconButton(
+                          icon: 'settings',
+                          semanticLabel: 'Settings',
+                          size: 34,
+                          background:
+                              Palette.forestNight.withValues(alpha: 0.55),
+                          foreground: Palette.onDark,
+                          edge: Palette.onDark.withValues(alpha: 0.25),
+                          onPressed: () => openSettings(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -210,39 +233,42 @@ class DawnHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: _PartyBadge(
-                      portrait: HeroPortrait(
-                        portraitId: hero.portraitId,
-                        size: 44,
-                        frame: game.frame,
+              KeyedSubtree(
+                key: TourMark.party,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: _PartyBadge(
+                        portrait: HeroPortrait(
+                          portraitId: hero.portraitId,
+                          size: 44,
+                          frame: game.frame,
+                        ),
+                        name: hero.name,
+                        level: heroProgress.level,
+                        progress: heroProgress,
+                        barColor: Palette.gold,
+                        semanticRole: 'Hero',
                       ),
-                      name: hero.name,
-                      level: heroProgress.level,
-                      progress: heroProgress,
-                      barColor: Palette.gold,
-                      semanticRole: 'Hero',
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _PartyBadge(
-                      portrait: CompanionPortrait(
-                        kind: companion.kind,
-                        size: 44,
-                        gearIcon: game.gearWorn?.icon,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _PartyBadge(
+                        portrait: CompanionPortrait(
+                          kind: companion.kind,
+                          size: 44,
+                          gearIcon: game.gearWorn?.icon,
+                        ),
+                        name: companion.name,
+                        level: companionProgress.level,
+                        progress: companionProgress,
+                        barColor: Palette.companion,
+                        semanticRole: 'Companion',
                       ),
-                      name: companion.name,
-                      level: companionProgress.level,
-                      progress: companionProgress,
-                      barColor: Palette.companion,
-                      semanticRole: 'Companion',
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               const _JourneyStrip(),
@@ -378,72 +404,91 @@ class _JourneyStrip extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  const VIcon('home', size: 15, color: Palette.goldBright),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Restoring ${target.name}',
-                        maxLines: 1,
-                        style: AppText.small.copyWith(
-                          color: Palette.onDark,
-                          fontSize: 12.5,
+              KeyedSubtree(
+                key: TourMark.restoring,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        const VIcon('home', size: 15, color: Palette.goldBright),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Restoring ${target.name}',
+                              maxLines: 1,
+                              style: AppText.small.copyWith(
+                                color: Palette.onDark,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        StatChip(
+                          icon: 'coin',
+                          value: '${game.hero?.gold ?? 0}',
+                          label: 'Gold',
+                          iconColor: Palette.goldBright,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  StatChip(
-                    icon: 'coin',
-                    value: '${game.hero?.gold ?? 0}',
-                    label: 'Gold',
-                    iconColor: Palette.goldBright,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              XpBar(
-                fraction: progress,
-                color: Palette.gold,
-                height: 5,
-                track: Palette.onDark.withValues(alpha: 0.16),
+                    const SizedBox(height: 5),
+                    XpBar(
+                      fraction: progress,
+                      color: Palette.gold,
+                      height: 5,
+                      track: Palette.onDark.withValues(alpha: 0.16),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
-              Row(
-                children: <Widget>[
-                  const VIcon('pace', size: 15, color: Palette.dawnPeach),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
-                        'the next discovery',
-                        maxLines: 1,
-                        style: AppText.small.copyWith(
-                          color: Palette.onDark,
-                          fontSize: 12.5,
+              KeyedSubtree(
+                key: TourMark.road,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        const VIcon('pace', size: 15, color: Palette.dawnPeach),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
+                              'the next discovery',
+                              maxLines: 1,
+                              style: AppText.small.copyWith(
+                                color: Palette.onDark,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              XpBar(
-                fraction: pacesIntoStretch(paces) / pacesPerDiscovery,
-                color: Palette.companion,
-                height: 5,
-                track: Palette.onDark.withValues(alpha: 0.16),
+                    const SizedBox(height: 5),
+                    XpBar(
+                      fraction: pacesIntoStretch(paces) / pacesPerDiscovery,
+                      color: Palette.companion,
+                      height: 5,
+                      track: Palette.onDark.withValues(alpha: 0.16),
+                    ),
+                  ],
+                ),
               ),
               if (still != null) ...<Widget>[
                 const SizedBox(height: 8),
-                _DailyStillRow(today: still, place: target.name),
+                KeyedSubtree(
+                  key: TourMark.sleeper,
+                  child: _DailyStillRow(today: still, place: target.name),
+                ),
               ],
             ],
           ),
@@ -680,37 +725,40 @@ class _CompanionSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  CompanionPortrait(kind: companion.kind, size: 46),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'With ${companion.name}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppText.title.copyWith(color: Palette.onDark),
-                        ),
-                        Text(
-                          'Small, kind goals for the road',
-                          style: AppText.small.copyWith(
-                            color: Palette.onDarkSoft,
-                            fontSize: 12.5,
+              KeyedSubtree(
+                key: TourMark.companion,
+                child: Row(
+                  children: <Widget>[
+                    CompanionPortrait(kind: companion.kind, size: 46),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'With ${companion.name}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppText.title.copyWith(color: Palette.onDark),
                           ),
-                        ),
-                      ],
+                          Text(
+                            'Small, kind goals for the road',
+                            style: AppText.small.copyWith(
+                              color: Palette.onDarkSoft,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  StatChip(
-                    icon: 'bond',
-                    value: '${companion.bond}',
-                    label: 'Bond',
-                    iconColor: Palette.dawnPeach,
-                  ),
-                ],
+                    StatChip(
+                      icon: 'bond',
+                      value: '${companion.bond}',
+                      label: 'Bond',
+                      iconColor: Palette.dawnPeach,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 10),
               if (open.isNotEmpty)

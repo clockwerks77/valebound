@@ -15,6 +15,7 @@ import '../adaptive.dart';
 import '../art/crests.dart';
 import '../board/board_screen.dart' show VillagerCard;
 import '../celebrations.dart';
+import '../tour/tours.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'delve_screen.dart';
@@ -51,6 +52,10 @@ class _CampfireScreenState extends State<CampfireScreen> {
     if (!_loaded) {
       _note.text = GameScope.read(context).dayNote;
       _loaded = true;
+      // The first time the Campfire is opened, say what it is.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showHintOnce(context, HintId.campfire);
+      });
     }
   }
 

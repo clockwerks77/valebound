@@ -1081,6 +1081,33 @@ class GameRepository {
     return completed;
   }
 
+  /// Writes [steps] as the count for [day], a day already gone by, so its
+  /// note carries the whole day's figure and not just what had been walked
+  /// when the app was last open. Only for a day the app was opened on, and
+  /// it completes nothing: that day's board is closed.
+  Future<void> recordStepsFor(String day, int steps) async {
+    if (steps < 0 || await dayLog(day) == null) return;
+    final existing = (await healthEntriesByKey(day))[stepsFieldKey];
+    if (existing?.value == '$steps') return;
+    await setHealthEntry(day, stepsFieldKey, '$steps');
+  }
+
+  /// Writes [day]'s average glucose, as Health Connect holds it, into that
+  /// day's Health Log (DECISIONS D-71). A number and its unit, nothing else.
+  /// Only for a day the app was opened on.
+  Future<void> recordGlucoseAverage(String day, double average) async {
+    if (average <= 0 || await dayLog(day) == null) return;
+    final value = formatGlucose(average);
+    final existing = (await healthEntriesByKey(day))[glucoseAverageFieldKey];
+    if (existing?.value == value) return;
+    await setHealthEntry(
+      day,
+      glucoseAverageFieldKey,
+      value,
+      unit: glucoseAverageUnit,
+    );
+  }
+
   // ---- Calendar suggestions (DESIGN §9.3) -----------------------------
 
   /// What was decided about each of [day]'s calendar events: event id to

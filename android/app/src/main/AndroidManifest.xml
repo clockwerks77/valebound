@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <!-- Today's step count from Health Connect, for the steps quest. Read only. -->
     <uses-permission android:name="android.permission.health.READ_STEPS"/>
+    <!-- The day's glucose readings from Health Connect, shown as an average
+         in the Health Log. Read only; another app puts the readings there. -->
+    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE"/>
     <!-- The one notification: an optional reminder the user sets on a quest. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Sets those reminders again after the device restarts. -->

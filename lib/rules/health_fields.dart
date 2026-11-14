@@ -62,6 +62,17 @@ class HealthField {
 const String stepsFieldKey = 'steps';
 const String injectionFieldKey = 'injection';
 
+/// The day's average glucose as read from Health Connect (DECISIONS D-71).
+/// Not one of the fields the user types: it has a key of its own, so a
+/// reading typed into "Glucose" stays exactly what was typed.
+const String glucoseAverageFieldKey = 'glucose_average';
+const String glucoseAverageLabel = 'Average glucose';
+const String glucoseAverageUnit = 'mmol/L';
+
+/// A glucose figure in mmol/L, to one decimal place, as Canadian meters and
+/// sensors show it.
+String formatGlucose(double mmolPerLitre) => mmolPerLitre.toStringAsFixed(1);
+
 /// Presets offered in Settings (DESIGN §9.3 examples, plus steps).
 const List<HealthField> healthPresets = <HealthField>[
   HealthField(key: stepsFieldKey, label: 'Steps'),
