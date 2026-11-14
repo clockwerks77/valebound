@@ -190,6 +190,15 @@ jobs:
           flutter pub get 2>&1 | tail -3
           dart run build_runner build --delete-conflicting-outputs 2>&1 | tail -3
 
+      # The emulator refuses to start without several GB free for its data
+      # image; the hosted runner is nearly full once Flutter is installed.
+      - name: Free disk space
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          sudo docker system prune -af >/dev/null 2>&1 || true
+          df -h / | tail -1
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -207,6 +216,7 @@ jobs:
           profile: pixel_6
           disable-animations: false
           emulator-boot-timeout: 900
+          disk-size: 4096M
           script: bash tool/device_check.sh
 
       - name: Publish device results
