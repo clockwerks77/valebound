@@ -5,13 +5,18 @@ import 'package:flutter/widgets.dart';
 import '../data/database.dart';
 import '../data/repository.dart';
 import '../data/seed.dart';
+import '../data/settings.dart';
+import '../device/device_port.dart';
 import '../export/export_service.dart';
 import '../export/vault_port.dart';
+import '../rules/companion_rules.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
+import '../rules/health_fields.dart';
 import '../rules/progression.dart';
+import '../rules/reminders.dart';
 import '../rules/still.dart';
 import '../rules/world.dart';
 
@@ -40,10 +45,17 @@ class PendingCompletion {
 /// No state-management package: a plain [ChangeNotifier] is enough for one
 /// player on one device (DECISIONS.md D-03).
 class GameController extends ChangeNotifier {
-  GameController(this.repo, {VaultPort vault = const NoVault()})
-      : export = ExportService(repo, vault);
+  GameController(
+    this.repo, {
+    VaultPort vault = const NoVault(),
+    this.device = const NoDevice(),
+  }) : export = ExportService(repo, vault);
 
   final GameRepository repo;
+
+  /// Calendar, Health Connect and the reminder (DESIGN §9.3, §6.1). All
+  /// optional; the app is whole without any of them.
+  final DevicePort device;
 
   /// The Markdown export and its queue (DESIGN §11).
   final ExportService export;
@@ -75,6 +87,59 @@ class GameController extends ChangeNotifier {
   List<String> gearUnlocked = const <String>[];
   List<String> cosmeticsUnlocked = const <String>[];
   Map<String, String> equipped = const <String, String>{};
+
+  // ---- Real life (Phase 3) ---------------------------------------------
+
+  GameSettings settings = const GameSettings();
+
+  /// Today's calendar events not yet accepted or dismissed.
+  List<CalendarEvent> suggestions = const <CalendarEvent>[];
+  List<DeviceCalendar> calendars = const <DeviceCalendar>[];
+  bool calendarGranted = false;
+  List<CalendarEvent> _eventsToday = const <CalendarEvent>[];
+
+  StepsAccess stepsAccess = StepsAccess.unavailable;
+
+  /// Today's Health Log entries by field key.
+  Map<String, HealthEntryRow> healthToday = const <String, HealthEntryRow>{};
+
+  /// The weekly Delve, when one can be entered at the Campfire.
+  DelveWaiting? delve;
+
+  bool notificationsAllowed = false;
+
+  /// Set when the app was opened from Health Connect's "why" link.
+  String? launchReason;
+
+  final List<AutoCompletion> _autoCompleted = <AutoCompletion>[];
+  String? _reminderSignature;
+
+  /// Quests the app completed by itself since this was last asked (steps
+  /// reaching their target), so the screen can mark the moment.
+  List<AutoCompletion> takeAutoCompletions() {
+    final out = List<AutoCompletion>.of(_autoCompleted);
+    _autoCompleted.clear();
+    return out;
+  }
+
+  /// The calendar offer on the Dawn board: made once, in context.
+  bool get calendarOfferDue => !settings.calendarAsked && !settings.calendarOn;
+
+  bool get stepsConnected =>
+      settings.stepsOn && stepsAccess == StepsAccess.connected;
+
+  /// Today's steps as recorded, from Health Connect or typed by hand.
+  int? get stepsToday {
+    final raw = healthToday[stepsFieldKey]?.value;
+    if (raw == null) return null;
+    return int.tryParse(raw.replaceAll(RegExp(r'[^0-9]'), ''));
+  }
+
+  bool get hasReminders =>
+      quests.any((q) => q.active && q.reminderTime != null);
+
+  /// The companion presents the comeback quest once they know Comfort.
+  bool get comfortKnown => (companion?.level ?? 1) >= comfortLevel;
 
   // ---- The world, worked out from what has been gathered ---------------
 
@@ -117,8 +182,9 @@ class GameController extends ChangeNotifier {
 
   Future<void> init() async {
     hasProfile = await repo.hasProfile();
+    launchReason = await device.takeLaunchReason();
     if (hasProfile) {
-      await _reload();
+      await _reload(fromDevice: true);
     }
     await export.refreshStatus();
     loading = false;
@@ -127,15 +193,28 @@ class GameController extends ChangeNotifier {
   }
 
   /// Re-reads everything. Also rolls the day over if midnight has passed.
-  Future<void> refresh() async {
+  ///
+  /// [fromDevice] also asks the device for today's steps and calendar; that
+  /// happens when the app is opened or returned to, and when the day turns.
+  Future<void> refresh({bool fromDevice = false}) async {
     if (!hasProfile) return;
-    await _reload();
+    await _reload(fromDevice: fromDevice);
     notifyListeners();
   }
 
-  Future<void> _reload() async {
+  /// Called when the app comes back to the front.
+  Future<void> resumed() async {
+    launchReason ??= await device.takeLaunchReason();
+    await refresh(fromDevice: true);
+  }
+
+  Future<void> _reload({bool fromDevice = false}) async {
     lastDawn = await repo.ensureDawn();
-    day = DayKey.of(repo.clock());
+    final today = DayKey.of(repo.clock());
+    final readDevice = fromDevice || today != day;
+    day = today;
+    settings = await repo.settings();
+    if (readDevice) await _readSteps();
     await repo.syncWorld();
     hero = await repo.hero();
     companion = await repo.companion();
@@ -164,7 +243,211 @@ class GameController extends ChangeNotifier {
     gearUnlocked =
         c == null ? const <String>[] : decodeStringList(c.gearUnlocked);
     await repo.recordBoardSize(day, board.length);
-    today = await repo.dayLog(day);
+    this.today = await repo.dayLog(day);
+    healthToday = await repo.healthEntriesByKey(day);
+    delve = await repo.delveWaiting();
+    if (readDevice) await _readCalendar();
+    await _filterSuggestions();
+    await _syncReminders();
+  }
+
+  // ---- Device: steps, calendar, reminders ------------------------------
+
+  /// Reads today's steps from Health Connect, when connected, and lets them
+  /// fill the Auto quest. Quiet in every other case (DESIGN §9.3).
+  Future<void> _readSteps() async {
+    stepsAccess = await device.stepsAccess();
+    if (!stepsConnected) return;
+    final steps = await device.stepsBetween(DayKey.parse(day), repo.clock());
+    if (steps == null) return;
+    _autoCompleted.addAll(await repo.recordSteps(steps));
+  }
+
+  Future<void> _readCalendar() async {
+    calendarGranted = await device.calendarGranted();
+    if (!settings.calendarOn || !calendarGranted) {
+      _eventsToday = const <CalendarEvent>[];
+      calendars = const <DeviceCalendar>[];
+      return;
+    }
+    final start = DayKey.parse(day);
+    final end = DayKey.parse(DayKey.addDays(day, 1));
+    calendars = await device.calendars();
+    _eventsToday = await device.eventsBetween(start, end);
+  }
+
+  Future<void> _filterSuggestions() async {
+    if (!settings.calendarOn || _eventsToday.isEmpty) {
+      suggestions = const <CalendarEvent>[];
+      return;
+    }
+    final choices = await repo.calendarChoicesOn(day);
+    suggestions = <CalendarEvent>[
+      for (final e in _eventsToday)
+        if (!choices.containsKey(e.id) &&
+            !settings.excludedCalendars.contains(e.calendarId))
+          e,
+    ];
+  }
+
+  /// Plans the week's reminders for quests that have one. The device is only
+  /// told when the plan has changed.
+  Future<void> _syncReminders() async {
+    final now = repo.clock();
+    final requests = <ReminderRequest>[];
+    for (final q in quests) {
+      if (!q.active || q.reminderTime == null) continue;
+      var settled = false;
+      for (final b in board) {
+        if (b.quest.id == q.id) settled = b.isDone || b.isSetAside;
+      }
+      final times = upcomingReminders(
+        schedule: scheduleOf(q),
+        time: q.reminderTime,
+        now: now,
+        settledToday: settled,
+      );
+      for (var i = 0; i < times.length; i++) {
+        requests.add(
+          ReminderRequest(
+            id: reminderId(q.id, i),
+            at: times[i],
+            title: q.name,
+            body: reminderBody,
+          ),
+        );
+      }
+    }
+    final signature = <String>[
+      for (final r in requests)
+        '${r.id}@${r.at.millisecondsSinceEpoch}:${r.title}',
+    ].join('|');
+    if (signature == _reminderSignature) return;
+    _reminderSignature = signature;
+    await device.syncReminders(requests);
+  }
+
+  // ---- Calendar (DESIGN §9.3) ------------------------------------------
+
+  /// Asks for the calendar, from the Dawn board or Settings. Whatever the
+  /// answer, the offer on the board is not made again.
+  Future<bool> connectCalendar() async {
+    final granted = await device.requestCalendar();
+    await repo.setSetting(SettingKey.calendarAsked, '1');
+    await repo.setSetting(SettingKey.calendarOn, granted ? '1' : '0');
+    await refresh(fromDevice: true);
+    return granted;
+  }
+
+  /// "Not now": the board stays as it is, and Settings can turn it on later.
+  Future<void> declineCalendar() async {
+    await repo.setSetting(SettingKey.calendarAsked, '1');
+    await repo.setSetting(SettingKey.calendarOn, '0');
+    await refresh();
+  }
+
+  Future<void> turnCalendarOff() async {
+    await repo.setSetting(SettingKey.calendarOn, '0');
+    await refresh(fromDevice: true);
+  }
+
+  Future<void> setCalendarExcluded(String calendarId, {required bool excluded}) async {
+    final ids = Set<String>.of(settings.excludedCalendars);
+    if (excluded) {
+      ids.add(calendarId);
+    } else {
+      ids.remove(calendarId);
+    }
+    await repo.setExcludedCalendars(ids);
+    await refresh();
+  }
+
+  /// Accept: the event becomes today's commitment. Returns the quest's id.
+  Future<String> acceptSuggestion(CalendarEvent event) async {
+    final id = await repo.acceptSuggestion(
+      externalId: event.id,
+      title: event.title,
+      timeLabel: event.timeLabel,
+    );
+    await refresh();
+    _exportSoon();
+    return id;
+  }
+
+  Future<void> dismissSuggestion(CalendarEvent event) async {
+    await repo.dismissSuggestion(event.id);
+    await refresh();
+  }
+
+  // ---- Steps and the Health Log (DESIGN §8.7, §9.3) ---------------------
+
+  Future<StepsAccess> connectSteps() async {
+    final access = await device.requestSteps();
+    await repo.setSetting(
+      SettingKey.stepsOn,
+      access == StepsAccess.connected ? '1' : '0',
+    );
+    await refresh(fromDevice: true);
+    _exportSoon();
+    return access;
+  }
+
+  Future<void> disconnectSteps() async {
+    await repo.setSetting(SettingKey.stepsOn, '0');
+    await refresh(fromDevice: true);
+  }
+
+  /// Saves the Health Log's form: field key to exactly what was typed. An
+  /// empty value clears that entry. Steps typed here fill the Auto quest
+  /// just as steps from Health Connect do.
+  Future<void> saveHealthLog(Map<String, String> values) async {
+    for (final field in settings.healthFields) {
+      final value = values[field.key];
+      if (value == null) continue;
+      if (field.key == stepsFieldKey) {
+        final steps = int.tryParse(value.replaceAll(RegExp(r'[^0-9]'), ''));
+        if (steps != null) {
+          _autoCompleted.addAll(await repo.recordSteps(steps));
+          continue;
+        }
+      }
+      await repo.setHealthEntry(day, field.key, value, unit: field.unit);
+    }
+    await refresh();
+    _exportSoon();
+  }
+
+  Future<void> setHealthFields(List<HealthField> fields) async {
+    await repo.setHealthFields(fields);
+    await refresh();
+  }
+
+  // ---- The weekly Delve (DESIGN §4.2) -----------------------------------
+
+  Future<DelveResult?> enterDelve() async {
+    final result = await repo.resolveDelve();
+    await refresh();
+    if (result != null) _exportSoon();
+    return result;
+  }
+
+  Future<void> setDelveWeekday(int weekday) async {
+    await repo.setDelveWeekday(weekday);
+    await refresh();
+  }
+
+  // ---- The reminder (DESIGN §6.1) ---------------------------------------
+
+  /// Asks to show notifications; called the first time a reminder is set.
+  Future<bool> enableNotifications() async {
+    notificationsAllowed = await device.requestNotifications();
+    notifyListeners();
+    return notificationsAllowed;
+  }
+
+  Future<void> checkNotifications() async {
+    notificationsAllowed = await device.notificationsAllowed();
+    notifyListeners();
   }
 
   /// Writes the Markdown files in the background. Never throws and never
@@ -197,6 +480,7 @@ class GameController extends ChangeNotifier {
   // ---- Board groups (DESIGN §8.1) -------------------------------------
 
   bool _isCampfire(BoardQuest b) => b.quest.systemKey == systemKeyCampfire;
+  bool _isComeback(BoardQuest b) => b.quest.systemKey == systemKeyComeback;
 
   /// Hero-track quests to do now.
   List<BoardQuest> get nowQuests => board
@@ -205,9 +489,18 @@ class GameController extends ChangeNotifier {
             !b.isDone &&
             !b.isSetAside &&
             !_isCampfire(b) &&
+            !_isComeback(b) &&
             b.quest.track == Track.hero,
       )
       .toList();
+
+  /// "Return to the Vale", while it is on today's board and not yet done.
+  BoardQuest? get comebackQuest {
+    for (final b in board) {
+      if (_isComeback(b) && !b.isDone) return b;
+    }
+    return null;
+  }
 
   /// Companion and Shared quests still open: the "With [Name]" section.
   List<BoardQuest> get companionQuests => board
