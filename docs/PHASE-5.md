@@ -135,3 +135,17 @@ and which line is told when), `test/ui/phase5_flows_test.dart` (the read
 while open, the prologue, the narrator's lines, chapters, the Chronicle),
 `test/golden/phase5_golden_test.dart` (the screenshots above, with the
 crease checks).
+
+## The build
+
+Version 0.5.1, commit `8a91928` on `phase-5`, GitHub Actions run
+43613713651, 14 Nov 2026. 423 tests passed.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| `Valebound-0.5.1.apk` (release) | 24,804,349 bytes | `2d76547a5d5853fd55c07a3ee60632dec7eaea819b4d696f4e4196986002ff8c` |
+| `Valebound-0.5.1-debug.apk` | 164,170,583 bytes | `32d8e83cc5d5d6552ed08b8002f18b9dd467338c0d49fe83fa668e6be6258ad5` |
+
+Both are signed with the fixed personal key (certificate SHA-256
+`8dcf398e…7a3b61`). The release file declares no `INTERNET` permission.
+
