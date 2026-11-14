@@ -6,6 +6,7 @@ import '../../data/database.dart';
 import '../../data/repository.dart';
 import '../../rules/awards.dart';
 import '../../rules/enums.dart';
+import '../../rules/progression.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
