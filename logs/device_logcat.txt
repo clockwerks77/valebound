@@ -1,0 +1,61 @@
+11-14 16:17:32.636   517   782 I SdkSandboxManager: No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10108, mPackageName='app.habit_adventure, mAppProcessToken='null'}
+11-14 16:17:32.703   931   931 D CarrierSvcBindHelper: onPackageModified: app.habit_adventure
+11-14 16:17:32.729   517   879 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=app.habit_adventure/.MainActivity} with LAUNCH_SINGLE_TOP from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+11-14 16:17:32.747   517   556 I ActivityManager: Start proc 1785:app.habit_adventure/u0a108 for next-top-activity {app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:17:32.920  1785  1785 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:17:32.920  1785  1785 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:17:33.044  1785  1785 D nativeloader: Configuring clns-6 for other apk /data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/lib/x86_64:/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/app.habit_adventure
+11-14 16:17:33.055  1785  1785 V GraphicsEnvironment: ANGLE GameManagerService for app.habit_adventure: false
+11-14 16:17:33.055  1785  1785 V GraphicsEnvironment: app.habit_adventure is not listed in per-application setting
+11-14 16:17:33.174  1785  1813 D FlutterJNI: Beginning load of flutter...
+11-14 16:17:33.221  1785  1813 D FlutterJNI: flutter (null) was loaded normally!
+11-14 16:17:33.401   517   578 I AppsFilter: interaction: PackageSetting{719c4aa app.habit_adventure/10108} -> PackageSetting{560b89b com.android.rkpdapp/10086} BLOCKED
+11-14 16:17:33.401   517   578 I AppsFilter: interaction: PackageSetting{719c4aa app.habit_adventure/10108} -> PackageSetting{5500438 com.android.cellbroadcastreceiver.module/10094} BLOCKED
+11-14 16:17:34.222  1785  1815 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/kernel_blob.bin
+11-14 16:17:34.223  1785  1815 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/vm_snapshot_data
+11-14 16:17:34.330  1785  1815 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/isolate_snapshot_data
+11-14 16:17:34.358  1785  1785 W habit_adventure: type=1400 audit(0.0:15): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=48200 scontext=u:r:untrusted_app:s0:c108,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=app.habit_adventure
+11-14 16:17:34.497  1785  1874 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+11-14 16:17:34.539  1785  1881 I flutter : The Dart VM service is listening on http://127.0.0.1:34005/-NKY2OzFL0M=/
+11-14 16:17:35.362   517  1696 D CoreBackPreview: Window{8c8c886 u0 app.habit_adventure/app.habit_adventure.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@eb7b0e0, mPriority=0, mIsAnimationCallback=false}
+11-14 16:17:36.295   517   542 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:17:36.354   517   542 I ActivityTaskManager: Displayed app.habit_adventure/.MainActivity for user 0: +3s589ms
+11-14 16:17:36.355   517   542 I ActivityTaskManager: Fully drawn app.habit_adventure/.MainActivity: +3s589ms
+11-14 16:17:36.355   517   542 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:17:36.372   517   879 I ImeTracker: app.habit_adventure:e016c504: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+11-14 16:17:36.373   517   879 I ImeTracker: app.habit_adventure:e016c504: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-14 16:17:41.101  1785  1894 D ProfileInstaller: Installing profile for app.habit_adventure
+11-14 16:18:06.754   517  1702 I ActivityManager: Force stopping app.habit_adventure appid=10108 user=0: from pid 1904
+11-14 16:18:06.770   517  1702 I ActivityManager: Killing 1785:app.habit_adventure/u0a108 (adj 0): stop app.habit_adventure due to from pid 1904
+11-14 16:18:06.774   517  1702 W ActivityTaskManager: Force removing ActivityRecord{11a2c10 u0 app.habit_adventure/.MainActivity t5 f}}: app died, no saved state
+11-14 16:18:06.779   517  1702 W InputManager-JNI: Input channel object 'Letterbox_left_ActivityRecord{11a2c10 u0 app.habit_adventure/.MainActivity t5} (client)' was disposed without first being removed with the input manager!
+11-14 16:18:06.783   517  1702 W InputManager-JNI: Input channel object 'Letterbox_top_ActivityRecord{11a2c10 u0 app.habit_adventure/.MainActivity t5} (client)' was disposed without first being removed with the input manager!
+11-14 16:18:06.784   517  1702 W InputManager-JNI: Input channel object 'Letterbox_right_ActivityRecord{11a2c10 u0 app.habit_adventure/.MainActivity t5} (client)' was disposed without first being removed with the input manager!
+11-14 16:18:06.784   517  1702 W InputManager-JNI: Input channel object 'Letterbox_bottom_ActivityRecord{11a2c10 u0 app.habit_adventure/.MainActivity t5} (client)' was disposed without first being removed with the input manager!
+11-14 16:18:06.793   517  1702 W InputManager-JNI: Input channel object '8c8c886 app.habit_adventure/app.habit_adventure.MainActivity (client)' was disposed without first being removed with the input manager!
+11-14 16:18:06.895   517   532 V ActivityManager: Got obituary of 1785:app.habit_adventure
+11-14 16:18:06.906   931   931 D CarrierSvcBindHelper: onHandleForceStop: [app.habit_adventure]
+11-14 16:18:09.932   517   532 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=app.habit_adventure/.MainActivity} with LAUNCH_SINGLE_TOP from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+11-14 16:18:09.951   517   556 I ActivityManager: Start proc 1913:app.habit_adventure/u0a108 for next-top-activity {app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:18:10.042  1913  1913 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:18:10.042  1913  1913 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:18:10.117  1913  1913 D nativeloader: Configuring clns-6 for other apk /data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/lib/x86_64:/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/app.habit_adventure
+11-14 16:18:10.128  1913  1913 V GraphicsEnvironment: ANGLE GameManagerService for app.habit_adventure: false
+11-14 16:18:10.128  1913  1913 V GraphicsEnvironment: app.habit_adventure is not listed in per-application setting
+11-14 16:18:10.168  1913  1932 D FlutterJNI: Beginning load of flutter...
+11-14 16:18:10.182  1913  1932 D FlutterJNI: flutter (null) was loaded normally!
+11-14 16:18:10.198  1913  1913 W habit_adventure: type=1400 audit(0.0:16): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=48200 scontext=u:r:untrusted_app:s0:c108,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=app.habit_adventure
+11-14 16:18:10.229  1913  1935 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+11-14 16:18:10.356  1913  1941 I flutter : The Dart VM service is listening on http://127.0.0.1:41417/45tUT8q-jbA=/
+11-14 16:18:11.208   517  1696 D CoreBackPreview: Window{4bbcc7 u0 app.habit_adventure/app.habit_adventure.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@2f58a60, mPriority=0, mIsAnimationCallback=false}
+11-14 16:18:11.953   517   542 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:18:11.960   517   542 I ActivityTaskManager: Displayed app.habit_adventure/.MainActivity for user 0: +2s31ms
+11-14 16:18:11.962   517   542 I ActivityTaskManager: Fully drawn app.habit_adventure/.MainActivity: +2s31ms
+11-14 16:18:11.963   517   542 W ziparchive: Unable to open '/data/app/~~wmHdVKefy30S52xQc2PjUw==/app.habit_adventure-P6maXWa_JtNpkLFSXZZ9Cw==/base.dm': No such file or directory
+11-14 16:18:12.872   517   801 I ImeTracker: app.habit_adventure:f04a547e: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+11-14 16:18:12.872   517   801 I ImeTracker: app.habit_adventure:f04a547e: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-14 16:18:16.505  1913  1952 D ProfileInstaller: Installing profile for app.habit_adventure
+11-14 16:18:27.593   517   546 I WindowManager: Screen frozen for +228ms due to Window{4bbcc7 u0 app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:18:28.092   517   546 I WindowManager: Screen frozen for +439ms due to Window{4bbcc7 u0 app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:18:36.510   517   546 I WindowManager: Screen frozen for +298ms due to Window{4bbcc7 u0 app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:18:45.446   517   546 I WindowManager: Screen frozen for +640ms due to Window{4bbcc7 u0 app.habit_adventure/app.habit_adventure.MainActivity}

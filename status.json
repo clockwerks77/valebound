@@ -1,0 +1,19 @@
+{
+  "sha": "8a91928d2d85053a23477c874af71e932a1a9fc6",
+  "ref": "phase-5",
+  "run_id": "43613713651",
+  "stage": "device",
+  "pub_get": "",
+  "codegen": "",
+  "analyze": "",
+  "test": "",
+  "apk": "",
+  "device": "success",
+  "apk_path": "",
+  "apk_bytes": 0,
+  "apk_sha256": "",
+  "apk_debug_path": "",
+  "apk_debug_bytes": 0,
+  "apk_debug_sha256": "",
+  "time": "2026-11-14T16:19:05Z"
+}

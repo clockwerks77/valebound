@@ -1,0 +1,26 @@
+== install
+Performing Streamed Install
+Success
+== first launch
+Starting: Intent { cmp=app.habit_adventure/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: app.habit_adventure/.MainActivity
+TotalTime: 3589
+WaitTime: 3610
+Complete
+pid after first launch: 1785
+== stop and relaunch
+Starting: Intent { cmp=app.habit_adventure/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: app.habit_adventure/.MainActivity
+TotalTime: 2031
+WaitTime: 2050
+Complete
+pid after relaunch: 1913
+== Fold-like window sizes
+launch check result: 0 (0 = passed)
+== on-device test (recorded, does not decide the job)
+emulator still responding after the test
+on-device test exit: 1 (0 = passed)

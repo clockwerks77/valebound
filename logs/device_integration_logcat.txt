@@ -1,0 +1,110 @@
+11-14 16:18:49.250   517   555 I ActivityManager: Force stopping app.habit_adventure appid=10108 user=-1: deletePackageX
+11-14 16:18:49.300   517   578 I PermissionManager: Removing permission app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION that used to be declared by app.habit_adventure
+11-14 16:18:49.353   517   578 I ActivityManager: Force stopping app.habit_adventure appid=10108 user=0: pkg removed
+11-14 16:18:49.370   931   931 D CarrierSvcBindHelper: onPackageRemoved: app.habit_adventure
+11-14 16:18:49.373   517   736 W WifiService: Couldn't get PackageInfo for package:app.habit_adventure
+11-14 16:18:49.373   517   736 D WifiService: Remove settings for package:app.habit_adventure
+11-14 16:18:49.373   517   736 D WifiConfigManager: Remove all networks for app ApplicationInfo{76368dc app.habit_adventure}
+11-14 16:18:49.387   517   625 V StorageManagerService: Package app.habit_adventure does not have legacy storage
+11-14 16:18:49.392   517   736 I PasspointManager: No app ops listener found for app.habit_adventure
+11-14 16:18:49.419   517   517 I Telecom : CarModeTracker: Package app.habit_adventure is not tracked.: SSH.oR@AGs🔒
+11-14 16:18:49.429   517   517 I ConditionProviders: Disallowing condition provider app.habit_adventure (userSet: true)
+11-14 16:18:49.437   517   598 I RollbackManager: broadcast=ACTION_PACKAGE_FULLY_REMOVED pkg=app.habit_adventure
+11-14 16:18:49.439   517   736 W WifiService: Couldn't get PackageInfo for package:app.habit_adventure
+11-14 16:18:49.439   517   736 D WifiService: Remove settings for package:app.habit_adventure
+11-14 16:18:49.439   517   736 D WifiConfigManager: Remove all networks for app ApplicationInfo{ac24b2f app.habit_adventure}
+11-14 16:18:49.456   517   736 I PasspointManager: No app ops listener found for app.habit_adventure
+11-14 16:18:49.597  1110  1470 D MediaProvider: Deleted 0 Android/media items belonging to app.habit_adventure on /data/user/0/com.android.providers.media.module/databases/external.db
+11-14 16:18:49.603  1110  1470 D MediaGrants: Removed 0 media_grants for 0 user for app.habit_adventure. Reason: Package orphaned
+11-14 16:18:49.667   810   810 D PersistedStoragePackageUninstalledReceiver: Received android.intent.action.PACKAGE_FULLY_REMOVED for app.habit_adventure for u0
+11-14 16:18:50.165   517   588 W ActivityManager: Invalid packageName: app.habit_adventure
+11-14 16:18:51.538   517   578 V BackupManagerService: [UserID:0] restoreAtInstall pkg=app.habit_adventure token=2 restoreSet=0
+11-14 16:18:51.559   931   931 D CarrierSvcBindHelper: onPackageAdded: app.habit_adventure
+11-14 16:18:51.576   517   782 I SdkSandboxManager: No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10109, mPackageName='app.habit_adventure, mAppProcessToken='null'}
+11-14 16:18:51.613   810   810 I SafetyLabelChangedBroadcastReceiver: received broadcast packageName: app.habit_adventure, current user: UserHandle{0}, packageChangeEvent: NEW_INSTALL, intent user: UserHandle{0}
+11-14 16:18:51.619   931   931 D CarrierSvcBindHelper: onPackageModified: app.habit_adventure
+11-14 16:18:51.719   517   533 I ActivityTaskManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x30000000 cmp=app.habit_adventure/.MainActivity (has extras)} with LAUNCH_SINGLE_TOP from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+11-14 16:18:51.758   517   556 I ActivityManager: Start proc 2068:app.habit_adventure/u0a109 for next-top-activity {app.habit_adventure/app.habit_adventure.MainActivity}
+11-14 16:18:51.838  2068  2068 W ziparchive: Unable to open '/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.dm': No such file or directory
+11-14 16:18:51.838  2068  2068 W ziparchive: Unable to open '/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.dm': No such file or directory
+11-14 16:18:51.908  2068  2068 D nativeloader: Configuring clns-6 for other apk /data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/lib/x86_64:/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/app.habit_adventure
+11-14 16:18:51.917  2068  2068 V GraphicsEnvironment: ANGLE GameManagerService for app.habit_adventure: false
+11-14 16:18:51.918  2068  2068 V GraphicsEnvironment: app.habit_adventure is not listed in per-application setting
+11-14 16:18:51.950  2068  2068 I FlutterActivityAndFragmentDelegate: If you are attempting to set --start-paused via Intent extras to launch a Flutter component outside of using the Flutter CLI, note that support for setting engine flags on Android via Intent will soon be dropped; see https://github.com/flutter/flutter/issues/180686 for more information on this breaking change. To migrate, set --start-paused or any other flags specified via Intent extras on the command line instead or see https://github.com/flutter/flutter/blob/main/docs/engine/Flutter-Android-Engine-Flags.md for alternative methods.
+11-14 16:18:51.958  2068  2087 D FlutterJNI: Beginning load of flutter...
+11-14 16:18:51.982  2068  2087 D FlutterJNI: flutter (null) was loaded normally!
+11-14 16:18:52.261  2068  2088 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/kernel_blob.bin
+11-14 16:18:52.261  2068  2088 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/vm_snapshot_data
+11-14 16:18:52.320  2068  2088 I ResourceExtractor: Extracted baseline resource assets/flutter_assets/isolate_snapshot_data
+11-14 16:18:52.334  2068  2068 W habit_adventure: type=1400 audit(0.0:24): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=48200 scontext=u:r:untrusted_app:s0:c109,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=app.habit_adventure
+11-14 16:18:52.412  2068  2090 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+11-14 16:18:52.453  2068  2097 I flutter : The Dart VM service is listening on http://127.0.0.1:44551/sWECs7IrqCg=/
+11-14 16:18:52.738   517  1165 D CoreBackPreview: Window{a363ccc u0 app.habit_adventure/app.habit_adventure.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@dfc7391, mPriority=0, mIsAnimationCallback=false}
+11-14 16:18:56.737  2068  2068 I flutter : 00:00 +0: first run, one completed quest, then reopen
+11-14 16:18:57.245  2068  2068 I flutter : DEVICE-TEST STEP: open storage
+11-14 16:18:57.499   517   542 W ziparchive: Unable to open '/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.dm': No such file or directory
+11-14 16:18:57.502   517   542 I ActivityTaskManager: Displayed app.habit_adventure/.MainActivity for user 0: +5s801ms
+11-14 16:18:57.503   517   542 I ActivityTaskManager: Fully drawn app.habit_adventure/.MainActivity: +5s801ms
+11-14 16:18:57.504   517   542 W ziparchive: Unable to open '/data/app/~~9QJxyziO02p6dyTi8AMiUw==/app.habit_adventure-WspWL-Um2zu7uU5NTJRlrA==/base.dm': No such file or directory
+11-14 16:18:57.592   517   533 I ImeTracker: app.habit_adventure:ea994a6b: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+11-14 16:18:57.592   517   533 I ImeTracker: app.habit_adventure:ea994a6b: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-14 16:18:57.961  2068  2068 I flutter : DEVICE-TEST STEP: show the app
+11-14 16:18:58.621  2068  2113 D ProfileInstaller: Installing profile for app.habit_adventure
+11-14 16:18:58.704  2068  2068 I flutter : DEVICE-TEST STEP: onboarding
+11-14 16:18:58.814  2068  2068 I ImeTracker: app.habit_adventure:e0c2e113: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+11-14 16:18:58.825  2068  2068 D InputMethodManager: showSoftInput() view=io.flutter.embedding.android.FlutterView{f0c06c4 VFE...... .F....ID 0,0-1080,2272 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+11-14 16:18:58.842  2068  2068 I ImeTracker: app.habit_adventure:fe301d33: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+11-14 16:18:58.842  2068  2068 D InputMethodManager: showSoftInput() view=io.flutter.embedding.android.FlutterView{f0c06c4 VFE...... .F....ID 0,0-1080,2272 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+11-14 16:18:58.843   517   533 I ImeTracker: app.habit_adventure:e0c2e113: onCancelled at PHASE_SERVER_WAIT_IME
+11-14 16:19:00.802  2068  2068 I ImeTracker: app.habit_adventure:39f4406b: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+11-14 16:19:00.802   517   533 I ImeTracker: app.habit_adventure:39f4406b: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-14 16:19:00.802   517   533 I ImeTracker: app.habit_adventure:fe301d33: onCancelled at PHASE_SERVER_WAIT_IME
+11-14 16:19:02.891  2068  2068 I flutter : DEVICE-TEST STEP: create the profile
+11-14 16:19:03.473  2068  2068 I flutter : DEVICE-TEST STEP: board is up
+11-14 16:19:04.008  2068  2068 I flutter : ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+11-14 16:19:04.009  2068  2068 I flutter : The following TestFailure was thrown running a test:
+11-14 16:19:04.009  2068  2068 I flutter : Expected: exactly one matching candidate
+11-14 16:19:04.009  2068  2068 I flutter :   Actual: _TypeWidgetFinder:<Found 0 widgets with type "AppShell": []>
+11-14 16:19:04.009  2068  2068 I flutter :    Which: means none were found but one was expected
+11-14 16:19:04.009  2068  2068 I flutter : 
+11-14 16:19:04.009  2068  2068 I flutter : When the exception was thrown, this was the stack:
+11-14 16:19:04.009  2068  2068 I flutter : #4      main.<anonymous closure> (file:///home/runner/work/valebound/valebound/integration_test/app_test.dart:61:5)
+11-14 16:19:04.009  2068  2068 I flutter : <asynchronous suspension>
+11-14 16:19:04.009  2068  2068 I flutter : #5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+11-14 16:19:04.009  2068  2068 I flutter : <asynchronous suspension>
+11-14 16:19:04.009  2068  2068 I flutter : #6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+11-14 16:19:04.009  2068  2068 I flutter : <asynchronous suspension>
+11-14 16:19:04.009  2068  2068 I flutter : #7      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1707:12)
+11-14 16:19:04.009  2068  2068 I flutter : <asynchronous suspension>
+11-14 16:19:04.009  2068  2068 I flutter : 
+11-14 16:19:04.009  2068  2068 I flutter : This was caught by the test expectation on the following line:
+11-14 16:19:04.009  2068  2068 I flutter :   file:///home/runner/work/valebound/valebound/integration_test/app_test.dart line 61
+11-14 16:19:04.009  2068  2068 I flutter : The test description was:
+11-14 16:19:04.009  2068  2068 I flutter :   first run, one completed quest, then reopen
+11-14 16:19:04.009  2068  2068 I flutter : ════════════════════════════════════════════════════════════════════════════════════════════════════
+11-14 16:19:04.012  2068  2068 I flutter : 00:07 +0: first run, one completed quest, then reopen [E]
+11-14 16:19:04.012  2068  2068 I flutter :   Test failed. See exception logs above.
+11-14 16:19:04.012  2068  2068 I flutter :   The test description was: first run, one completed quest, then reopen
+11-14 16:19:04.012  2068  2068 I flutter :   
+11-14 16:19:04.020  2068  2068 I flutter : 00:07 +0 -1: (tearDownAll)
+11-14 16:19:04.094  2068  2068 I flutter : 00:07 +1 -1: Some tests failed.
+11-14 16:19:04.132   517  1165 I ActivityManager: Force stopping app.habit_adventure appid=10109 user=0: from pid 2118
+11-14 16:19:04.133   517  1165 I ActivityManager: Killing 2068:app.habit_adventure/u0a109 (adj 0): stop app.habit_adventure due to from pid 2118
+11-14 16:19:04.135   517  1165 W ActivityTaskManager: Force removing ActivityRecord{102b60d u0 app.habit_adventure/.MainActivity t7 f}}: app died, no saved state
+11-14 16:19:04.136   517  1165 W InputManager-JNI: Input channel object 'Letterbox_left_ActivityRecord{102b60d u0 app.habit_adventure/.MainActivity t7} (client)' was disposed without first being removed with the input manager!
+11-14 16:19:04.137   517  1165 W InputManager-JNI: Input channel object 'Letterbox_top_ActivityRecord{102b60d u0 app.habit_adventure/.MainActivity t7} (client)' was disposed without first being removed with the input manager!
+11-14 16:19:04.137   517  1165 W InputManager-JNI: Input channel object 'Letterbox_right_ActivityRecord{102b60d u0 app.habit_adventure/.MainActivity t7} (client)' was disposed without first being removed with the input manager!
+11-14 16:19:04.137   517  1165 W InputManager-JNI: Input channel object 'Letterbox_bottom_ActivityRecord{102b60d u0 app.habit_adventure/.MainActivity t7} (client)' was disposed without first being removed with the input manager!
+11-14 16:19:04.138   517  1165 W InputManager-JNI: Input channel object 'a363ccc app.habit_adventure/app.habit_adventure.MainActivity (client)' was disposed without first being removed with the input manager!
+11-14 16:19:04.189   931   931 D CarrierSvcBindHelper: onHandleForceStop: [app.habit_adventure]
+11-14 16:19:04.190   517  1696 V ActivityManager: Got obituary of 2068:app.habit_adventure
+11-14 16:19:04.215   517   555 I ActivityManager: Force stopping app.habit_adventure appid=10109 user=-1: deletePackageX
+11-14 16:19:04.269   517   578 I PermissionManager: Removing permission app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION that used to be declared by app.habit_adventure
+11-14 16:19:04.314   517   578 I ActivityManager: Force stopping app.habit_adventure appid=10109 user=0: pkg removed
+11-14 16:19:04.342   517   736 W WifiService: Couldn't get PackageInfo for package:app.habit_adventure
+11-14 16:19:04.342   517   736 D WifiService: Remove settings for package:app.habit_adventure
+11-14 16:19:04.342   517   736 D WifiConfigManager: Remove all networks for app ApplicationInfo{8cb2e7f app.habit_adventure}
+11-14 16:19:04.344   517   625 V StorageManagerService: Package app.habit_adventure does not have legacy storage
+11-14 16:19:04.362   517   736 I PasspointManager: No app ops listener found for app.habit_adventure
+11-14 16:19:04.368   517   598 I RollbackManager: broadcast=ACTION_PACKAGE_FULLY_REMOVED pkg=app.habit_adventure
+11-14 16:19:04.368   931   931 D CarrierSvcBindHelper: onPackageRemoved: app.habit_adventure
