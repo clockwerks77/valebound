@@ -501,6 +501,81 @@ class RoundIconButton extends StatelessWidget {
   }
 }
 
+/// A labelled tick box, with an optional line of explanation beneath.
+class ToggleRow extends StatelessWidget {
+  const ToggleRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+    this.caption,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final String? caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      checked: value,
+      label: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => onChanged(!value),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: value
+                      ? Palette.forest
+                      : Colors.white.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: value ? Palette.gold : Palette.parchmentEdge,
+                    width: 1.4,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: value
+                    ? const VIcon('check', size: 16, color: Palette.goldBright)
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ExcludeSemantics(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        label,
+                        style: AppText.body.copyWith(color: Palette.slate),
+                      ),
+                      if (caption != null)
+                        Text(
+                          caption!,
+                          style: AppText.small.copyWith(
+                            color: Palette.slateSoft,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 String formatClock(int seconds) {
   final s = seconds < 0 ? 0 : seconds;
   final m = s ~/ 60;

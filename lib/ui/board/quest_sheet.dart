@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/repository.dart';
+import '../../data/seed.dart';
+import '../../device/device_port.dart';
+import '../../export/markdown.dart' show thousands;
 import '../../rules/enums.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
@@ -77,7 +80,25 @@ class _QuestSheetState extends State<_QuestSheet> {
     final navigator = Navigator.of(context);
     final note = _note.text;
     navigator.pop();
-    await completeEntry(navigator.context, entry, note: note);
+    await completeFromBoard(navigator.context, entry, note: note);
+  }
+
+  /// What the steps quest says about where its steps come from.
+  String _stepsLine(GameController game) {
+    if (game.stepsConnected) {
+      final steps = game.stepsToday;
+      return steps == null
+          ? 'Steps fill in from Health Connect. Nothing has come through yet '
+              'today; you can also mark it done yourself.'
+          : '${thousands(steps)} steps so far today, from Health Connect. It '
+              'completes itself at the target, or mark it done yourself.';
+    }
+    if (game.stepsAccess == StepsAccess.unavailable) {
+      return 'Health Connect is not available on this device, so this one is '
+          'yours to mark done.';
+    }
+    return 'Connect Health Connect and steps fill in by themselves. Either '
+        'way, you can mark it done yourself.';
   }
 
   @override
@@ -92,6 +113,7 @@ class _QuestSheetState extends State<_QuestSheet> {
     final quest = entry.quest;
     final type = quest.completionType;
     final isSystem = quest.source == QuestSource.system;
+    final isCampfire = quest.systemKey == systemKeyCampfire;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottom),
@@ -195,16 +217,27 @@ class _QuestSheetState extends State<_QuestSheet> {
               onPressed: () => _complete(entry),
             ),
           ] else ...<Widget>[
-            if (type == CompletionType.auto)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  'Steps will fill in by themselves once Health Connect is '
-                  'linked. Until then, mark it done yourself.',
-                  style: AppText.small.copyWith(color: Palette.slateSoft),
-                ),
+            if (type == CompletionType.auto) ...<Widget>[
+              Text(
+                _stepsLine(game),
+                style: AppText.small.copyWith(color: Palette.slateSoft),
               ),
-            if (!isSystem)
+              if (!game.stepsConnected &&
+                  game.stepsAccess != StepsAccess.unavailable)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: QuietButton(
+                      label: 'Connect Health Connect',
+                      icon: 'boot',
+                      onPressed: () => game.connectSteps(),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+            ],
+            if (!isCampfire)
               TextField(
                 controller: _note,
                 textCapitalization: TextCapitalization.sentences,
@@ -214,8 +247,12 @@ class _QuestSheetState extends State<_QuestSheet> {
               ),
             const SizedBox(height: 14),
             PrimaryButton(
-              label: isSystem ? 'Close the day' : 'Mark done',
-              icon: isSystem ? 'campfire' : 'check',
+              label: isCampfire
+                  ? 'Close the day'
+                  : type == CompletionType.confirm
+                      ? 'I did this'
+                      : 'Mark done',
+              icon: isCampfire ? 'campfire' : 'check',
               onPressed: () => _complete(entry),
             ),
           ],

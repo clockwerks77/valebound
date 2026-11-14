@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 
 import '../../data/database.dart';
 import '../../data/repository.dart';
+import '../../data/seed.dart';
 import '../../rules/awards.dart';
+import '../../rules/day_cycle.dart';
 import '../../rules/enums.dart';
+import '../../rules/health_fields.dart';
 import '../../rules/progression.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
+import '../adaptive.dart';
 import '../celebrations.dart';
+import '../health/health_log_screen.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 
@@ -50,6 +55,110 @@ Future<void> completeEntry(
       ? await game.completeTimer(entry)
       : await game.complete(entry.quest.id, note: note, progress: progress);
   if (outcome != null) played(outcome);
+}
+
+/// Completes a quest from the board the way that quest asks to be completed
+/// (DESIGN §12):
+///
+/// * Morning Health Check opens the Health Log, and completes when it is
+///   saved.
+/// * Weekly Injection offers an optional dose note first.
+/// * Everything else completes like any tap, with its Undo.
+Future<void> completeFromBoard(
+  BuildContext context,
+  BoardQuest entry, {
+  String? note,
+}) async {
+  final game = GameScope.read(context);
+  final key = entry.quest.systemKey;
+  final opensLog =
+      key == systemKeyHealthCheck && game.settings.healthFields.isNotEmpty;
+  if (!opensLog && key != systemKeyInjection) {
+    return completeEntry(context, entry, note: note);
+  }
+  final navigator = Navigator.of(context, rootNavigator: true);
+  if (opensLog) {
+    final saved = await openHealthLog(navigator.context);
+    if (saved && navigator.mounted) {
+      await completeEntry(navigator.context, entry, note: note, undoable: false);
+    }
+    return;
+  }
+  final dose = await askDoseNote(navigator.context, entry.quest.name);
+  if (dose == null || !navigator.mounted) return;
+  await game.saveHealthLog(<String, String>{
+    injectionFieldKey: encodeCheck(dose),
+  });
+  if (navigator.mounted) {
+    await completeEntry(
+      navigator.context,
+      entry,
+      note: dose.isEmpty ? note : dose,
+      undoable: false,
+    );
+  }
+}
+
+/// Asks for the optional dose note. Null if the user backed out; an empty
+/// string if they marked it done without a note.
+Future<String?> askDoseNote(BuildContext context, String questName) {
+  final controller = TextEditingController();
+  return showDialog<String>(
+    context: context,
+    useRootNavigator: true,
+    builder: (context) => CreaseAware(
+      child: Dialog(
+        insetPadding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  questName,
+                  style: AppText.heading.copyWith(color: Palette.slate),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: AppText.body.copyWith(color: Palette.slate),
+                  decoration: const InputDecoration(
+                    labelText: 'Dose note (optional)',
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Kept exactly as written, in today’s vault note.',
+                  style: AppText.small.copyWith(color: Palette.slateSoft),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: <Widget>[
+                    QuietButton(
+                      label: 'Not now',
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    PrimaryButton(
+                      label: 'Mark done',
+                      icon: 'check',
+                      onPressed: () =>
+                          Navigator.of(context).pop(controller.text.trim()),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 /// Shown on a quest for the few seconds its completion can be taken back.
@@ -130,6 +239,9 @@ class _UndoRingPainter extends CustomPainter {
 /// What a quest will award, in a few words.
 String rewardLabel(QuestRow quest, String companionName) {
   final a = awardFor(difficulty: quest.difficulty, track: quest.track);
+  if (quest.systemKey == systemKeyComeback) {
+    return '+${a.heroXp + comebackBonusXp} XP';
+  }
   return switch (quest.track) {
     Track.hero => '+${a.heroXp} XP',
     Track.companion => '$companionName +${a.companionXp} XP',

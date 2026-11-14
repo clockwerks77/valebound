@@ -6,6 +6,7 @@ import '../../data/repository.dart';
 import '../../rules/awards.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
+import '../../rules/reminders.dart';
 import '../../rules/schedule.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
@@ -162,6 +163,24 @@ class _QuestEditorState extends State<QuestEditor> {
       _draft.schedule = days.isEmpty
           ? const Schedule.daily()
           : Schedule.onWeekdays(days);
+    });
+  }
+
+  /// Sets the reminder. The first time, this is also when the app asks to
+  /// show notifications: in context, never at launch.
+  void _setReminder(String time) {
+    final first = _draft.reminderTime == null;
+    setState(() => _draft.reminderTime = time);
+    if (first) GameScope.read(context).enableNotifications();
+  }
+
+  void _nudgeReminder(int minutes) {
+    final at = parseReminderTime(_draft.reminderTime);
+    if (at == null) return;
+    final total = (at.hour * 60 + at.minute + minutes) % (24 * 60);
+    final wrapped = total < 0 ? total + 24 * 60 : total;
+    setState(() {
+      _draft.reminderTime = formatReminderTime(wrapped ~/ 60, wrapped % 60);
     });
   }
 
@@ -390,32 +409,44 @@ class _QuestEditorState extends State<QuestEditor> {
                     spacing: 8,
                     runSpacing: 8,
                     children: <Widget>[
-                      for (final t in const <CompletionType>[
-                        CompletionType.tap,
-                        CompletionType.count,
-                        CompletionType.timer,
-                      ])
+                      for (final t in CompletionType.values)
                         ChoicePill(
-                          label: t.label,
+                          label: switch (t) {
+                            CompletionType.auto => 'Auto (steps)',
+                            CompletionType.confirm => 'Confirm',
+                            _ => t.label,
+                          },
                           icon: switch (t) {
                             CompletionType.count => 'plus',
                             CompletionType.timer => 'clock',
+                            CompletionType.auto => 'boot',
+                            CompletionType.confirm => 'calendar',
                             _ => 'check',
                           },
                           selected: type == t,
                           onTap: () => setState(() {
                             _draft.completionType = t;
+                            if (t == CompletionType.auto &&
+                                _target.text.isEmpty) {
+                              _target.text = '7000';
+                            }
                           }),
-                        ),
-                      if (type == CompletionType.auto)
-                        ChoicePill(
-                          label: 'Auto (steps)',
-                          icon: 'boot',
-                          selected: true,
-                          onTap: () {},
                         ),
                     ],
                   ),
+                  if (type == CompletionType.auto ||
+                      type == CompletionType.confirm)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        type == CompletionType.auto
+                            ? 'Fills from today’s steps and completes itself '
+                                'at the target. A tap always works too.'
+                            : 'For something on the calendar: an "I did '
+                                'this" tap once it has happened.',
+                        style: AppText.small.copyWith(color: Palette.slateSoft),
+                      ),
+                    ),
                   if (type == CompletionType.count ||
                       type == CompletionType.timer ||
                       type == CompletionType.auto) ...<Widget>[
@@ -479,6 +510,70 @@ class _QuestEditorState extends State<QuestEditor> {
                       },
                     ),
                   ),
+                  const _FieldLabel('Reminder'),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: <Widget>[
+                      ChoicePill(
+                        label: 'Off',
+                        selected: _draft.reminderTime == null,
+                        onTap: () => setState(() => _draft.reminderTime = null),
+                      ),
+                      for (final preset in const <String>[
+                        '08:00',
+                        '12:00',
+                        '18:00',
+                        '21:00',
+                      ])
+                        ChoicePill(
+                          label: preset,
+                          icon: 'bell',
+                          selected: _draft.reminderTime == preset,
+                          onTap: () => _setReminder(preset),
+                        ),
+                    ],
+                  ),
+                  if (_draft.reminderTime != null) ...<Widget>[
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        RoundIconButton(
+                          icon: 'minus',
+                          size: 40,
+                          semanticLabel: 'Reminder fifteen minutes earlier',
+                          background: Colors.white.withValues(alpha: 0.55),
+                          foreground: Palette.slate,
+                          edge: Palette.parchmentEdge,
+                          onPressed: () => _nudgeReminder(-15),
+                        ),
+                        SizedBox(
+                          width: 84,
+                          child: Text(
+                            _draft.reminderTime!,
+                            textAlign: TextAlign.center,
+                            style: AppText.number.copyWith(
+                              color: Palette.slate,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        RoundIconButton(
+                          icon: 'plus',
+                          size: 40,
+                          semanticLabel: 'Reminder fifteen minutes later',
+                          onPressed: () => _nudgeReminder(15),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'One quiet reminder on the days this quest is due. '
+                      'Nothing is sent once it is done.',
+                      style: AppText.small.copyWith(color: Palette.slateSoft),
+                    ),
+                  ],
                   const _FieldLabel('Icon'),
                   Wrap(
                     spacing: 8,

@@ -17,6 +17,7 @@ import '../board/board_screen.dart' show VillagerCard;
 import '../celebrations.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
+import 'delve_screen.dart';
 
 /// Opens the Campfire over whatever screen is showing.
 Future<void> openCampfire(BuildContext context) {
@@ -131,6 +132,10 @@ class _CampfireScreenState extends State<CampfireScreen> {
           ],
         ),
       ),
+      if (game.delve != null) ...<Widget>[
+        const SizedBox(height: 12),
+        _DelveCard(open: done),
+      ],
       const SizedBox(height: 12),
       const _ExportLine(),
       const SizedBox(height: 16),
@@ -202,6 +207,55 @@ class _CampfireScreenState extends State<CampfireScreen> {
                   ],
                 ),
         ),
+      ),
+    );
+  }
+}
+
+/// The week's Delve, waiting at the Campfire. It opens once the day is
+/// closed, so the whole day counts toward it.
+class _DelveCard extends StatelessWidget {
+  const _DelveCard({required this.open});
+
+  /// The day is closed, so the Delve can be entered.
+  final bool open;
+
+  @override
+  Widget build(BuildContext context) {
+    final delve = GameScope.of(context).delve;
+    if (delve == null) return const SizedBox.shrink();
+    return ParchmentCard(
+      edge: Palette.gold,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'THE WEEKLY DELVE',
+            style: AppText.label.copyWith(color: Palette.goldDeep),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            delve.site,
+            style: AppText.cardTitle.copyWith(color: Palette.slate),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            open
+                ? 'The week’s quests are its supplies. Go in whenever you '
+                    'like; it will keep.'
+                : 'It opens when you close the day, so all of today counts.',
+            style: AppText.small.copyWith(color: Palette.slateSoft),
+          ),
+          if (open) ...<Widget>[
+            const SizedBox(height: 10),
+            PrimaryButton(
+              label: 'Enter the Delve',
+              icon: 'cave',
+              color: Palette.moss,
+              onPressed: () => openDelve(context),
+            ),
+          ],
+        ],
       ),
     );
   }

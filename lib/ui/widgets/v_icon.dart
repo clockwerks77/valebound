@@ -79,6 +79,9 @@ const Map<String, _Spec> _icons = <String, _Spec>{
   'clock': _Spec(strokes: <String>['M12 3.5 A8.5 8.5 0 1 1 11.99 3.5', 'M12 7.5 V12 L15.5 14']),
   'lock': _Spec(strokes: <String>['M6 11 H18 V20 H6 Z', 'M8.5 11 V8 A3.5 3.5 0 0 1 15.5 8 V11']),
   'later': _Spec(strokes: <String>['M12 3.5 A8.5 8.5 0 1 1 11.99 3.5', 'M9.5 9 L13.5 12 L9.5 15', 'M14 9 L17 12']),
+  'calendar': _Spec(strokes: <String>['M5 6 H19 V20 H5 Z', 'M5 10.5 H19', 'M9 3.5 V8', 'M15 3.5 V8']),
+  'key': _Spec(strokes: <String>['M8 11.8 A3.2 3.2 0 1 1 7.99 11.8', 'M10.3 12.7 L19 4', 'M16 7 L18.5 9.5', 'M13.5 9.5 L15.5 11.5']),
+  'cave': _Spec(strokes: <String>['M3.5 20 C3.5 10 7 5 12 5 C17 5 20.5 10 20.5 20 Z', 'M9 20 C9 15.5 10.2 13 12 13 C13.8 13 15 15.5 15 20']),
   // ---- navigation ----
   'board': _Spec(strokes: <String>['M6 4 H18 V20 H6 Z', 'M9 9 H15', 'M9 12.5 H15', 'M9 16 H13']),
   'map': _Spec(strokes: <String>['M3.5 6 L9 4 L15 6 L20.5 4 V18 L15 20 L9 18 L3.5 20 Z', 'M9 4 V18', 'M15 6 V20']),

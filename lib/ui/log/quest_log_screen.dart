@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/database.dart';
 import '../../data/repository.dart';
+import '../../data/seed.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
 import '../../state/game_controller.dart';
@@ -138,8 +139,10 @@ class _LogList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = GameScope.of(context);
-    final active = game.quests.where((q) => q.active).toList();
-    final archived = game.quests.where((q) => !q.active).toList();
+    // The welcome-back quest is the app's own and comes and goes by itself.
+    final own = game.quests.where((q) => q.systemKey != systemKeyComeback);
+    final active = own.where((q) => q.active).toList();
+    final archived = own.where((q) => !q.active).toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 28),

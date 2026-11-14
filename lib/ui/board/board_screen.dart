@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../app_info.dart';
 import '../../data/repository.dart';
 import '../../data/seed.dart';
+import '../../device/device_port.dart';
+import '../../export/markdown.dart' show thousands;
+import '../../rules/day_cycle.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
 import '../../rules/journey.dart';
@@ -14,6 +18,7 @@ import '../../theme/palette.dart';
 import '../art/crests.dart';
 import '../art/vista.dart';
 import '../campfire/campfire_screen.dart';
+import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
 import '../settings/settings_screen.dart';
 import '../widgets/common.dart';
@@ -46,6 +51,8 @@ class BoardScreen extends StatelessWidget {
           children: <Widget>[
             const DawnHeader(),
             const _VillagerLine(),
+            const _ComebackCard(),
+            const _Suggestions(),
             if (now.isNotEmpty) ...<Widget>[
               SectionHeader('Now', icon: 'sun', count: now.length),
               for (final entry in now) ...<Widget>[
@@ -56,6 +63,7 @@ class BoardScreen extends StatelessWidget {
               const _QuietLine(
                 'Nothing waiting for you right now. The day is yours.',
               ),
+            const _CalendarOffer(),
             const _CompanionSection(),
             if (later.isNotEmpty) ...<Widget>[
               SectionHeader('Later', icon: 'later', count: later.length),
@@ -160,6 +168,16 @@ class DawnHeader extends StatelessWidget {
                       style: AppText.label.copyWith(color: Palette.goldBright),
                     ),
                   ),
+                  RoundIconButton(
+                    icon: 'sprig',
+                    semanticLabel: 'Health Log',
+                    size: 34,
+                    background: Palette.forestNight.withValues(alpha: 0.55),
+                    foreground: Palette.onDark,
+                    edge: Palette.onDark.withValues(alpha: 0.25),
+                    onPressed: () => openHealthLog(context),
+                  ),
+                  const SizedBox(width: 8),
                   RoundIconButton(
                     icon: 'settings',
                     semanticLabel: 'Settings',
@@ -660,7 +678,7 @@ class QuestCard extends StatelessWidget {
         _ => CompleteButton(
             label: 'Complete ${quest.name}',
             color: companionStyle ? Palette.companion : Palette.forest,
-            onComplete: () => completeEntry(context, entry),
+            onComplete: () => completeFromBoard(context, entry),
           ),
       };
     }
@@ -726,6 +744,16 @@ class QuestCard extends StatelessWidget {
                     fontSize: 12.5,
                   ),
                 ),
+                if (!pending && _detailLine(entry) != null)
+                  Text(
+                    _detailLine(entry)!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.small.copyWith(
+                      color: Palette.slateSoft,
+                      fontSize: 12,
+                    ),
+                  ),
                 if (still != null && !pending) ...<Widget>[
                   const SizedBox(height: 4),
                   Row(
@@ -751,6 +779,249 @@ class QuestCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           action,
+        ],
+      ),
+    );
+  }
+}
+
+/// One more quiet line for quests that have something to say: steps so
+/// far, or the time of a calendar commitment.
+String? _detailLine(BoardQuest entry) {
+  final quest = entry.quest;
+  if (quest.completionType == CompletionType.auto && entry.banked > 0) {
+    final target = quest.target ?? 0;
+    return target > 0
+        ? '${thousands(entry.banked)} of ${thousands(target)} steps so far'
+        : '${thousands(entry.banked)} steps so far';
+  }
+  if (quest.source == QuestSource.calendar && quest.notes.isNotEmpty) {
+    return quest.notes;
+  }
+  return null;
+}
+
+/// "Return to the Vale" (DESIGN §4.3): the single welcome after time away.
+/// Once the companion knows Comfort, they are the one who offers it.
+class _ComebackCard extends StatelessWidget {
+  const _ComebackCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final entry = game.comebackQuest;
+    final companion = game.companion;
+    if (entry == null || companion == null) return const SizedBox.shrink();
+    final comfort = game.comfortKnown;
+    final pending = game.isPending(entry.quest.id);
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: ParchmentCard(
+        tint: comfort ? Palette.companionTint : null,
+        edge: comfort ? Palette.companionEdge : Palette.gold,
+        child: Row(
+          children: <Widget>[
+            if (comfort)
+              CompanionPortrait(kind: companion.kind, size: 46)
+            else
+              const Roundel(icon: 'lantern', color: Palette.goldDeep, size: 46),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    comebackQuestName,
+                    style: AppText.cardTitle.copyWith(color: Palette.slate),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    comfort
+                        ? '${companion.name} kept the camp warm. Welcome back.'
+                        : 'Welcome back. The Vale waited, just as you left it.',
+                    style: AppText.small.copyWith(color: Palette.slateSoft),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    pending
+                        ? 'Done. Undo if that was a slip.'
+                        : comfort
+                            ? '${rewardLabel(entry.quest, companion.name)} · '
+                                '+$comfortBonusBond Bond'
+                            : rewardLabel(entry.quest, companion.name),
+                    style: AppText.small.copyWith(
+                      color: comfort ? Palette.companionDeep : Palette.goldDeep,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (pending)
+              UndoButton(
+                questName: entry.quest.name,
+                onUndo: () => game.undo(entry.quest.id),
+              )
+            else
+              CompleteButton(
+                label: 'Complete ${entry.quest.name}',
+                color: comfort ? Palette.companion : Palette.forest,
+                onComplete: () => completeEntry(context, entry),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The offer to connect the calendar (DESIGN §9.3): made once, in context,
+/// on the Dawn board. Never at first launch, and never again once answered.
+class _CalendarOffer extends StatelessWidget {
+  const _CalendarOffer();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    if (!game.calendarOfferDue) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: ParchmentCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                const VIcon('calendar', size: 19, color: Palette.goldDeep),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Today’s calendar, as quests?',
+                    style: AppText.cardTitle.copyWith(color: Palette.slate),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '$appName can offer today’s calendar events here as '
+              'suggested quests. It only reads your calendar and never '
+              'changes it, and nothing is accepted for you.',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: <Widget>[
+                PrimaryButton(
+                  label: 'Connect calendar',
+                  icon: 'calendar',
+                  onPressed: () => game.connectCalendar(),
+                ),
+                QuietButton(
+                  label: 'Not now',
+                  onPressed: () => game.declineCalendar(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's calendar events as suggested quests to accept or dismiss
+/// (DESIGN §9.3). Nothing is ever accepted or completed for the user.
+class _Suggestions extends StatelessWidget {
+  const _Suggestions();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final suggestions = game.suggestions;
+    if (suggestions.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SectionHeader(
+          'From your calendar',
+          icon: 'calendar',
+          count: suggestions.length,
+        ),
+        for (final event in suggestions) ...<Widget>[
+          _SuggestionCard(event: event),
+          const SizedBox(height: 10),
+        ],
+      ],
+    );
+  }
+}
+
+class _SuggestionCard extends StatelessWidget {
+  const _SuggestionCard({required this.event});
+
+  final CalendarEvent event;
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.read(context);
+    final title = event.title.trim().isEmpty
+        ? commitmentFallbackName
+        : event.title.trim();
+    return ParchmentCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Roundel(
+                icon: 'calendar',
+                color: Palette.attribute(Attribute.order),
+                size: 40,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.cardTitle.copyWith(color: Palette.slate),
+                    ),
+                    Text(
+                      '${event.timeLabel} · suggested',
+                      style: AppText.small.copyWith(
+                        color: Palette.slateSoft,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: <Widget>[
+              PrimaryButton(
+                label: 'Accept',
+                icon: 'plus',
+                onPressed: () => game.acceptSuggestion(event),
+              ),
+              QuietButton(
+                label: 'Dismiss',
+                onPressed: () => game.dismissSuggestion(event),
+              ),
+            ],
+          ),
         ],
       ),
     );
