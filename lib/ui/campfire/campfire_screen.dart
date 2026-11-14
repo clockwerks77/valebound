@@ -366,16 +366,24 @@ class CampScene extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: AppText.body.copyWith(color: Palette.onDark),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
+              // The narrator closes the day (DECISIONS D-76).
               Text(
-                oldFriends
-                    ? 'Old friends by now. The big goals restore the world; '
-                        'the small ones move you through it, together.'
-                    : 'The big goals restore the world; the small ones move '
-                        'you through it, together.',
+                game.campfireStory,
                 textAlign: TextAlign.center,
-                style: AppText.small.copyWith(color: Palette.onDarkSoft),
+                style: AppText.narrator.copyWith(
+                  color: Palette.onDark,
+                  fontSize: 15.5,
+                ),
               ),
+              if (oldFriends) ...<Widget>[
+                const SizedBox(height: 6),
+                Text(
+                  'Old friends by now.',
+                  textAlign: TextAlign.center,
+                  style: AppText.small.copyWith(color: Palette.onDarkSoft),
+                ),
+              ],
             ],
           ),
         ),

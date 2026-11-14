@@ -36,20 +36,21 @@ Future<void> tour(WidgetTester tester, TestDevice device, String suffix) async {
   if (open) expectCreaseClear(tester, device);
 
   const pictured = <int, String>{
-    2: '81_tour_party',
-    5: '82_tour_sleeper',
-    6: '83_tour_quest',
-    8: '84_tour_campfire',
-    11: '85_tour_nav',
+    2: '90_tour_story',
+    3: '81_tour_party',
+    6: '82_tour_sleeper',
+    7: '83_tour_quest',
+    9: '84_tour_campfire',
+    12: '85_tour_nav',
   };
   await tester.tap(primary('Show me'));
   await tester.pumpAndSettle();
-  for (var step = 2; step <= 11; step++) {
-    expect(find.text('$step OF 11'), findsOneWidget);
+  for (var step = 2; step <= 12; step++) {
+    expect(find.text('$step OF 12'), findsOneWidget);
     if (open) expectCreaseClear(tester, device);
     final name = pictured[step];
     if (name != null) await shot(tester, '${name}_$suffix');
-    await tester.tap(primary(step == 11 ? 'Done' : 'Next'));
+    await tester.tap(primary(step == 12 ? 'Done' : 'Next'));
     await tester.pumpAndSettle();
   }
   await app.settle(tester);
@@ -94,7 +95,8 @@ void main() {
     await shot(tester, '86_board_creature_awake_cover');
 
     await tester.tap(roundButton('Health Log'));
-    await tester.pumpAndSettle();
+    // Opening the log reads Health Connect again.
+    await app.settle(tester);
     await shot(tester, '87_health_log_glucose_cover');
     await tester.tap(roundButton('Close the Health Log'));
     await tester.pumpAndSettle();

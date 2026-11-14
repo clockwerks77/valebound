@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../state/game_controller.dart';
@@ -11,6 +13,7 @@ import '../log/quest_log_screen.dart';
 import '../map/map_panel.dart';
 import '../party/party_sheet.dart';
 import '../settings/settings_screen.dart';
+import '../story/story.dart';
 import '../tour/tour.dart';
 import '../tour/tours.dart';
 import '../widgets/v_icon.dart';
@@ -48,11 +51,23 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   GameController? _game;
   bool _marking = false;
   bool _touring = false;
+  Timer? _healthTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _watchHealth();
+  }
+
+  /// While the app is in front, Health Connect is read again every few
+  /// minutes, so steps and glucose keep up without leaving and returning.
+  void _watchHealth() {
+    _healthTimer?.cancel();
+    _healthTimer = Timer.periodic(
+      GameController.healthRefreshEvery,
+      (_) => _game?.refreshHealth(),
+    );
   }
 
   @override
@@ -67,6 +82,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _healthTimer?.cancel();
     _game?.removeListener(_onGame);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -77,10 +93,15 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void _onGame() {
     final game = _game;
     if (!mounted || game == null) return;
-    // The tour of the board: on the first run, and when asked for again.
-    if (!_touring && game.hasProfile && game.takeTourRequest()) {
-      _touring = true;
-      _tour();
+    // The prologue, told once; then the tour of the board, on the first
+    // run and whenever it is asked for again.
+    if (!_touring && game.hasProfile) {
+      final prologue = game.takePrologueRequest();
+      final tour = game.takeTourRequest();
+      if (prologue || tour) {
+        _touring = true;
+        _welcome(prologue: prologue, tour: tour);
+      }
     }
     if (_marking) return;
     final done = game.takeAutoCompletions();
@@ -105,20 +126,28 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     });
   }
 
-  /// Walks the board with a bubble on each part (DECISIONS D-72).
-  Future<void> _tour() async {
+  /// Tells the prologue (DECISIONS D-76), then walks the board with a
+  /// bubble on each part (DECISIONS D-72). Either may be asked for alone.
+  Future<void> _welcome({required bool prologue, required bool tour}) async {
     final game = _game;
     try {
       if (!mounted || game == null) return;
       if (_index != 0) setState(() => _index = 0);
       await WidgetsBinding.instance.endOfFrame;
-      if (!mounted) return;
-      await runTour(
-        context,
-        boardTour(game.companionName),
-        leaveLabel: 'Skip the tour',
-      );
-      await game.finishTour();
+      if (prologue) {
+        if (!mounted) return;
+        await showPrologue(context, companionName: game.companionName);
+        await game.finishPrologue();
+      }
+      if (tour) {
+        if (!mounted) return;
+        await runTour(
+          context,
+          boardTour(game.companionName),
+          leaveLabel: 'Skip the tour',
+        );
+        await game.finishTour();
+      }
     } finally {
       _touring = false;
     }
@@ -147,8 +176,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       // Coming back to the app may mean a new day has begun, more steps
       // walked, or a calendar that has changed.
       game.resumed();
+      _watchHealth();
     } else {
-      // Leaving: commit anything still inside its Undo window.
+      // Leaving: commit anything still inside its Undo window, and stop
+      // asking Health Connect until the app is back in front.
+      _healthTimer?.cancel();
+      _healthTimer = null;
       game.flushPending();
     }
   }

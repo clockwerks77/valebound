@@ -33,6 +33,9 @@ abstract final class SettingKey {
 
   /// JSON list of the screens whose one-time hint has been shown.
   static const String hintsSeen = 'hints_seen';
+
+  /// `1` once the prologue has been read or skipped (DECISIONS D-76).
+  static const String prologueSeen = 'prologue_seen';
 }
 
 /// The settings as the app uses them.
@@ -47,6 +50,7 @@ class GameSettings {
     this.glucoseOn = false,
     this.tourDone = false,
     this.hintsSeen = const <String>{},
+    this.prologueSeen = false,
   });
 
   factory GameSettings.fromMap(Map<String, String> raw) {
@@ -63,6 +67,7 @@ class GameSettings {
       glucoseOn: raw[SettingKey.glucoseOn] == '1',
       tourDone: raw[SettingKey.tourDone] == '1',
       hintsSeen: _stringSet(raw[SettingKey.hintsSeen]),
+      prologueSeen: raw[SettingKey.prologueSeen] == '1',
     );
   }
 
@@ -75,6 +80,7 @@ class GameSettings {
   final bool glucoseOn;
   final bool tourDone;
   final Set<String> hintsSeen;
+  final bool prologueSeen;
 
   static Set<String> _stringSet(String? json) {
     if (json == null || json.isEmpty) return const <String>{};

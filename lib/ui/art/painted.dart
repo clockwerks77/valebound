@@ -29,11 +29,17 @@ const Map<String, String> discoveryArt = <String, String>{
   'standing_stone': 'assets/art/discoveries/standing_stone.jpg',
 };
 
+/// Story pictures: the prologue's scenes by [StoryScene] name, and each
+/// region as `<region>_asleep` and `<region>_awake`. Until a picture is
+/// listed here the page shows a valley painted in code.
+const Map<String, String> storyArt = <String, String>{};
+
 /// Every illustrated asset, for loading ahead of time.
 List<String> get allPaintedAssets => <String>[
       ...companionArt.values,
       ...heroArt.values,
       ...discoveryArt.values,
+      ...storyArt.values,
     ];
 
 /// A round illustrated portrait inside a coloured ring. If the picture

@@ -10,6 +10,7 @@ import '../../rules/day_cycle.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
 import '../../rules/journey.dart';
+import '../../rules/narrator.dart';
 import '../../rules/still.dart';
 import '../../rules/world.dart';
 import '../../rules/xp_curve.dart';
@@ -22,6 +23,7 @@ import '../campfire/campfire_screen.dart';
 import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
 import '../settings/settings_screen.dart';
+import '../story/chronicle_screen.dart';
 import '../tour/tour.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
@@ -151,6 +153,7 @@ class DawnHeader extends StatelessWidget {
     final companion = game.companion!;
     final heroProgress = XpCurve.progress(hero.totalXp);
     final companionProgress = XpCurve.progress(companion.totalXp);
+    final narration = game.narration;
 
     return Vista(
       radius: 26,
@@ -181,7 +184,8 @@ class DawnHeader extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'DAWN IN THE VALE · ${game.questsDoneToday} OF '
+                        '${narration.setting.toUpperCase()} · '
+                        '${game.questsDoneToday} OF '
                         '${game.questsTotalToday} DONE',
                         maxLines: 1,
                         style:
@@ -233,7 +237,12 @@ class DawnHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 4),
+              KeyedSubtree(
+                key: TourMark.story,
+                child: _NarratorLine(narration: narration),
+              ),
+              const SizedBox(height: 8),
               KeyedSubtree(
                 key: TourMark.party,
                 child: Row(
@@ -274,6 +283,58 @@ class DawnHeader extends StatelessWidget {
               const SizedBox(height: 8),
               const _JourneyStrip(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The narrator's line for today (DECISIONS D-76), in the storyteller's
+/// italic. Pressing it opens the Chronicle.
+class _NarratorLine extends StatelessWidget {
+  const _NarratorLine({required this.narration});
+
+  final Narration narration;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Chronicle. ${narration.full}',
+      excludeSemantics: true,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openChronicle(context),
+          splashColor: Palette.gold.withValues(alpha: 0.18),
+          highlightColor: Palette.gold.withValues(alpha: 0.08),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    narration.line,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.narrator.copyWith(
+                      color: Palette.onDark,
+                      fontSize: 15.5,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: VIcon('book', size: 16, color: Palette.goldBright),
+                ),
+              ],
+            ),
           ),
         ),
       ),

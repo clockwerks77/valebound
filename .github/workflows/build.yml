@@ -3,11 +3,11 @@ name: build
 # On every push: code generation, analysis and the full test suite, with logs
 # and rendered screenshots published to the `ci-results` branch.
 #
-# The debug APK is built (and the `latest-debug` release replaced) only when
-# the commit message contains [apk], or when the workflow is run by hand from
-# the Actions tab. That keeps the download link steady between releases and
+# The APKs are built (and the `latest` release replaced) only when the commit
+# message contains [apk], or when the workflow is run by hand from the
+# Actions tab. That keeps the download link steady between releases and
 # saves the account's included Actions minutes. A message containing
-# [apk-check] builds the APK to prove it compiles but leaves the release
+# [apk-check] builds the APKs to prove they compile but leaves the release
 # alone.
 #
 # Nothing here ships inside the app. The app itself makes no network calls.
@@ -113,41 +113,70 @@ jobs:
           S_APK: pending
         run: bash tool/ci_publish.sh tests
 
-      - name: Build debug APK
+      # The release build is the one to install: compiled ahead of time, for
+      # the phone's arm64 processor only, and with no INTERNET permission.
+      # The debug build is kept beside it as a fallback; both are signed with
+      # the same fixed personal key, so either installs over the other and
+      # the data on the device is kept.
+      - name: Build APKs (release, and debug beside it)
         id: apk
         if: contains(github.event.head_commit.message, '[apk') || github.event_name == 'workflow_dispatch'
         continue-on-error: true
         run: |
-          set -o pipefail
-          flutter build apk --debug 2>&1 | tee ci_out/build_apk.txt
-          ls -la build/app/outputs/flutter-apk/ 2>&1 | tee -a ci_out/build_apk.txt
-          # Which key signed it: must be the fixed personal key, so the build
-          # installs over the last one and keeps its data.
-          APKSIGNER="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort | tail -1)"
-          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-debug.apk 2>&1 \
-            | grep -i "SHA-256" | head -1 | tee ci_out/apk_signer.txt || true
+          set -eo pipefail
+          VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')"
+          OUT=build/app/outputs/flutter-apk
+          mkdir -p dist
+          flutter build apk --release --target-platform android-arm64 2>&1 | tee ci_out/build_apk.txt
+          cp "$OUT/app-release.apk" "dist/Valebound-${VERSION}.apk"
+          flutter build apk --debug 2>&1 | tee ci_out/build_apk_debug.txt
+          cp "$OUT/app-debug.apk" "dist/Valebound-${VERSION}-debug.apk"
+          ls -la dist 2>&1 | tee -a ci_out/build_apk.txt
+          # Which key signed each: must be the fixed personal key.
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          : > ci_out/apk_signer.txt
+          : > ci_out/apk_permissions.txt
+          for f in dist/*.apk; do
+            echo "$(basename "$f")" | tee -a ci_out/apk_signer.txt ci_out/apk_permissions.txt
+            "$BT/apksigner" verify --print-certs "$f" 2>&1 \
+              | grep -i "SHA-256" | head -1 | tee -a ci_out/apk_signer.txt || true
+            "$BT/aapt2" dump permissions "$f" 2>&1 | tee -a ci_out/apk_permissions.txt || true
+            "$BT/aapt2" dump badging "$f" 2>&1 \
+              | grep -E "^package:|native-code|application-debuggable" | tee -a ci_out/apk_permissions.txt || true
+          done
+          # The release build must not be able to reach the network at all.
+          PERMS="$("$BT/aapt2" dump permissions "dist/Valebound-${VERSION}.apk")"
+          case "$PERMS" in
+            *android.permission.INTERNET*)
+              echo "The release build declares INTERNET." | tee -a ci_out/apk_permissions.txt
+              exit 1
+              ;;
+          esac
 
       - name: Upload APK artifact
         if: steps.apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: valebound-apks
+          path: dist/*.apk
           retention-days: 30
 
-      - name: Update latest-debug release
+      - name: Update the latest release
         id: release
         if: steps.apk.outcome == 'success' && (contains(github.event.head_commit.message, '[apk]') || github.event_name == 'workflow_dispatch')
         continue-on-error: true
         run: |
           set -o pipefail
+          VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')"
+          gh release delete latest --cleanup-tag --yes 2>/dev/null || true
+          # The old debug-only download, from before 0.5.0.
           gh release delete latest-debug --cleanup-tag --yes 2>/dev/null || true
           sleep 3
-          gh release create latest-debug build/app/outputs/flutter-apk/app-debug.apk \
+          gh release create latest "dist/Valebound-${VERSION}.apk" "dist/Valebound-${VERSION}-debug.apk" \
             --prerelease \
             --target "$GITHUB_SHA" \
-            --title "Latest debug build" \
-            --notes "Debug APK built from ${GITHUB_REF_NAME} at ${GITHUB_SHA}. Sideload on Android; not for the Play Store. Signed with the project's fixed personal key, so it installs over any earlier build signed with that key and keeps its data." \
+            --title "Valebound ${VERSION}" \
+            --notes "Built from ${GITHUB_REF_NAME} at ${GITHUB_SHA}. Install Valebound-${VERSION}.apk: the release build, for arm64 phones. Valebound-${VERSION}-debug.apk is the same app as a debug build, kept as a fallback. Both are signed with the project's fixed personal key, so either installs over the other, or over any earlier build, and keeps its data. Sideload on Android; not for the Play Store." \
             2>&1 | tee ci_out/release.txt
 
       - name: Publish final results

@@ -12,12 +12,21 @@ cp -r ci_out/. "$OUT/logs/" 2>/dev/null || true
 cp test/golden/goldens/*.png "$OUT/screenshots/" 2>/dev/null || true
 cp device_shots/*.png "$OUT/screenshots/" 2>/dev/null || true
 
-APK="build/app/outputs/flutter-apk/app-debug.apk"
+# The release build is the one that is installed; the debug build sits
+# beside it as a fallback.
+APK="$(ls dist/Valebound-*.apk 2>/dev/null | grep -v -- '-debug.apk' | head -1)"
+APK_DEBUG="$(ls dist/Valebound-*-debug.apk 2>/dev/null | head -1)"
 APK_BYTES=0
 APK_SHA256=""
-if [ -f "$APK" ]; then
+APK_DEBUG_BYTES=0
+APK_DEBUG_SHA256=""
+if [ -n "$APK" ] && [ -f "$APK" ]; then
   APK_BYTES=$(stat -c %s "$APK")
   APK_SHA256=$(sha256sum "$APK" | cut -d' ' -f1)
+fi
+if [ -n "$APK_DEBUG" ] && [ -f "$APK_DEBUG" ]; then
+  APK_DEBUG_BYTES=$(stat -c %s "$APK_DEBUG")
+  APK_DEBUG_SHA256=$(sha256sum "$APK_DEBUG" | cut -d' ' -f1)
 fi
 
 cat > "$OUT/status.json" <<EOF
@@ -35,6 +44,9 @@ cat > "$OUT/status.json" <<EOF
   "apk_path": "${APK}",
   "apk_bytes": ${APK_BYTES},
   "apk_sha256": "${APK_SHA256}",
+  "apk_debug_path": "${APK_DEBUG}",
+  "apk_debug_bytes": ${APK_DEBUG_BYTES},
+  "apk_debug_sha256": "${APK_DEBUG_SHA256}",
   "time": "$(date -u +%FT%TZ)"
 }
 EOF

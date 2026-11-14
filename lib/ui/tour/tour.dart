@@ -8,6 +8,7 @@ import '../widgets/common.dart';
 /// The things on the board that the tour points at. The board wraps each in
 /// a `KeyedSubtree` and knows nothing else about the tour.
 abstract final class TourMark {
+  static final GlobalKey story = GlobalKey(debugLabel: 'tour.story');
   static final GlobalKey party = GlobalKey(debugLabel: 'tour.party');
   static final GlobalKey restoring = GlobalKey(debugLabel: 'tour.restoring');
   static final GlobalKey road = GlobalKey(debugLabel: 'tour.road');

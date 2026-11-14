@@ -11,6 +11,13 @@ List<TourStep> boardTour(String companion) => <TourStep>[
         body: 'Your real day is the game. Do something real, tap it here, '
             'and the Vale wakes a little more. Here is a quick look round.',
       ),
+      const TourStep(
+        title: 'The storyteller',
+        body: 'This line says where you are in the Vale and what is waiting '
+            'to be woken. It turns with the day. Tap it for the Chronicle: '
+            'the story so far.',
+        target: TourMark.story,
+      ),
       TourStep(
         title: 'You and $companion',
         body: 'Your quests raise your level. $companion levels beside you, '

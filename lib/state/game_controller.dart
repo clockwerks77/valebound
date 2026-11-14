@@ -16,6 +16,7 @@ import '../rules/day_key.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/health_fields.dart';
+import '../rules/narrator.dart';
 import '../rules/progression.dart';
 import '../rules/reminders.dart';
 import '../rules/still.dart';
@@ -201,6 +202,7 @@ class GameController extends ChangeNotifier {
     launchReason = await device.takeLaunchReason();
     if (hasProfile) {
       await _reload(fromDevice: true);
+      _prologueWanted = !settings.prologueSeen;
       _tourWanted = !settings.tourDone;
     }
     await export.refreshStatus();
@@ -223,6 +225,37 @@ class GameController extends ChangeNotifier {
   Future<void> resumed() async {
     launchReason ??= await device.takeLaunchReason();
     await refresh(fromDevice: true);
+  }
+
+  /// How often Health Connect is read again while the app stays in front.
+  static const Duration healthRefreshEvery = Duration(minutes: 3);
+
+  bool _readingHealth = false;
+
+  /// Reads steps and glucose again, without waiting for the app to be left
+  /// and returned to. Runs every few minutes while the app is in front, and
+  /// when the Health Log opens (DECISIONS D-74).
+  Future<void> refreshHealth() async {
+    if (!hasProfile || loading || _readingHealth) return;
+    _readingHealth = true;
+    try {
+      if (DayKey.of(repo.clock()) != day) {
+        // Midnight passed with the app open: the whole day turns over.
+        await refresh(fromDevice: true);
+        return;
+      }
+      final stepsBefore = stepsAccess;
+      final glucoseBefore = glucoseAccess;
+      await _readSteps();
+      await _readGlucose();
+      final changed =
+          stepsBefore != stepsAccess || glucoseBefore != glucoseAccess;
+      if (!changed && !stepsConnected && !glucoseConnected) return;
+      await _reload();
+      notifyListeners();
+    } finally {
+      _readingHealth = false;
+    }
   }
 
   Future<void> _reload({bool fromDevice = false}) async {
@@ -556,9 +589,79 @@ class GameController extends ChangeNotifier {
     );
     hasProfile = true;
     await _reload();
+    _prologueWanted = !settings.prologueSeen;
     _tourWanted = !settings.tourDone;
     notifyListeners();
   }
+
+  // ---- The narrator (DECISIONS D-76) ------------------------------------
+
+  bool _prologueWanted = false;
+
+  /// True once, when the prologue should be told: on the first run, and on
+  /// the first launch of a build that has one.
+  bool takePrologueRequest() {
+    final wanted = _prologueWanted;
+    _prologueWanted = false;
+    return wanted;
+  }
+
+  /// The prologue has been read to the end, or skipped.
+  Future<void> finishPrologue() async {
+    await repo.setSetting(SettingKey.prologueSeen, '1');
+    await refresh();
+  }
+
+  /// The chapter being told now.
+  Chapter get chapter => chapterAt(restored);
+
+  /// "Chapter Two · Larkdown", or the afterword's heading.
+  String get storyTitle => storyHeading(restored);
+
+  /// What the narrator says over today's board.
+  Narration get narration => dawnNarration(
+        now: repo.clock(),
+        day: day,
+        restored: restored,
+        paces: world?.journeyPaces ?? 0,
+        companionName: companionName,
+        returning: comebackQuest != null,
+      );
+
+  /// Places that woke today, in the order they woke.
+  List<RestorationTarget> get wokeToday {
+    final indexes = <int>[
+      for (final e in restoredOn.entries)
+        if (e.value == day) targetIndexByKey(e.key),
+    ]..sort();
+    return <RestorationTarget>[
+      for (final i in indexes)
+        if (i >= 0) targetAt(i),
+    ];
+  }
+
+  /// What the narrator says at tonight's Campfire.
+  String get campfireStory {
+    final creature = dailyStillToday;
+    return campfireNarration(
+      day: day,
+      questsDone: board.where((b) => b.isDone && !_isCampfire(b)).length,
+      wokeToday: wokeToday,
+      creatureWoke: (creature != null && creature.still.awake)
+          ? creature.still.creature.name
+          : null,
+      companionName: companionName,
+      next: target,
+    );
+  }
+
+  /// The story so far, oldest first.
+  List<ChronicleEntry> get story => chronicle(
+        arrivedOn: hero == null ? day : DayKey.of(hero!.createdAt),
+        companionName: companionName,
+        restored: restored,
+        restoredOn: restoredOn,
+      );
 
   // ---- The tour and the screen hints (DECISIONS D-72) -------------------
 

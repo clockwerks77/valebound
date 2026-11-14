@@ -8,6 +8,7 @@ import '../rules/daily_still.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
 import '../rules/journey.dart';
+import '../rules/narrator.dart';
 import '../rules/progression.dart';
 import '../rules/still.dart';
 import '../rules/world.dart';
@@ -17,6 +18,7 @@ import '../theme/palette.dart';
 import 'adaptive.dart';
 import 'art/crests.dart';
 import 'art/painted.dart';
+import 'story/story.dart';
 import 'widgets/common.dart';
 import 'widgets/v_icon.dart';
 
@@ -44,6 +46,12 @@ Future<void> celebrate(
   for (final index in outcome.newRestorationIndexes) {
     if (!context.mounted) return;
     await showRestoration(context, target: targetAt(index));
+    // The last place of a region: its chapter closes and the next opens
+    // (DECISIONS D-76).
+    final closed = chapterClosedBy(index);
+    if (closed != null && context.mounted) {
+      await showChapterTurn(context, closed);
+    }
   }
 
   if (outcome.heroLevelledUp && hero != null && context.mounted) {

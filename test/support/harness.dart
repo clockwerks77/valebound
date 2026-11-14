@@ -70,6 +70,7 @@ Future<void> loadAppFonts() async {
   await family('Fraunces', <String>[
     'Fraunces-SemiBold.ttf',
     'Fraunces-Bold.ttf',
+    'Fraunces-Italic.ttf',
   ]);
   await family('Figtree', <String>[
     'Figtree-Regular.ttf',
@@ -297,6 +298,7 @@ class TestApp {
     DevicePort? device,
     bool tour = false,
     bool hints = false,
+    bool prologue = false,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
@@ -313,6 +315,10 @@ class TestApp {
       // The first-run tour and the one-time screen hints would sit on top
       // of every other test, so they are marked as seen unless asked for.
       if (!tour) await app.repo.setSetting(SettingKey.tourDone, '1');
+      // The prologue too: it is told over the whole screen.
+      if (!prologue) {
+        await app.repo.setSetting(SettingKey.prologueSeen, '1');
+      }
       if (!hints) {
         await app.repo.setSetting(
           SettingKey.hintsSeen,

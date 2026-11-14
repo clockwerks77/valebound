@@ -43,6 +43,10 @@ flutter:
           weight: 600
         - asset: assets/fonts/Fraunces-Bold.ttf
           weight: 700
+        # The narrator's voice.
+        - asset: assets/fonts/Fraunces-Italic.ttf
+          weight: 400
+          style: italic
     - family: Figtree
       fonts:
         - asset: assets/fonts/Figtree-Regular.ttf

@@ -50,6 +50,8 @@ class _HealthLogScreenState extends State<HealthLogScreen> {
         _text[field.key] = TextEditingController(text: stored);
       }
     }
+    // The figures Health Connect supplies are read afresh as the log opens.
+    game.refreshHealth();
   }
 
   @override

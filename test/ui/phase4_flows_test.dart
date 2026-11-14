@@ -113,7 +113,8 @@ void main() {
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       await tester.tap(roundButton('Health Log'));
-      await tester.pumpAndSettle();
+      // Opening the log reads Health Connect again.
+      await app.settle(tester);
       expect(
         find.text(
           'Average glucose today: 7.4 mmol/L, from 212 readings in Health '
@@ -150,7 +151,8 @@ void main() {
       expect(app.game.glucoseAverageToday, isNull);
 
       await tester.tap(roundButton('Health Log'));
-      await tester.pumpAndSettle();
+      // Opening the log reads Health Connect again.
+      await app.settle(tester);
       expect(
         find.text('Average glucose: nothing from Health Connect yet today.'),
         findsOneWidget,
@@ -212,6 +214,7 @@ void main() {
 
   group('The tour (DECISIONS D-72)', () {
     const titles = <String>[
+      'The storyteller',
       'You and Babs',
       'A place to wake',
       'The road',
@@ -230,13 +233,13 @@ void main() {
       final app = await TestApp.start(tester, now: saturday, tour: true);
       await app.settle(tester);
       expect(find.text('Welcome to the Vale'), findsOneWidget);
-      expect(find.text('1 OF 11'), findsOneWidget);
+      expect(find.text('1 OF 12'), findsOneWidget);
       expect(app.game.settings.tourDone, isFalse);
 
       await tester.tap(primary('Show me'));
       await tester.pumpAndSettle();
       for (var i = 0; i < titles.length; i++) {
-        expect(find.text('${i + 2} OF 11'), findsOneWidget, reason: titles[i]);
+        expect(find.text('${i + 2} OF 12'), findsOneWidget, reason: titles[i]);
         expect(find.text(titles[i]), findsWidgets, reason: titles[i]);
         final last = i == titles.length - 1;
         expect(quiet('Back'), findsOneWidget);
@@ -256,17 +259,18 @@ void main() {
       await tester.tap(primary('Show me'));
       await tester.pumpAndSettle();
       // On to the Campfire, well down the board, then back up it.
-      for (var i = 0; i < 6; i++) {
+      for (var i = 0; i < 7; i++) {
         await tester.tap(primary('Next'));
         await tester.pumpAndSettle();
       }
-      expect(find.text('8 OF 11'), findsOneWidget);
-      for (var i = 0; i < 6; i++) {
+      expect(find.text('9 OF 12'), findsOneWidget);
+      expect(find.text('The Campfire'), findsWidgets);
+      for (var i = 0; i < 7; i++) {
         await tester.tap(quiet('Back'));
         await tester.pumpAndSettle();
       }
-      expect(find.text('2 OF 11'), findsOneWidget);
-      expect(find.text('You and Babs'), findsOneWidget);
+      expect(find.text('2 OF 12'), findsOneWidget);
+      expect(find.text('The storyteller'), findsOneWidget);
     });
 
     testWidgets('it can be left at once, and does not come back',
@@ -314,7 +318,7 @@ void main() {
 
       await tester.tap(primary('Show me'));
       await tester.pumpAndSettle();
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < 4; i++) {
         await tester.tap(primary('Next'));
         await tester.pumpAndSettle();
       }
@@ -323,7 +327,7 @@ void main() {
       await tester.pumpAndSettle();
       // Straight on to the companion: there is no quest card to point at.
       expect(find.text('A quest'), findsNothing);
-      expect(find.text('7 OF 11'), findsOneWidget);
+      expect(find.text('8 OF 12'), findsOneWidget);
     });
 
     testWidgets('Settings can show it again', (tester) async {
@@ -355,7 +359,10 @@ void main() {
 
       await tester.tap(primary('Show me'));
       await tester.pumpAndSettle();
-      expect(find.text('2 OF 11'), findsOneWidget);
+      expect(find.text('2 OF 12'), findsOneWidget);
+      expect(find.text('The storyteller'), findsOneWidget);
+      await tester.tap(primary('Next'));
+      await tester.pumpAndSettle();
       expect(find.text('You and Babs'), findsOneWidget);
     });
 

@@ -64,6 +64,16 @@ class AppText {
     letterSpacing: 1.1,
   );
 
+  /// The narrator's voice: the display serif, in italic. Used only for
+  /// the storyteller's own words, so they are told apart at a glance.
+  static const TextStyle narrator = TextStyle(
+    fontFamily: Fonts.display,
+    fontWeight: FontWeight.w400,
+    fontStyle: FontStyle.italic,
+    fontSize: 16,
+    height: 1.35,
+  );
+
   static const TextStyle number = TextStyle(
     fontFamily: Fonts.display,
     fontWeight: FontWeight.w700,

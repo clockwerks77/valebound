@@ -44,9 +44,15 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // The same fixed personal key as the debug build, so a release
+            // build installs over a debug build (and back) and the data on
+            // the device is kept. See DECISIONS.md D-34 and D-75.
             signingConfig = signingConfigs.getByName("debug")
+            // The speed of a release build comes from the compiled Dart
+            // code. Shrinking the small Android side as well would save
+            // little and cannot be tried on a device from CI, so it is off.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

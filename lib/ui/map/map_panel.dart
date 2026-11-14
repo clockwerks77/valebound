@@ -9,6 +9,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../party/party_sheet.dart';
+import '../story/chronicle_screen.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'vale_map.dart';
@@ -110,17 +111,41 @@ class _MapHeading extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'THE VALE',
-            style: AppText.label.copyWith(color: Palette.goldBright),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'THE VALE',
+                  style: AppText.label.copyWith(color: Palette.goldBright),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  line,
+                  style: AppText.display
+                      .copyWith(color: Palette.onDark, fontSize: 24),
+                ),
+                const SizedBox(height: 2),
+                // Where the story has reached (DECISIONS D-76).
+                Text(
+                  game.storyTitle,
+                  style: AppText.small.copyWith(color: Palette.onDarkSoft),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 3),
-          Text(
-            line,
-            style: AppText.display.copyWith(color: Palette.onDark, fontSize: 24),
+          const SizedBox(width: 10),
+          RoundIconButton(
+            icon: 'book',
+            semanticLabel: 'Chronicle',
+            size: 40,
+            background: Palette.forestNight.withValues(alpha: 0.55),
+            foreground: Palette.onDark,
+            edge: Palette.onDark.withValues(alpha: 0.25),
+            onPressed: () => openChronicle(context),
           ),
         ],
       ),
