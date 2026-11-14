@@ -19,8 +19,9 @@ with the date and the version it was confirmed on.
 | Items failing | 0 |
 
 So by the checklist's own rule ("not done until all are true") the build is
-**not yet done**: three items wait on about ten minutes with the Fold. The
-steps are in [`PHASE-3.md`](PHASE-3.md), section (b).
+**not yet done**: three items wait on a short session with the Fold. The
+steps are in [`PHASE-3.md`](PHASE-3.md), section (b), and the open checks
+are listed at the foot of this page.
 
 ## The twelve items
 
@@ -52,9 +53,9 @@ steps are in [`PHASE-3.md`](PHASE-3.md), section (b).
   every row: Phase 1 to 2 in `test/data/phase2_test.dart`, Phase 2 to 3 in
   `test/data/phase3_test.dart` ("opens, keeps every row, and gains what
   Phase 3 adds").
-- **Installs and runs: needs the Fold.** Versions 0.1 and 0.2 were
-  installed and used on the Galaxy Z Fold 8 by Adam on 13 November 2026.
-  Version 0.3.0 has not been installed on any device yet.
+- **Installs and runs: needs the Fold.** The Phase 1 and Phase 2 builds
+  were installed and used on the Galaxy Z Fold 8 by Adam on 13 November
+  2026. Version 0.3.0 has not been installed on any device yet.
 
 ### 3. Board is usable one-handed on compact width and uses two panes when open; nothing critical sits on the crease — **Pass**
 
@@ -73,9 +74,9 @@ steps are in [`PHASE-3.md`](PHASE-3.md), section (b).
   bottom centre. Screenshots:
   [cover](screenshots/phase-3/board-calendar-cover.png),
   [open](screenshots/phase-3/board-calendar-open.png).
-- Adam used the Board on the Fold on 13 November 2026 (versions 0.1 and
-  0.2). "Usable one-handed" is in the end his thumb's call; nothing
-  measured here argues against it.
+- Adam used the Board on the Fold on 13 November 2026 (the Phase 1 and
+  Phase 2 builds). "Usable one-handed" is in the end his thumb's call;
+  nothing measured here argues against it.
 
 ### 4. A quest of each completion type can be created and completed — **Pass**
 
