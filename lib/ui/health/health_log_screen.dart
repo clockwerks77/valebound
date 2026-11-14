@@ -7,13 +7,14 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
+import '../motion.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 
 /// Opens the Health Log. True if the form was saved.
 Future<bool> openHealthLog(BuildContext context) async {
   final saved = await Navigator.of(context, rootNavigator: true).push<bool>(
-    MaterialPageRoute<bool>(builder: (_) => const HealthLogScreen()),
+    RiseRoute<bool>(builder: (_) => const HealthLogScreen()),
   );
   return saved ?? false;
 }

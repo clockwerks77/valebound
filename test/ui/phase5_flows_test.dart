@@ -33,6 +33,20 @@ Finder completeButton(String questName) => find.byWidgetPredicate(
       (w) => w is CompleteButton && w.label == 'Complete $questName',
     );
 
+/// Turns on reading from Health Connect, as Settings does.
+Future<void> connect(
+  WidgetTester tester,
+  TestApp app, {
+  bool steps = false,
+  bool glucose = false,
+}) async {
+  await tester.runAsync(() async {
+    if (steps) await app.game.connectSteps();
+    if (glucose) await app.game.connectGlucose();
+  });
+  await app.settle(tester);
+}
+
 /// Sets what the hero has gathered, as if earned on earlier days.
 Future<void> gather(
   WidgetTester tester,
@@ -73,6 +87,7 @@ void main() {
         stepCount: 3120,
       );
       final app = await TestApp.start(tester, now: saturday, device: device);
+      await connect(tester, app, steps: true);
       expect(app.game.stepsToday, 3120);
       expect(app.game.doneQuests, isEmpty);
 
@@ -94,6 +109,7 @@ void main() {
         glucoseToday: const GlucoseSpan(average: 7.44, readings: 212),
       );
       final app = await TestApp.start(tester, now: saturday, device: device);
+      await connect(tester, app, glucose: true);
       expect(app.game.glucoseAverageToday!.value, '7.4');
 
       device.glucoseToday = const GlucoseSpan(average: 6.91, readings: 215);
@@ -111,6 +127,7 @@ void main() {
         glucoseToday: const GlucoseSpan(average: 7.44, readings: 212),
       );
       final app = await TestApp.start(tester, now: saturday, device: device);
+      await connect(tester, app, glucose: true);
 
       device.glucoseToday = const GlucoseSpan(average: 6.12, readings: 214);
       await tester.tap(roundButton('Health Log'));
@@ -133,6 +150,7 @@ void main() {
         stepCount: 900,
       );
       final app = await TestApp.start(tester, now: saturday, device: device);
+      await connect(tester, app, steps: true);
       final atLaunch = device.stepReads;
 
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
@@ -176,6 +194,7 @@ void main() {
         stepCountYesterday: 6400,
       );
       final app = await TestApp.start(tester, now: saturday, device: device);
+      await connect(tester, app, steps: true);
       expect(app.game.day, '2026-11-14');
 
       app.now = DateTime(2026, 11, 15, 0, 2);
@@ -360,7 +379,7 @@ void main() {
       );
       await tester.runAsync(() async {
         final check = app.game.quests
-            .firstWhere((q) => q.name == 'Morning Health Check');
+            .firstWhere((q) => q.name == '7,000 Steps');
         await app.repo.completeQuest(check.id);
         await app.game.refresh();
       });
@@ -382,13 +401,14 @@ void main() {
         'the next', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       final app = await TestApp.start(tester, now: saturday);
-      // One Timber short of the Moot Hall, the last place in Hearthmere.
-      await gather(tester, app, timber: 14, stone: 14, shards: 4);
+      // Two Timber short of the Moot Hall, the last place in Hearthmere.
+      // 7,000 Steps is a Standard hero quest: two materials, Timber first.
+      await gather(tester, app, timber: 13, stone: 14, shards: 4);
       expect(app.game.restored, 3);
       expect(app.game.storyTitle, 'Chapter One · Hearthmere');
 
-      await reveal(tester, completeButton('Morning Health Check'));
-      await tester.tap(completeButton('Morning Health Check'));
+      await reveal(tester, completeButton('7,000 Steps'));
+      await tester.tap(completeButton('7,000 Steps'));
       await app.settle(tester);
 
       // First the place wakes...
@@ -416,10 +436,10 @@ void main() {
         (tester) async {
       useDevice(tester, TestDevice.foldCover);
       final app = await TestApp.start(tester, now: saturday);
-      // One Timber short of the Gate Lantern.
-      await gather(tester, app, timber: 1, stone: 1, shards: 0);
-      await reveal(tester, completeButton('Morning Health Check'));
-      await tester.tap(completeButton('Morning Health Check'));
+      // Two Timber short of the Gate Lantern.
+      await gather(tester, app, timber: 0, stone: 1, shards: 0);
+      await reveal(tester, completeButton('7,000 Steps'));
+      await tester.tap(completeButton('7,000 Steps'));
       await app.settle(tester);
       expect(find.text('The Gate Lantern'), findsWidgets);
       await tester.tap(find.text('The Vale wakes'));

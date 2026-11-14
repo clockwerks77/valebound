@@ -156,6 +156,29 @@ void main() {
     await app.settle(tester);
   });
 
+  screenTest('The sky over the board keeps the hours', (tester) async {
+    for (final (hour, name) in <(int, String)>[
+      (14, 'afternoon'),
+      (19, 'evening'),
+      (23, 'night'),
+    ]) {
+      useDevice(tester, TestDevice.foldCover);
+      final app = await TestApp.start(
+        tester,
+        now: DateTime(2026, 11, 14, hour, 20),
+        withHistory: true,
+      );
+      expect(
+        app.game.narration.setting.toLowerCase(),
+        startsWith(name),
+      );
+      await shot(tester, '100_board_${name}_cover');
+      // Start again from nothing for the next hour.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.runAsync(() => app.db.close());
+    }
+  });
+
   screenTest('The Chronicle on the cover screen', (tester) async {
     useDevice(tester, TestDevice.foldCover);
     final app = await TestApp.start(tester, now: saturday, withHistory: true);
@@ -166,7 +189,7 @@ void main() {
     await tester.drag(find.byType(ListView).first, const Offset(0, -470));
     await tester.pumpAndSettle();
     await shot(tester, '99b_chronicle_story_cover');
-    await tester.tap(roundButton('Close the Chronicle'), warnIfMissed: false);
+    await tester.tap(roundButton('Close the Chronicle'));
     await tester.pumpAndSettle();
   });
 

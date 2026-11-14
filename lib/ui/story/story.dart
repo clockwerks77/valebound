@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../rules/narrator.dart';
 import '../../theme/app_theme.dart';
@@ -7,6 +6,7 @@ import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../art/painted.dart';
 import '../art/vista.dart';
+import '../feel.dart';
 import '../motion.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
@@ -223,7 +223,7 @@ class _StoryViewState extends State<_StoryView> {
       Navigator.of(context).maybePop();
       return;
     }
-    HapticFeedback.selectionClick();
+    Feel.tap();
     setState(() => _index++);
   }
 

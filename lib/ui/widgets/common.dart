@@ -306,8 +306,9 @@ class ChoicePill extends StatelessWidget {
   }
 }
 
-/// The main call to action: forest green with a gold edge.
-class PrimaryButton extends StatelessWidget {
+/// The main call to action: forest green with a gold edge. It gives a
+/// little under the thumb while it is pressed.
+class PrimaryButton extends StatefulWidget {
   const PrimaryButton({
     super.key,
     required this.label,
@@ -322,39 +323,57 @@ class PrimaryButton extends StatelessWidget {
   final Color color;
 
   @override
+  State<PrimaryButton> createState() => _PrimaryButtonState();
+}
+
+class _PrimaryButtonState extends State<PrimaryButton> {
+  bool _down = false;
+
+  @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null;
-    return Opacity(
-      opacity: enabled ? 1 : 0.45,
-      child: Material(
-        color: color,
-        shape: const StadiumBorder(
-          side: BorderSide(color: Palette.gold, width: 1.4),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onPressed,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 52),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  if (icon != null) ...<Widget>[
-                    VIcon(icon!, size: 20, color: Palette.goldBright),
-                    const SizedBox(width: 10),
-                  ],
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.cardTitle.copyWith(color: Palette.onDark),
+    final enabled = widget.onPressed != null;
+    final icon = widget.icon;
+    return AnimatedScale(
+      scale: _down && enabled ? 0.965 : 1,
+      duration: const Duration(milliseconds: 110),
+      curve: Curves.easeOut,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.45,
+        child: Material(
+          color: widget.color,
+          shape: const StadiumBorder(
+            side: BorderSide(color: Palette.gold, width: 1.4),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: widget.onPressed,
+            onHighlightChanged: (down) {
+              if (mounted && down != _down) setState(() => _down = down);
+            },
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 52),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    if (icon != null) ...<Widget>[
+                      VIcon(icon, size: 20, color: Palette.goldBright),
+                      const SizedBox(width: 10),
+                    ],
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            AppText.cardTitle.copyWith(color: Palette.onDark),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

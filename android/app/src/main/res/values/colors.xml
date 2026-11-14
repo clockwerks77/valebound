@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#12352C</color>
+    <!-- The app's own deep green, so the window is never white or black
+         behind the app: not while it starts, and not while it resizes. -->
+    <color name="vale_forest">#12352C</color>
 </resources>

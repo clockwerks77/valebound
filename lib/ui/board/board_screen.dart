@@ -22,6 +22,7 @@ import '../art/vista.dart';
 import '../campfire/campfire_screen.dart';
 import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
+import '../motion.dart';
 import '../settings/settings_screen.dart';
 import '../story/chronicle_screen.dart';
 import '../tour/tour.dart';
@@ -157,6 +158,8 @@ class DawnHeader extends StatelessWidget {
 
     return Vista(
       radius: 26,
+      // The sky over the board keeps the same hours as the narrator.
+      part: partOfDay(game.now),
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -317,14 +320,25 @@ class _NarratorLine extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Expanded(
-                  child: Text(
-                    narration.line,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.narrator.copyWith(
-                      color: Palette.onDark,
-                      fontSize: 15.5,
-                      height: 1.3,
+                  child: AnimatedSwitcher(
+                    duration: motion(context, Motion.gentle),
+                    layoutBuilder: (current, previous) => Stack(
+                      alignment: Alignment.centerLeft,
+                      children: <Widget>[
+                        ...previous,
+                        if (current != null) current,
+                      ],
+                    ),
+                    child: Text(
+                      narration.line,
+                      key: ValueKey<String>(narration.line),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.narrator.copyWith(
+                        color: Palette.onDark,
+                        fontSize: 15.5,
+                        height: 1.3,
+                      ),
                     ),
                   ),
                 ),

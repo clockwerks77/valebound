@@ -13,6 +13,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../board/quest_actions.dart';
+import '../motion.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 
@@ -40,8 +41,7 @@ Future<void> openQuestEditor(BuildContext context, {QuestRow? quest}) {
     );
   }
   return Navigator.of(context, rootNavigator: true).push<void>(
-    MaterialPageRoute<void>(
-      fullscreenDialog: true,
+    RiseRoute<void>(
       builder: (pageContext) => Scaffold(
         backgroundColor: Palette.parchment,
         body: SafeArea(

@@ -9,6 +9,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
+import '../motion.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'campfire_screen.dart' show CampScene;
@@ -16,7 +17,7 @@ import 'campfire_screen.dart' show CampScene;
 /// Opens the weekly Delve over the Campfire.
 Future<void> openDelve(BuildContext context) {
   return Navigator.of(context, rootNavigator: true).push(
-    MaterialPageRoute<void>(builder: (_) => const DelveScreen()),
+    RiseRoute<void>(builder: (_) => const DelveScreen()),
   );
 }
 

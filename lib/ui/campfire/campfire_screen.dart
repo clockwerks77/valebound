@@ -12,6 +12,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
+import '../motion.dart';
 import '../art/crests.dart';
 import '../board/board_screen.dart' show VillagerCard;
 import '../celebrations.dart';
@@ -23,7 +24,7 @@ import 'delve_screen.dart';
 /// Opens the Campfire over whatever screen is showing.
 Future<void> openCampfire(BuildContext context) {
   return Navigator.of(context, rootNavigator: true).push(
-    MaterialPageRoute<void>(builder: (_) => const CampfireScreen()),
+    RiseRoute<void>(builder: (_) => const CampfireScreen()),
   );
 }
 

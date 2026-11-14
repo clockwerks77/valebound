@@ -15,6 +15,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../celebrations.dart';
+import '../feel.dart';
 import '../health/health_log_screen.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
@@ -185,7 +186,10 @@ class UndoButton extends StatelessWidget {
         shape: const CircleBorder(),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: onUndo,
+          onTap: () {
+            Feel.tap();
+            onUndo();
+          },
           child: SizedBox(
             width: size,
             height: size,
@@ -284,6 +288,7 @@ class _CompleteButtonState extends State<CompleteButton>
 
   Future<void> _press() async {
     if (_busy) return;
+    Feel.done();
     setState(() => _busy = true);
     await _fill.forward();
     await widget.onComplete();

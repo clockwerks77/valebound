@@ -18,6 +18,7 @@ import '../theme/palette.dart';
 import 'adaptive.dart';
 import 'art/crests.dart';
 import 'art/painted.dart';
+import 'feel.dart';
 import 'story/story.dart';
 import 'widgets/common.dart';
 import 'widgets/v_icon.dart';
@@ -310,6 +311,7 @@ Future<void> showHeroLevelUp(
   required CharacterRow hero,
   required int level,
 }) {
+  Feel.moment();
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -343,6 +345,7 @@ Future<void> showCompanionLevelUp(
 }) {
   final Trick? trick =
       companionTricks.where((t) => t.level == level).firstOrNull;
+  Feel.moment();
   return showDialog<void>(
     context: context,
     barrierColor: Palette.forestNight.withValues(alpha: 0.78),
@@ -423,6 +426,7 @@ Future<void> showRestoration(
   required RestorationTarget target,
 }) {
   final villager = target.villager;
+  Feel.moment();
   return showDialog<void>(
     context: context,
     barrierColor: Palette.forestNight.withValues(alpha: 0.78),
@@ -493,6 +497,7 @@ Future<void> showDiscovery(
   required int number,
   CompanionRow? companion,
 }) {
+  Feel.moment();
   return showDialog<void>(
     context: context,
     barrierColor: Palette.forestNight.withValues(alpha: 0.78),

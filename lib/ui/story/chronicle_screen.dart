@@ -78,11 +78,11 @@ class ChronicleScreen extends StatelessWidget {
       for (final entry in entries) _EntryView(entry: entry),
     ];
 
-    final standing = <Widget>[
-      header,
-      const SizedBox(height: 14),
-      const _Standing(),
-    ];
+    // The heading and its Close button stay put while the page scrolls.
+    final top = Padding(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      child: header,
+    );
 
     return Scaffold(
       backgroundColor: Palette.forestDeep,
@@ -102,21 +102,40 @@ class ChronicleScreen extends StatelessWidget {
         child: SafeArea(
           child: isExpanded(context)
               ? TwoPane(
-                  start: ListView(
-                    padding: const EdgeInsets.fromLTRB(14, 10, 0, 24),
-                    children: standing,
+                  start: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 10, 0, 10),
+                        child: header,
+                      ),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.fromLTRB(14, 4, 0, 24),
+                          children: const <Widget>[_Standing()],
+                        ),
+                      ),
+                    ],
                   ),
                   end: ListView(
                     padding: const EdgeInsets.fromLTRB(0, 22, 14, 24),
                     children: story,
                   ),
                 )
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 28),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    ...standing,
-                    const SizedBox(height: 20),
-                    ...story,
+                    top,
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(14, 4, 14, 28),
+                        children: <Widget>[
+                          const _Standing(),
+                          const SizedBox(height: 20),
+                          ...story,
+                        ],
+                      ),
+                    ),
                   ],
                 ),
         ),

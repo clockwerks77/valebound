@@ -8,9 +8,11 @@ import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../board/board_screen.dart';
 import '../celebrations.dart';
+import '../feel.dart';
 import '../health/health_note.dart';
 import '../log/quest_log_screen.dart';
 import '../map/map_panel.dart';
+import '../motion.dart';
 import '../party/party_sheet.dart';
 import '../settings/settings_screen.dart';
 import '../story/story.dart';
@@ -46,12 +48,20 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
+class _AppShellState extends State<AppShell>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   int _index = 0;
   GameController? _game;
   bool _marking = false;
   bool _touring = false;
   Timer? _healthTimer;
+
+  /// Plays as a destination is chosen: the new screen fades up into place.
+  late final AnimationController _arrive = AnimationController(
+    vsync: this,
+    duration: Motion.standard,
+    value: 1,
+  );
 
   @override
   void initState() {
@@ -83,6 +93,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   @override
   void dispose() {
     _healthTimer?.cancel();
+    _arrive.dispose();
     _game?.removeListener(_onGame);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -155,6 +166,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   /// Moves to a destination and, the first time, says what it is.
   void _select(int index) {
+    if (index != _index) {
+      Feel.tap();
+      if (!(MediaQuery.maybeDisableAnimationsOf(context) ?? false)) {
+        _arrive.forward(from: 0);
+      }
+    }
     setState(() => _index = index);
     final hint = switch (index) {
       1 => HintId.map,
@@ -202,7 +219,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
         ),
         child: SafeArea(
           bottom: expanded,
-          child: expanded ? _expanded() : _compact(),
+          child: expanded ? _expanded() : _arriving(_compact()),
         ),
       ),
       bottomNavigationBar: expanded
@@ -211,6 +228,21 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
               key: TourMark.nav,
               child: _BottomNav(index: _index, onSelect: _select),
             ),
+    );
+  }
+
+  /// [child], fading up a few pixels whenever a destination is chosen.
+  Widget _arriving(Widget child) {
+    final curved = CurvedAnimation(parent: _arrive, curve: Motion.enter);
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.012),
+          end: Offset.zero,
+        ).animate(curved),
+        child: child,
+      ),
     );
   }
 
@@ -251,7 +283,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             child: _Rail(index: _index, onSelect: _select),
           ),
         ),
-        Expanded(child: page),
+        Expanded(child: _arriving(page)),
       ],
     );
   }
