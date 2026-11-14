@@ -1,0 +1,6 @@
+Reference model, 7 level pairs x 300 days x 5 enemy types per cell
+class      did-quests(turns)  per type [swift, armoured, brute, swarm, arcane]   no-quests  greedy  strike-only  heroic
+ranger      86.4% (4.7)      [98, 62, 84, 95, 92]    66.4%    45.7%   24.2%    40.3%
+warden      80.3% (5.2)      [50, 80, 99, 77, 93]    53.0%    80.8%   26.4%    48.1%
+sage        89.9% (4.6)      [71, 98, 97, 82, 99]    79.6%    83.8%   24.2%    65.1%
+artificer   85.1% (4.1)      [99, 100, 85, 93, 46]    50.2%    47.6%   26.4%    59.3%
