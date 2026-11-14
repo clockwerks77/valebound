@@ -153,12 +153,16 @@ jobs:
         run: exit 1
 
   # Installs the APK on an Android emulator, launches and relaunches it, and
-  # runs the on-device test (first run, a completed quest, reopen storage).
-  # Results go to the `ci-device-results` branch.
+  # captures the screen at phone and Fold-like sizes. Results go to the
+  # `ci-device-results` branch.
+  #
+  # Everything is built before the emulator starts and the Gradle daemon is
+  # stopped: on the 2-core hosted runner, a build running beside the
+  # emulator starves it of memory and the emulator dies.
   device-check:
     # Pinned: the emulator needs KVM, which is known to work on this image.
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 40
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RESULTS_BRANCH: ci-device-results
@@ -178,12 +182,6 @@ jobs:
           flutter-version: 3.47.x
           cache: true
 
-      - name: Prepare
-        run: |
-          mkdir -p ci_out device_shots
-          flutter pub get 2>&1 | tail -3
-          dart run build_runner build --delete-conflicting-outputs 2>&1 | tail -3
-
       # The emulator refuses to start without several GB free for its data
       # image; the hosted runner is nearly full once Flutter is installed.
       - name: Free disk space
@@ -192,6 +190,23 @@ jobs:
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
           sudo docker system prune -af >/dev/null 2>&1 || true
           df -h / | tail -1
+
+      - name: Build the APKs (before the emulator starts)
+        id: prebuild
+        run: |
+          set -eo pipefail
+          mkdir -p ci_out device_shots apk
+          flutter pub get 2>&1 | tail -2
+          dart run build_runner build --delete-conflicting-outputs 2>&1 | tail -2
+          flutter build apk --debug 2>&1 | tail -3
+          cp build/app/outputs/flutter-apk/app-debug.apk apk/app-debug.apk
+          # The same app with the on-device test as its entry point.
+          flutter build apk --debug --target integration_test/app_test.dart 2>&1 | tail -3
+          cp build/app/outputs/flutter-apk/app-debug.apk apk/app-debug-test.apk
+          (cd android && ./gradlew --stop >/dev/null 2>&1) || true
+          pkill -f GradleDaemon || true
+          pkill -f kotlin-daemon || true
+          free -m | head -2
 
       - name: Enable KVM
         run: |
@@ -222,4 +237,3 @@ jobs:
       - name: Fail the run if the device check did not pass
         if: steps.device.outcome != 'success'
         run: exit 1
-
