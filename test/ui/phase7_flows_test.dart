@@ -53,8 +53,10 @@ Future<void> play(
   }
 }
 
+// Two strikes, Defend through the big blow, then Stand Firm: the answering
+// blow from the Shield finishes it on the fourth turn.
 const List<String> winningLine = <String>[
-  'Strike', 'Strike', 'Defend', 'Stand Firm', 'Strike', //
+  'Strike', 'Strike', 'Defend', 'Stand Firm', //
 ];
 const List<String> strikesOnly = <String>['Strike', 'Strike', 'Strike'];
 
@@ -161,7 +163,7 @@ void main() {
       final record = app.game.encounterToday!;
       expect(record.won, isTrue);
       expect(record.attempts, 1);
-      expect(record.turns, 5);
+      expect(record.turns, 4);
       expect(record.classId, 'warden');
       expect(app.game.encounterStatus, EncounterStatus.won);
       expect(app.game.hero!.gold, 8);
@@ -180,7 +182,7 @@ void main() {
       expect(
         vault.files['Daily/2026-11-14.md'],
         contains('## Encounter\n\n- Creature: Old Yawnstone (Brute)\n'
-            '- Result: woke it in 5 turns\n- Class: Warden\n'),
+            '- Result: woke it in 4 turns\n- Class: Warden\n'),
       );
     });
 

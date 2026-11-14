@@ -64,7 +64,7 @@ Future<void> encounter(
   // Turn three: the Brute's big blow is due.
   await shot(tester, '115_fight_big_blow_due_$suffix');
   if (open) expectCreaseClear(tester, device);
-  for (final move in <String>['Defend', 'Stand Firm', 'Strike']) {
+  for (final move in <String>['Defend', 'Stand Firm']) {
     await tester.tap(find.text(move));
     await app.settle(tester);
   }

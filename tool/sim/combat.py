@@ -16,19 +16,21 @@ CLASSES = ['ranger', 'warden', 'sage', 'artificer']
 TYPES = ['swift', 'armoured', 'brute', 'swarm', 'arcane']
 # knobs -----------------------------------------------------------------
 K = dict(
-    hero_hp=(26, 6), hero_atk=(6, 2), comp_hp=(12, 4), comp_atk=(5, 3, 2),  # 5 + 3C/2
-    enemy_hp=(48, 11), enemy_atk=(9, 2),
+    # every stat grows as (4 + level), so a fight is as hard at level 1 as at 20
+    hero_hp=(24, 6), hero_atk=(8, 2), comp_hp=(16, 4), comp_atk=(6, 3, 2),  # 6 + 3C/2
+    enemy_hp=(52, 13), enemy_atk=(8, 2),
+    e=(3, 1, 2, 4),  # the creature's level: (3 x hero + companion + 2) // 4
     cls_hp=dict(ranger=100, warden=115, sage=90, artificer=100),
-    cls_atk=dict(ranger=80, warden=110, sage=110, artificer=95),
-    type_hp=dict(swift=95, armoured=90, brute=100, swarm=110, arcane=105),
-    type_atk=dict(swift=95, armoured=95, brute=110, swarm=110, arcane=130),
+    cls_atk=dict(ranger=95, warden=105, sage=115, artificer=100),
+    type_hp=dict(swift=90, armoured=85, brute=110, swarm=105, arcane=65),
+    type_atk=dict(swift=90, armoured=95, brute=115, swarm=110, arcane=140),
     base=2, cap=8, cost=3,
     strike=90, strike_swift=75, comp=85, comp_swift=75,
     crit=19, crit_pct=150,
-    armour=80, big=270, heavy=220, swarm_hit=40, swarm_all=95, bodies=3, aoe=50,
-    fortify=8, volley=190, riposte=140, firm=25, firm_turns=2, guard_shield=2,
-    exploit=(45, 30), trap=110, trap_turns=3, salve=45, bomb=(8, 3),
-    heroic_hp=122, heroic_atk=114, turn_cap=12,
+    armour=80, big=280, heavy=260, swarm_hit=45, swarm_all=105, bodies=3, aoe=50,
+    fortify=8, volley=220, riposte=150, firm=25, firm_turns=2, guard_shield=2,  # percent of max HP for each Guard
+    exploit=(45, 25), trap=100, trap_turns=3, salve=45, bomb=(12, 3),
+    heroic_hp=126, heroic_atk=110, turn_cap=12,
     boss_hp=260, boss_atk=85, boss_turns=7, boss_debuff=75, boss_shield=40,
 )
 MATRIX = {  # class -> enemy type -> percent
@@ -59,7 +61,7 @@ class Fight:
         s.comp_max = K['comp_hp'][0] + K['comp_hp'][1] * comp_level
         s.comp_hp = s.comp_max
         s.comp_atk = K['comp_atk'][0] + (K['comp_atk'][1] * comp_level) // K['comp_atk'][2] + bond // 25
-        e = (level + comp_level + 1) // 2
+        e = (K['e'][0] * level + K['e'][1] * comp_level + K['e'][2]) // K['e'][3]
         hp = pct(K['enemy_hp'][0] + K['enemy_hp'][1] * e, K['type_hp'][etype])
         ea = pct(K['enemy_atk'][0] + K['enemy_atk'][1] * e, K['type_atk'][etype])
         if not boss:
@@ -77,7 +79,7 @@ class Fight:
         if n > 1: s.enemy_max = (hp // n) * n
         s.start_hp = sum(s.bodies)
         s.res = min(K['cap'], resource)
-        s.shield = pct(s.hero_max, K['guard_shield']) * s.res if cls == 'warden' else 0
+        s.shield = pct(s.hero_max, K['guard_shield'] * s.res) if cls == 'warden' else 0
         s.armoured = etype == 'armoured'
         s.ward = False; s.dimmed = False; s.taunt = 0; s.trap = 0; s.charging = False
         s.items = dict(items or {})

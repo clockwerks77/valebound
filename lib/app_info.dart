@@ -4,4 +4,4 @@
 const String appName = 'Valebound';
 
 /// Shown in Settings > About. Kept in step with `version:` in pubspec.yaml.
-const String appVersion = '0.7.0';
+const String appVersion = '0.7.1';

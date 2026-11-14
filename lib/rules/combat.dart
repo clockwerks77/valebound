@@ -122,13 +122,20 @@ enum Advantage {
 }
 
 // ---- The numbers (tuned in tool/sim) --------------------------------------
+//
+// Every stat grows as (4 + level), hero, companion and creature alike, so a
+// fight is as hard at level 1 as at level 20 (DECISIONS D-101).
 
-const int _heroHpBase = 26, _heroHpPer = 6;
-const int _heroAtkBase = 6, _heroAtkPer = 2;
-const int _compHpBase = 12, _compHpPer = 4;
-const int _compAtkBase = 5, _compAtkNum = 3, _compAtkDen = 2;
-const int _enemyHpBase = 48, _enemyHpPer = 11;
-const int _enemyAtkBase = 9, _enemyAtkPer = 2;
+const int _heroHpBase = 24, _heroHpPer = 6;
+const int _heroAtkBase = 8, _heroAtkPer = 2;
+const int _compHpBase = 16, _compHpPer = 4;
+const int _compAtkBase = 6, _compAtkNum = 3, _compAtkDen = 2;
+const int _enemyHpBase = 52, _enemyHpPer = 13;
+const int _enemyAtkBase = 8, _enemyAtkPer = 2;
+
+/// The creature's level leans on the hero's: (3 x hero + companion + 2) ~/ 4.
+int enemyLevel(int level, int companionLevel) =>
+    (3 * level + companionLevel + 2) ~/ 4;
 
 const Map<HeroClass, int> _classHp = <HeroClass, int>{
   HeroClass.ranger: 100,
@@ -137,24 +144,24 @@ const Map<HeroClass, int> _classHp = <HeroClass, int>{
   HeroClass.artificer: 100,
 };
 const Map<HeroClass, int> _classAtk = <HeroClass, int>{
-  HeroClass.ranger: 80,
-  HeroClass.warden: 110,
-  HeroClass.sage: 110,
-  HeroClass.artificer: 95,
+  HeroClass.ranger: 95,
+  HeroClass.warden: 105,
+  HeroClass.sage: 115,
+  HeroClass.artificer: 100,
 };
 const Map<EnemyType, int> _typeHp = <EnemyType, int>{
-  EnemyType.swift: 95,
-  EnemyType.armoured: 90,
-  EnemyType.brute: 100,
-  EnemyType.swarm: 110,
-  EnemyType.arcane: 105,
+  EnemyType.swift: 90,
+  EnemyType.armoured: 85,
+  EnemyType.brute: 110,
+  EnemyType.swarm: 105,
+  EnemyType.arcane: 65,
 };
 const Map<EnemyType, int> _typeAtk = <EnemyType, int>{
-  EnemyType.swift: 95,
+  EnemyType.swift: 90,
   EnemyType.armoured: 95,
-  EnemyType.brute: 110,
+  EnemyType.brute: 115,
   EnemyType.swarm: 110,
-  EnemyType.arcane: 130,
+  EnemyType.arcane: 140,
 };
 
 const int abilityCost = 3;
@@ -162,14 +169,14 @@ const int sageMinimum = 2;
 const int strikeChance = 90, strikeChanceSwift = 75;
 const int companionChance = 85, companionChanceSwift = 75;
 const int _critOn = 19, _critPercent = 150;
-const int _armour = 80, _big = 270, _heavy = 220;
-const int _swarmHit = 40, _swarmAll = 95, _bodies = 3, _aoe = 50;
-const int _fortify = 8, _volley = 190, _riposte = 140;
+const int _armour = 80, _big = 280, _heavy = 260;
+const int _swarmHit = 45, _swarmAll = 105, _bodies = 3, _aoe = 50;
+const int _fortify = 8, _volley = 220, _riposte = 150;
 const int _firm = 25, _firmTurns = 2, _guardShield = 2;
-const int _exploitBase = 45, _exploitPer = 30;
-const int _trap = 110, _trapTurns = 3, _salve = 45;
-const int _bombBase = 8, _bombPer = 3;
-const int _heroicHp = 122, _heroicAtk = 114;
+const int _exploitBase = 45, _exploitPer = 25;
+const int _trap = 100, _trapTurns = 3, _salve = 45;
+const int _bombBase = 12, _bombPer = 3;
+const int _heroicHp = 126, _heroicAtk = 110;
 const int turnCap = 12;
 const int _bossHp = 260, _bossAtk = 85;
 const int bossTurns = 7;
@@ -331,7 +338,7 @@ class Fight {
     companionAttack = _compAtkBase +
         (_compAtkNum * setup.companionLevel) ~/ _compAtkDen +
         setup.bond ~/ 25;
-    final e = (setup.level + setup.companionLevel + 1) ~/ 2;
+    final e = enemyLevel(setup.level, setup.companionLevel);
     var hp = _pct(_enemyHpBase + _enemyHpPer * e, _typeHp[type]!);
     var atk = _pct(_enemyAtkBase + _enemyAtkPer * e, _typeAtk[type]!);
     if (!boss) {
@@ -356,8 +363,10 @@ class Fight {
     if (n > 1) enemyMax = (hp ~/ n) * n;
     startHp = enemyHp;
     resource = setup.resource > resourceCap ? resourceCap : setup.resource;
+    // A percentage of max HP for each Guard, worked out in one step so that a
+    // small hero's Shield is not rounded away to nothing.
     shield =
-        cls == HeroClass.warden ? _pct(heroMax, _guardShield) * resource : 0;
+        cls == HeroClass.warden ? _pct(heroMax, _guardShield * resource) : 0;
     armoured = type == EnemyType.armoured;
     switch (setup.advantage) {
       case Advantage.debuff:

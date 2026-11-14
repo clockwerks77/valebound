@@ -76,8 +76,20 @@ if __name__ == '__main__' and False:
             r, t, per = rate(pol, cls, res, heroic)
             print(f'{cls:10} {name:12} {res:4} {r:5.1f} {t:6.2f}  ' + ' '.join(f'{per[x]:5d}' for x in TYPES))
 
+def by_level(n=100):
+    print('quests done and reading intents, by party level (hero/companion)')
+    print('class      ' + ' '.join(f'{L:>3}/{C:<2}' for (L, C) in LEVELS))
+    for cls in CLASSES:
+        print(f'{cls:10} ' + ' '.join(f'{rate(smart, cls, 7, levels=[lv], n=n)[0]:5.0f}%' for lv in LEVELS))
+    print('the same, by creature type at each level')
+    for cls in CLASSES:
+        for et in TYPES:
+            row = [rate(smart, cls, 7, levels=[lv], n=n, etypes=[et])[0] for lv in LEVELS]
+            print(f'{cls:10} {et:9} {MATRIX[et][cls]:3}  ' + ' '.join(f'{x:5.0f}%' for x in row))
+
 if __name__ == '__main__':
     import json
     for kv in sys.argv[1:]:
         k, v = kv.split('=', 1); K[k] = json.loads(v)
-    table()
+    table(n=100)
+    by_level()

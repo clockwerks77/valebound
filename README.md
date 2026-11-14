@@ -33,7 +33,7 @@ analytics, no network calls.
   minutes while the app is open, a release build, and motion, haptics and a
   launch screen that belong to the app ([report](docs/PHASE-5.md)). Branch
   `phase-5`. Built and tested; not yet run on a phone.
-- **Classes, the daily encounter and real stakes, version 0.7.0:** four
+- **Classes, the daily encounter and real stakes, version 0.7.1:** four
   classes fed by the day's quests, a turn-based fight each day that can be
   lost (never anything already earned), and a weekly boss whose HP carries
   over, to Amendment v0.3 in
