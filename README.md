@@ -23,6 +23,10 @@ analytics, no network calls.
   calendar, the reminder and the Health Log were confirmed on the Fold on
   14 Nov 2026; a real step count from Health Connect is the one check
   still open.
+- **After the first run, version 0.4.0:** a daily Still creature to wake,
+  the day's average glucose from Health Connect, and a first-run tour, all
+  asked for by Adam after using 0.3.0 ([report](docs/PHASE-4.md)). Branch
+  `phase-4`. Built and tested; not yet run on a phone.
 
 ## Getting the app
 
@@ -68,13 +72,13 @@ Install on a connected device: `flutter install` or
 
 | Path | What lives there |
 |---|---|
-| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields. No Flutter, no database. |
+| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still and the day's creature, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields, calendar suggestions. No Flutter, no database. |
 | `lib/data/` | Local SQLite storage (Drift): schema and its migrations, seeded quests, the repository, the JSON backup. |
 | `lib/export/` | The Markdown export: the three documents as pure text builders, the queue, and the door to the vault folder. |
-| `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. Also the device door: reading the calendar, reading steps from Health Connect, and the one local reminder. |
+| `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. Also the device door: reading the calendar, reading steps and glucose from Health Connect, and the one local reminder. |
 | `lib/device/` | The app's side of the device door, with a do-nothing version so the app is whole without any of it. |
 | `lib/state/` | One controller that the screens listen to. |
-| `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout. |
+| `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout; `tour/` holds the first-run tour and the one-time screen hints. |
 | `lib/ui/art/` | Code-drawn stand-in art, and the widgets that show the illustrated pieces (see ASSETS.md). |
 | `assets/art/` | The illustrated pieces: ten portraits and the first Discovery card. |
 | `test/rules/` | Unit tests for every rule. |

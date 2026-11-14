@@ -340,6 +340,24 @@ void main() {
       expect(app.game.settings.hintsSeen, isEmpty);
     });
 
+    testWidgets('it finds its way from wherever the board was left',
+        (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      final app = await TestApp.start(tester, now: saturday);
+      await app.settle(tester);
+      // Down to the foot of the board, then ask for the tour from there.
+      await tester.drag(find.byType(ListView).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() => app.game.requestTour());
+      await app.settle(tester);
+      expect(find.text('Welcome to the Vale'), findsOneWidget);
+
+      await tester.tap(primary('Show me'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 OF 11'), findsOneWidget);
+      expect(find.text('You and Babs'), findsOneWidget);
+    });
+
     testWidgets('each other screen explains itself once', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       final app = await TestApp.start(tester, now: saturday, hints: true);

@@ -18,6 +18,11 @@ abstract final class TourMark {
   static final GlobalKey newQuest = GlobalKey(debugLabel: 'tour.newQuest');
   static final GlobalKey tools = GlobalKey(debugLabel: 'tour.tools');
   static final GlobalKey nav = GlobalKey(debugLabel: 'tour.nav');
+
+  /// The board's own scrolling, so the tour can find a part of the board
+  /// wherever the list was left.
+  static final ScrollController boardScroll =
+      ScrollController(debugLabel: 'tour.board');
 }
 
 /// One bubble of a tour: what it says, and what it points at (nothing, for a
@@ -136,6 +141,8 @@ class _TourViewState extends State<_TourView> {
   /// it is not on the board at all.
   Future<Rect?> _find(GlobalKey key) async {
     var found = key.currentContext;
+    final board = TourMark.boardScroll;
+    _scroll ??= board.hasClients ? board.positions.last : null;
     final scroll = _scroll;
     if (found == null && scroll != null && scroll.hasContentDimensions) {
       // Lists build only what is near the screen: look from the top down.
@@ -242,8 +249,10 @@ class _ScrimPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final scrim = Paint()..color = Palette.forestNight.withValues(alpha: 0.78);
     final whole = Path()..addRect(Offset.zero & size);
-    final window = hole;
-    if (window == null) {
+    // Kept just inside the screen, so the outline is never cut off at an
+    // edge (the navigation bar and rail reach all the way to it).
+    final window = hole?.intersect((Offset.zero & size).deflate(2));
+    if (window == null || window.isEmpty) {
       canvas.drawPath(whole, scrim);
       return;
     }

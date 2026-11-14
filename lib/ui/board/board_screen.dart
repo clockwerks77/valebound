@@ -49,6 +49,7 @@ class BoardScreen extends StatelessWidget {
     return Stack(
       children: <Widget>[
         ListView(
+          controller: TourMark.boardScroll,
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 104),
           children: <Widget>[
             const DawnHeader(),

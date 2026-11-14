@@ -192,7 +192,9 @@ foot of this page.
 - `test/export/markdown_test.dart` checks each file field by field against
   §11. `test/export/export_service_test.dart` regenerates the three sample
   files from a scripted fortnight and compares them with
-  [`docs/samples`](samples); they are unchanged since Phase 2.
+  [`docs/samples`](samples). Their format is unchanged since Phase 2; they
+  were regenerated for 0.4.0, where a three-quest day gathers a little more
+  gold and one more material (the day's Still creature, D-70).
 - On screen: `test/ui/phase2_flows_test.dart`, "closing the day sends the
   export to the vault".
 - **Confirmed on the Fold by Adam, 13 November 2026 (version 0.2):** he sent
