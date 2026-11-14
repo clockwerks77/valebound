@@ -91,5 +91,7 @@ if __name__ == '__main__':
     import json
     for kv in sys.argv[1:]:
         k, v = kv.split('=', 1); K[k] = json.loads(v)
+    print('Reference model, the numbers of app version 0.7.1. 3,500 fights a row (5 types x 7 party levels x 100 days),')
+    print('empty pouch. Regenerate from tool/sim with: python3 sim.py > balance.txt')
     table(n=100)
     by_level()

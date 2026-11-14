@@ -80,6 +80,7 @@ three fifths size are in `docs/screenshots/phase-7/`.
 | The fight, first turn | `114_fight_first_turn_cover` | `114_fight_first_turn_open` |
 | The fight, the big blow due | `115_fight_big_blow_due_cover` | `115_fight_big_blow_due_open` |
 | Won, with the chest | `116_fight_won_cover` | `116_fight_won_open` |
+| The board after the win | `117_board_after_win_cover` | `117_board_after_win_open` |
 | The creature held | `118_fight_held_cover` | |
 | The board while it holds | `119_board_holding_cover` | |
 | The class on the Party Sheet | `120_party_class_cover` | |
