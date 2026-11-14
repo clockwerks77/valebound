@@ -121,6 +121,11 @@ jobs:
           set -o pipefail
           flutter build apk --debug 2>&1 | tee ci_out/build_apk.txt
           ls -la build/app/outputs/flutter-apk/ 2>&1 | tee -a ci_out/build_apk.txt
+          # Which key signed it: must be the fixed personal key, so the build
+          # installs over the last one and keeps its data.
+          APKSIGNER="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort | tail -1)"
+          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-debug.apk 2>&1 \
+            | grep -i "SHA-256" | head -1 | tee ci_out/apk_signer.txt || true
 
       - name: Upload APK artifact
         if: steps.apk.outcome == 'success'

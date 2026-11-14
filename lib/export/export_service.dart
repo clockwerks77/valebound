@@ -18,7 +18,7 @@ enum ExportState {
   /// queued and goes out by itself when the folder is there again.
   waiting,
 
-  /// Everything is written.
+  /// The folder is there and being written to.
   upToDate,
 }
 
@@ -40,6 +40,7 @@ class ExportService {
 
   bool _running = false;
   bool _again = false;
+  bool _lastWriteMissed = false;
 
   /// Days with something to export whose file is not yet written.
   Future<List<String>> _pending() async {
@@ -68,11 +69,9 @@ class ExportService {
       return;
     }
     pendingDays = (await _pending()).length;
-    if (!vaultStatus.available) {
-      state = ExportState.waiting;
-    } else {
-      state = pendingDays == 0 ? ExportState.upToDate : ExportState.waiting;
-    }
+    state = (!vaultStatus.available || _lastWriteMissed)
+        ? ExportState.waiting
+        : ExportState.upToDate;
   }
 
   /// Writes the Character Sheet, the quest list and every queued day. Quiet
@@ -91,7 +90,9 @@ class ExportService {
         if (!await repo.hasProfile()) continue;
         final days = await _pending();
         final files = await buildFiles(days: days);
-        if (await vault.writeFiles(files)) {
+        final written = await vault.writeFiles(files);
+        _lastWriteMissed = !written;
+        if (written) {
           await repo.markExported(days);
           lastExportAt = repo.clock();
         }

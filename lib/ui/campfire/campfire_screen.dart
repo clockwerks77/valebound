@@ -703,7 +703,7 @@ String exportStatusLine(ExportService export) {
       final at = export.lastExportAt;
       final where = name == null ? 'the vault folder' : '“$name”';
       return at == null
-          ? 'Export is up to date in $where.'
+          ? 'Writing to $where.'
           : 'Exported to $where at ${formatTimeOfDay(at)}.';
   }
 }

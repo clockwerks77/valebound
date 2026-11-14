@@ -68,6 +68,12 @@ String _materials(Map<MaterialKind, int> m) => <String>[
 
 String _lines(List<String> lines) => '${lines.join('\n')}\n';
 
+/// ` mmol/L`, but `%` sits against its number.
+String _unit(String unit) {
+  if (unit.isEmpty) return '';
+  return unit == '%' ? '%' : ' $unit';
+}
+
 // ---- Character Sheet.md --------------------------------------------------
 
 class AttributeLine {
@@ -336,7 +342,7 @@ String dailyMarkdown(DayData d) {
       '## Health',
       '',
       for (final h in d.health)
-        '- ${h.label}: ${h.value}${h.unit.isEmpty ? '' : ' ${h.unit}'}',
+        '- ${h.label}: ${h.value}${_unit(h.unit)}',
     ],
     '',
     '## World',

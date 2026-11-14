@@ -85,6 +85,8 @@ void main() {
       await reveal(tester, completeButton('Walk Babs'));
       await tester.tap(completeButton('Walk Babs'));
       await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(UndoButton), findsOneWidget);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
       await app.settle(tester);
       expect(app.game.companion!.totalXp, 25);

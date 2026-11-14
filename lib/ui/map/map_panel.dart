@@ -34,6 +34,7 @@ class MapPanel extends StatelessWidget {
         const _MapHeading(),
         const SizedBox(height: 10),
         const _TheMap(),
+        if (!brief) ...const <Widget>[SizedBox(height: 10), MapLegend()],
         const SizedBox(height: 14),
         const TargetCard(),
         const SizedBox(height: 12),
@@ -62,6 +63,8 @@ class MapPane extends StatelessWidget {
         _MapHeading(),
         SizedBox(height: 10),
         _TheMap(),
+        SizedBox(height: 10),
+        MapLegend(),
       ],
     );
   }
@@ -138,6 +141,62 @@ class _TheMap extends StatelessWidget {
       scout: (game.companion?.level ?? 1) >= scoutLevel,
       stills: game.stillQuests.length,
       decorations: game.cosmeticsUnlocked,
+    );
+  }
+}
+
+/// What the marks on the map mean.
+class MapLegend extends StatelessWidget {
+  const MapLegend({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget dot(Color fill, Color ring) => Container(
+          width: 13,
+          height: 13,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: fill,
+            border: Border.all(color: ring, width: 1.6),
+          ),
+        );
+    Widget item(Widget mark, String label) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            mark,
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppText.small.copyWith(
+                color: Palette.onDarkSoft,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Semantics(
+        label: 'Map key: restored places are gold-ringed, the next one is '
+            'pale, sleeping ones are grey. The tent is your camp and each '
+            'gold light is a discovery.',
+        child: ExcludeSemantics(
+          child: Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: <Widget>[
+              item(dot(Palette.forest, Palette.goldBright), 'Restored'),
+              item(dot(Palette.parchment, Palette.gold), 'Next'),
+              item(dot(const Color(0xFF8D9A9B), const Color(0xFFC9D2D0)), 'Asleep'),
+              item(
+                const VIcon('tent', size: 14, color: Palette.onDark),
+                'Camp',
+              ),
+              item(dot(Palette.goldBright, Palette.forestNight), 'Discovery'),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

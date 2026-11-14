@@ -40,14 +40,14 @@ class _PartySheetScreenState extends State<PartySheetScreen> {
     }
     final toggle = Row(
       children: <Widget>[
-        ChoicePill(
+        _SheetTab(
           label: 'Party',
           icon: 'party',
           selected: !_inventory,
           onTap: () => setState(() => _inventory = false),
         ),
         const SizedBox(width: 8),
-        ChoicePill(
+        _SheetTab(
           label: 'Inventory',
           icon: 'bag',
           selected: _inventory,
@@ -81,6 +81,71 @@ class _PartySheetScreenState extends State<PartySheetScreen> {
         const SizedBox(height: 16),
         second,
       ],
+    );
+  }
+}
+
+/// Party | Inventory, on the dark background: gold when chosen.
+class _SheetTab extends StatelessWidget {
+  const _SheetTab({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final String icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected ? Palette.goldBright : Palette.onDarkSoft;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Material(
+        color: selected
+            ? Palette.gold.withValues(alpha: 0.22)
+            : Colors.transparent,
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: selected
+                ? Palette.gold
+                : Palette.onDark.withValues(alpha: 0.22),
+            width: 1.2,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  VIcon(icon, size: 18, color: color),
+                  const SizedBox(width: 7),
+                  ExcludeSemantics(
+                    child: Text(
+                      label,
+                      style: AppText.small.copyWith(
+                        color: color,
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
