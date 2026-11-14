@@ -50,12 +50,19 @@ class StoryPicture extends StatelessWidget {
       fit: StackFit.expand,
       children: <Widget>[
         Vista(wake: wake),
-        // The one lantern still burning, at the gate: down among the
-        // roofs, where the village is.
+        // The one lantern still burning, at the gate: beside the roofs,
+        // where the village is, whatever shape the picture takes.
         if (lantern)
-          const Align(
-            alignment: Alignment(-0.44, 0.5),
-            child: _Glow(),
+          LayoutBuilder(
+            builder: (context, box) => Stack(
+              children: <Widget>[
+                Positioned(
+                  left: box.maxWidth * 0.33 - _Glow.size / 2,
+                  top: box.maxHeight * 0.69 - _Glow.size / 2,
+                  child: const _Glow(),
+                ),
+              ],
+            ),
           ),
       ],
     );
@@ -75,11 +82,13 @@ class StoryPicture extends StatelessWidget {
 class _Glow extends StatelessWidget {
   const _Glow();
 
+  static const double size = 150;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 170,
-      height: 170,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
@@ -92,7 +101,7 @@ class _Glow extends StatelessWidget {
         ),
       ),
       alignment: Alignment.center,
-      child: const VIcon('lantern', size: 34, color: Color(0xFFFFF6DC)),
+      child: const VIcon('lantern', size: 30, color: Color(0xFFFFF6DC)),
     );
   }
 }
