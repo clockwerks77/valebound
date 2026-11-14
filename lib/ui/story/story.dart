@@ -50,10 +50,11 @@ class StoryPicture extends StatelessWidget {
       fit: StackFit.expand,
       children: <Widget>[
         Vista(wake: wake),
-        // The one lantern still burning, at the gate.
+        // The one lantern still burning, at the gate: down among the
+        // roofs, where the village is.
         if (lantern)
           const Align(
-            alignment: Alignment(0, 0.18),
+            alignment: Alignment(-0.44, 0.5),
             child: _Glow(),
           ),
       ],
@@ -77,32 +78,33 @@ class _Glow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 190,
-      height: 190,
+      width: 170,
+      height: 170,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: <Color>[
-            Palette.goldBright.withValues(alpha: 0.55),
-            Palette.gold.withValues(alpha: 0.18),
+            Palette.goldBright.withValues(alpha: 0.85),
+            Palette.gold.withValues(alpha: 0.28),
             Palette.gold.withValues(alpha: 0.0),
           ],
-          stops: const <double>[0.0, 0.42, 1.0],
+          stops: const <double>[0.0, 0.34, 1.0],
         ),
       ),
       alignment: Alignment.center,
-      child: const VIcon('lantern', size: 46, color: Palette.goldBright),
+      child: const VIcon('lantern', size: 34, color: Color(0xFFFFF6DC)),
     );
   }
 }
 
 /// How awake the valley looks behind each page of the prologue.
 double _wakeFor(StoryScene scene) => switch (scene) {
-      StoryScene.lastHill => 0.5,
+      // First light on the hill, before the grey comes into view.
+      StoryScene.lastHill => 0.9,
       StoryScene.sleepingVale => 0.0,
-      StoryScene.gateLantern => 0.08,
+      StoryScene.gateLantern => 0.0,
       StoryScene.stillness => 0.0,
-      StoryScene.road => 0.3,
+      StoryScene.road => 0.45,
     };
 
 /// The prologue, then the page that opens Chapter One.
@@ -262,7 +264,7 @@ class _StoryViewState extends State<_StoryView> {
       duration: motion(context, const Duration(milliseconds: 460)),
       switchInCurve: Curves.easeOut,
       layoutBuilder: (current, previous) => Stack(
-        alignment: Alignment.bottomLeft,
+        alignment: Alignment.topLeft,
         children: <Widget>[...previous, if (current != null) current],
       ),
       transitionBuilder: (child, animation) => FadeTransition(
@@ -347,46 +349,39 @@ class _StoryViewState extends State<_StoryView> {
         ),
       );
     } else {
-      body = Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          picture,
-          // Darkens toward the foot of the page, where the words are.
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  Palette.forestNight.withValues(alpha: 0.5),
-                  Palette.forestNight.withValues(alpha: 0.0),
-                  Palette.forestNight.withValues(alpha: 0.82),
-                  Palette.forestNight.withValues(alpha: 0.97),
-                ],
-                stops: const <double>[0.0, 0.2, 0.56, 1.0],
+      // The cover screen: the picture as a plate above, the words beneath
+      // it on the dark, so neither dims the other.
+      body = SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              top,
+              const SizedBox(height: 10),
+              Expanded(
+                flex: 6,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(26),
+                  child: picture,
+                ),
               ),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 14, 22, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  top,
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: SingleChildScrollView(child: words),
-                    ),
+              const SizedBox(height: 18),
+              Expanded(
+                flex: 5,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: words,
                   ),
-                  const SizedBox(height: 26),
-                  bottom,
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 12),
+              bottom,
+            ],
           ),
-        ],
+        ),
       );
     }
 

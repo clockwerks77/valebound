@@ -27,30 +27,41 @@ analytics, no network calls.
   the day's average glucose from Health Connect, and a first-run tour, all
   asked for by Adam after using 0.3.0 ([report](docs/PHASE-4.md)). Branch
   `phase-4`. Built and tested; not yet run on a phone.
+- **The narrator and a first polish pass, version 0.5.0:** a storyteller
+  who says where you are (prologue, a line over the board, a line at the
+  Campfire, chapters, a Chronicle), Health Connect read again every few
+  minutes while the app is open, a release build, and motion, haptics and a
+  launch screen that belong to the app ([report](docs/PHASE-5.md)). Branch
+  `phase-5`. Built and tested; not yet run on a phone.
 
 ## Getting the app
 
-Every push is analysed and tested on GitHub Actions. A debug APK is built
-when a commit message contains `[apk]`, or when the workflow is run by hand
-from the Actions tab.
+Every push is analysed and tested on GitHub Actions. The APKs are built when
+a commit message contains `[apk]`, or when the workflow is run by hand from
+the Actions tab.
 
-- **Latest build:** the `latest-debug` release on this repository's Releases
-  page. Open it on the phone (signed in to GitHub), download
-  `app-debug.apk`, and allow installation from your browser when Android
-  asks.
-- The same file is attached to that workflow run as the `app-debug-apk`
+- **Latest build:** the `latest` release on this repository's Releases page.
+  Open it on the phone (signed in to GitHub), download
+  **`Valebound-<version>.apk`**, and allow installation from your browser
+  when Android asks. This is the release build: about 24 MB, for arm64
+  phones, with no internet permission at all.
+- **Fallback:** `Valebound-<version>-debug.apk` on the same page is the same
+  app as a debug build (about 160 MB). If the release build misbehaves,
+  install this one over it.
+- Both files are also attached to the workflow run as the `valebound-apks`
   artifact.
 
-Debug builds are large (about 150 MB) because they carry every CPU
-architecture and Flutter's debug engine. That is expected for v1.
+Both are signed with a fixed key kept in this private repository
+(`android/app/personal-debug.p12`), so either installs over the other, and
+over any build since Phase 2, and keeps the data on the phone. Builds made
+before Phase 2 used throwaway keys and have to be uninstalled once first.
 
-Builds are signed with a fixed key kept in this private repository
-(`android/app/personal-debug.p12`), so each one installs over the last and
-keeps the data on the phone. Builds made before Phase 2 used throwaway keys
-and have to be uninstalled once first.
+CI reads the permissions out of the release file and fails the build if it
+ever declares `INTERNET` (`logs/apk_permissions.txt` on the `ci-results`
+branch).
 
-A commit message containing `[apk-check]` builds the APK to prove it
-compiles without replacing the release.
+A commit message containing `[apk-check]` builds both files to prove they
+compile without replacing the release.
 
 ## Building it yourself
 
@@ -60,25 +71,26 @@ Requires Flutter 3.47.x (stable) and a JDK 17+.
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Drift code
 flutter test                                               # all tests
-flutter build apk --debug
+flutter build apk --release --target-platform android-arm64
 ```
 
-Output: `build/app/outputs/flutter-apk/app-debug.apk`
+Output: `build/app/outputs/flutter-apk/app-release.apk`
+(`flutter build apk --debug` for the debug build).
 
-Install on a connected device: `flutter install` or
-`adb install -r build/app/outputs/flutter-apk/app-debug.apk`.
+Install on a connected device:
+`adb install -r build/app/outputs/flutter-apk/app-release.apk`.
 
 ## How the project is laid out
 
 | Path | What lives there |
 |---|---|
-| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still and the day's creature, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields, calendar suggestions. No Flutter, no database. |
+| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still and the day's creature, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields, calendar suggestions, and the narrator's words (`narrator.dart`). No Flutter, no database. |
 | `lib/data/` | Local SQLite storage (Drift): schema and its migrations, seeded quests, the repository, the JSON backup. |
 | `lib/export/` | The Markdown export: the three documents as pure text builders, the queue, and the door to the vault folder. |
 | `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. Also the device door: reading the calendar, reading steps and glucose from Health Connect, and the one local reminder. |
 | `lib/device/` | The app's side of the device door, with a do-nothing version so the app is whole without any of it. |
 | `lib/state/` | One controller that the screens listen to. |
-| `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout; `tour/` holds the first-run tour and the one-time screen hints. |
+| `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout; `tour/` holds the first-run tour and the one-time screen hints; `story/` holds the prologue, the chapter pages and the Chronicle; `motion.dart` and `feel.dart` hold the app's motion and haptics. |
 | `lib/ui/art/` | Code-drawn stand-in art, and the widgets that show the illustrated pieces (see ASSETS.md). |
 | `assets/art/` | The illustrated pieces: ten portraits and the first Discovery card. |
 | `test/rules/` | Unit tests for every rule. |

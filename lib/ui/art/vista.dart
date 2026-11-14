@@ -49,6 +49,7 @@ class _Hour {
     required this.stars,
     required this.shade,
     required this.shadeAmount,
+    this.disc = true,
   });
 
   /// Top to horizon.
@@ -66,6 +67,11 @@ class _Hour {
   /// The land is mixed toward this colour by [shadeAmount].
   final Color shade;
   final double shadeAmount;
+
+  /// Whether the sun is drawn as a disc. Low suns are; a high sun and the
+  /// moon are only their light, so nothing pale sits behind the words that
+  /// are set over the sky.
+  final bool disc;
 
   static const _Hour morning = _Hour(
     sky: <Color>[
@@ -90,13 +96,14 @@ class _Hour {
       Color(0xFFB5D3D6),
       Color(0xFFF1E2B7),
     ],
-    sun: Offset(0.68, 0.24),
+    sun: Offset(0.72, -0.08),
     sunColor: Color(0xFFFFFBE8),
     glow: Color(0xFFFFF1BF),
-    glowStrength: 0.5,
+    glowStrength: 0.55,
     stars: 0,
     shade: Palette.forest,
     shadeAmount: 0,
+    disc: false,
   );
 
   static const _Hour evening = _Hour(
@@ -122,13 +129,14 @@ class _Hour {
       Color(0xFF1F3858),
       Color(0xFF304B66),
     ],
-    sun: Offset(0.72, 0.24),
+    sun: Offset(0.78, 0.04),
     sunColor: Color(0xFFEFF2E6),
     glow: Color(0xFFBFD3E6),
-    glowStrength: 0.32,
+    glowStrength: 0.3,
     stars: 1,
     shade: Color(0xFF0C1B33),
     shadeAmount: 0.52,
+    disc: false,
   );
 
   static _Hour of(PartOfDay part) => switch (part) {
@@ -230,14 +238,11 @@ class VistaPainter extends CustomPainter {
           stops: const <double>[0.0, 0.35, 1.0],
         ).createShader(Rect.fromCircle(center: sun, radius: glowRadius)),
     );
-    final disc = math.min(w, h) * (part == PartOfDay.night ? 0.07 : 0.085);
-    canvas.drawCircle(sun, disc, Paint()..color = _tone(hour.sunColor));
-    if (part == PartOfDay.night) {
-      // A crescent: the sky's own colour laid over part of the disc.
+    if (hour.disc) {
       canvas.drawCircle(
-        sun.translate(disc * 0.42, -disc * 0.16),
-        disc * 0.86,
-        Paint()..color = _tone(hour.sky[1]),
+        sun,
+        math.min(w, h) * 0.085,
+        Paint()..color = _tone(hour.sunColor),
       );
     }
 
