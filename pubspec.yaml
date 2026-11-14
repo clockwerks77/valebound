@@ -28,6 +28,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # Illustrated art, made to docs/STYLE.md and listed in ASSETS.md. Bundled:
+  # nothing is fetched at runtime.
+  assets:
+    - assets/art/portraits/
+    - assets/art/discoveries/
+
   # Fonts are bundled so nothing is fetched at runtime. Both are SIL Open
   # Font License 1.1; licence texts sit beside the files.
   fonts:

@@ -5,6 +5,8 @@ import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../board/board_screen.dart';
+import '../celebrations.dart';
+import '../health/health_note.dart';
 import '../log/quest_log_screen.dart';
 import '../map/map_panel.dart';
 import '../party/party_sheet.dart';
@@ -41,6 +43,8 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   int _index = 0;
+  GameController? _game;
+  bool _marking = false;
 
   @override
   void initState() {
@@ -49,9 +53,47 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_game == null) {
+      _game = GameScope.read(context)..addListener(_onGame);
+      // Anything that happened while the app was opening.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onGame());
+    }
+  }
+
+  @override
   void dispose() {
+    _game?.removeListener(_onGame);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Marks the moments the app made by itself: a steps quest reaching its
+  /// target, or being opened from Health Connect's "why" link.
+  void _onGame() {
+    final game = _game;
+    if (!mounted || game == null || _marking) return;
+    final done = game.takeAutoCompletions();
+    final reason = game.launchReason;
+    if (done.isEmpty && reason == null) return;
+    game.launchReason = null;
+    _marking = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (!mounted) return;
+        final navigator = Navigator.of(context, rootNavigator: true);
+        for (final auto in done) {
+          if (!navigator.mounted) return;
+          await celebrate(navigator.context, auto.outcome, questId: auto.questId);
+        }
+        if (reason == 'health_rationale' && navigator.mounted) {
+          await showHealthNote(navigator.context);
+        }
+      } finally {
+        _marking = false;
+      }
+    });
   }
 
   @override
@@ -59,8 +101,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     if (!mounted) return;
     final game = GameScope.read(context);
     if (state == AppLifecycleState.resumed) {
-      // Coming back to the app may mean a new day has begun.
-      game.refresh();
+      // Coming back to the app may mean a new day has begun, more steps
+      // walked, or a calendar that has changed.
+      game.resumed();
     } else {
       // Leaving: commit anything still inside its Undo window.
       game.flushPending();

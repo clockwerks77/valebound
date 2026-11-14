@@ -93,14 +93,14 @@ is checked against.
 
 | File | Size | Subject | Status |
 |---|---|---|---|
-| `portraits/hero_lamplighter.png` | 1024×1024 | traveller in an amber cloak carrying a small glass lantern | needed-from-Adam |
-| `portraits/hero_riverwarden.png` | 1024×1024 | traveller in a river-blue cloak with a reed-and-wave clasp | needed-from-Adam |
-| `portraits/hero_emberkeeper.png` | 1024×1024 | traveller in a rust-red cloak warmed by firelight | needed-from-Adam |
+| `assets/art/portraits/hero_lamplighter.jpg` | 512×512 | `Subject: an older woman traveller with silver hair tied back and a kind lined face, wearing an amber hooded cloak fastened at the neck over a high-collared tunic, holding up a small lit glass lantern, shown from the chest up, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 (second try) |
+| `assets/art/portraits/hero_riverwarden.jpg` | 512×512 | `Subject: a young woman traveller with dark braided hair and warm brown skin in a river-blue hooded cloak with a small silver wave clasp, calm friendly expression, shown from the chest up, centred, simple soft background.` | generated 14 Nov 2026 |
+| `assets/art/portraits/hero_emberkeeper.jpg` | 512×512 | `Subject: a broad-shouldered traveller with a short red-brown beard and a warm smile, wearing a rust-red hooded cloak fastened at the neck over a cream tunic, shown from the chest up, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 (second try) |
 | `assets/art/portraits/companion_cat.jpg` | 512×512 | `Subject: a composed grey cat with gold eyes, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 (second try; the first came out too dark) |
-| `portraits/companion_fox.png` | 1024×1024 | a bright-eyed red fox with a white chest | needed-from-Adam |
-| `portraits/companion_owl.png` | 1024×1024 | a small brown owl with large amber eyes | needed-from-Adam |
-| `portraits/companion_hare.png` | 1024×1024 | a sandy-brown hare with tall ears | needed-from-Adam |
-| `portraits/companion_clockwork_sprite.png` | 1024×1024 | a small brass clockwork sprite with a wind-up key, glass wings and gentle teal-lit eyes | needed-from-Adam |
+| `assets/art/portraits/companion_fox.jpg` | 512×512 | `Subject: a bright-eyed red fox with a white chest, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 |
+| `assets/art/portraits/companion_owl.jpg` | 512×512 | `Subject: a small brown owl with large amber eyes, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026; cropped in a little |
+| `assets/art/portraits/companion_hare.jpg` | 512×512 | `Subject: a sandy-brown hare with tall ears, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 |
+| `assets/art/portraits/companion_clockwork_sprite.jpg` | 512×512 | `Subject: a small friendly brass clockwork sprite with a wind-up key on its back, glass wings and gentle teal-lit eyes, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026; shading is glossier than the rest, a candidate to redo |
 
 ### Scenes
 

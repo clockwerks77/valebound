@@ -9,9 +9,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/app.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
+import 'package:habit_adventure/device/device_port.dart';
 import 'package:habit_adventure/export/vault_port.dart';
 import 'package:habit_adventure/rules/enums.dart';
 import 'package:habit_adventure/state/game_controller.dart';
+import 'package:habit_adventure/ui/art/painted.dart';
 
 /// Screen sizes for the test matrix in DESIGN §9.1. The two Fold sizes come
 /// from the Galaxy Z Fold 8's published panel resolutions (1248×1972 cover,
@@ -136,6 +138,106 @@ class MemoryVault implements VaultPort {
   Future<String?> openDocument() async => documentToOpen;
 }
 
+/// A device held in memory, standing in for the Android side: a calendar,
+/// a step counter and a reminder list the test controls.
+class MemoryDevice implements DevicePort {
+  MemoryDevice({
+    this.calendarPermission = false,
+    this.grantCalendar = true,
+    this.steps = StepsAccess.notConnected,
+    this.grantSteps = true,
+    this.stepCount,
+    this.notifications = false,
+    this.grantNotifications = true,
+    this.launchReason,
+  });
+
+  bool calendarPermission;
+
+  /// What the user answers when asked for the calendar.
+  bool grantCalendar;
+  List<DeviceCalendar> calendarList = const <DeviceCalendar>[
+    DeviceCalendar(id: '1', name: 'Personal', account: 'adam'),
+    DeviceCalendar(id: '2', name: 'Work', account: 'adam'),
+  ];
+  List<CalendarEvent> events = <CalendarEvent>[];
+
+  StepsAccess steps;
+
+  /// What the user answers when asked for steps.
+  bool grantSteps;
+  int? stepCount;
+  int stepReads = 0;
+
+  bool notifications;
+  bool grantNotifications;
+  List<ReminderRequest> reminders = const <ReminderRequest>[];
+  int reminderSyncs = 0;
+  String? launchReason;
+
+  @override
+  Future<bool> calendarGranted() async => calendarPermission;
+
+  @override
+  Future<bool> requestCalendar() async {
+    calendarPermission = calendarPermission || grantCalendar;
+    return calendarPermission;
+  }
+
+  @override
+  Future<List<DeviceCalendar>> calendars() async =>
+      calendarPermission ? calendarList : const <DeviceCalendar>[];
+
+  @override
+  Future<List<CalendarEvent>> eventsBetween(DateTime start, DateTime end) async {
+    if (!calendarPermission) return const <CalendarEvent>[];
+    return <CalendarEvent>[
+      for (final e in events)
+        if (e.begin.isBefore(end) && e.end.isAfter(start)) e,
+    ];
+  }
+
+  @override
+  Future<StepsAccess> stepsAccess() async => steps;
+
+  @override
+  Future<StepsAccess> requestSteps() async {
+    if (steps == StepsAccess.notConnected && grantSteps) {
+      steps = StepsAccess.connected;
+    }
+    return steps;
+  }
+
+  @override
+  Future<int?> stepsBetween(DateTime start, DateTime end) async {
+    stepReads++;
+    return steps == StepsAccess.connected ? stepCount : null;
+  }
+
+  @override
+  Future<bool> notificationsAllowed() async => notifications;
+
+  @override
+  Future<bool> requestNotifications() async {
+    notifications = notifications || grantNotifications;
+    return notifications;
+  }
+
+  @override
+  Future<bool> syncReminders(List<ReminderRequest> next) async {
+    reminders = List<ReminderRequest>.of(next);
+    reminderSyncs++;
+    return true;
+  }
+
+  @override
+  Future<String?> takeLaunchReason() async {
+    final reason = launchReason;
+    launchReason = null;
+    return reason;
+  }
+}
+
 /// A running app on an in-memory database with a clock the test controls.
 class TestApp {
   TestApp(this.now);
@@ -151,14 +253,17 @@ class TestApp {
     bool withProfile = true,
     bool withHistory = false,
     VaultPort? vault,
+    DevicePort? device,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
     app.db = AppDatabase(NativeDatabase.memory());
     app.repo = GameRepository(app.db, clock: () => app.now);
-    app.game = vault == null
-        ? GameController(app.repo)
-        : GameController(app.repo, vault: vault);
+    app.game = GameController(
+      app.repo,
+      vault: vault ?? const NoVault(),
+      device: device ?? const NoDevice(),
+    );
     addTearDown(app.db.close);
 
     await tester.runAsync(() async {
@@ -179,6 +284,14 @@ class TestApp {
     });
 
     await tester.pumpWidget(HabitAdventureApp(controller: app.game));
+    // Decode the illustrated art before the first frame is judged, so
+    // screenshots show the portraits and not an empty ring.
+    final context = tester.element(find.byType(HabitAdventureApp));
+    await tester.runAsync(() async {
+      for (final asset in allPaintedAssets) {
+        await precacheImage(AssetImage(asset), context);
+      }
+    });
     await tester.pumpAndSettle();
     return app;
   }

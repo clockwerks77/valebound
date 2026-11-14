@@ -15,6 +15,7 @@ import '../theme/app_theme.dart';
 import '../theme/palette.dart';
 import 'adaptive.dart';
 import 'art/crests.dart';
+import 'art/painted.dart';
 import 'widgets/common.dart';
 import 'widgets/v_icon.dart';
 
@@ -485,7 +486,10 @@ Future<void> showDiscovery(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Roundel(icon: 'lantern', color: Palette.goldDeep, size: 72),
+              if (DiscoveryPicture.exists(scene.key))
+                DiscoveryPicture(sceneKey: scene.key)
+              else
+                const Roundel(icon: 'lantern', color: Palette.goldDeep, size: 72),
               const SizedBox(height: 12),
               Text(
                 'DISCOVERY $number',

@@ -3,12 +3,13 @@ import 'package:flutter/widgets.dart';
 import '../../rules/enums.dart';
 import '../../theme/palette.dart';
 import '../widgets/v_icon.dart' show VIcon, parseSvgPath;
+import 'painted.dart';
 
-// Code-drawn crest medallions for the hero and each companion kind.
+// Portraits for the hero and each companion kind.
 //
-// These are Phase 1 stand-ins, listed as such in ASSETS.md: the painterly
-// portraits the design calls for need an illustration tool this build
-// environment does not have. Shapes are original and drawn on a 100-unit grid.
+// Where an illustrated portrait exists (`painted.dart`, ASSETS.md) it is
+// shown. Otherwise the code-drawn crest below stands in: original shapes on a
+// 100-unit grid, listed as stand-ins in ASSETS.md.
 
 enum _R { fur, furDark, light, ink, accent }
 
@@ -286,6 +287,9 @@ class CompanionPortrait extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badge = size * 0.36;
+    final Widget crest = CustomPaint(
+      painter: _CrestPainter(_companionCrests[kind]!, Palette.companion),
+    );
     return Semantics(
       label: '${kind.label} portrait',
       image: true,
@@ -296,9 +300,14 @@ class CompanionPortrait extends StatelessWidget {
           clipBehavior: Clip.none,
           children: <Widget>[
             Positioned.fill(
-              child: CustomPaint(
-                painter: _CrestPainter(_companionCrests[kind]!, Palette.companion),
-              ),
+              child: companionArt[kind] == null
+                  ? crest
+                  : PaintedMedallion(
+                      asset: companionArt[kind]!,
+                      ring: Palette.companion,
+                      size: size,
+                      fallback: crest,
+                    ),
             ),
             if (gearIcon != null)
               Positioned(
@@ -344,18 +353,23 @@ class HeroPortrait extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final crest = _heroCrests[portraitId] ?? _heroCrests['wayfarer']!;
+    final ring = frame == null ? Palette.gold : frameColor(frame!);
+    final Widget drawn = CustomPaint(painter: _CrestPainter(crest, ring));
+    final art = heroArt[portraitId];
     return Semantics(
       label: 'Hero portrait',
       image: true,
       child: SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(
-          painter: _CrestPainter(
-            crest,
-            frame == null ? Palette.gold : frameColor(frame!),
-          ),
-        ),
+        child: art == null
+            ? drawn
+            : PaintedMedallion(
+                asset: art,
+                ring: ring,
+                size: size,
+                fallback: drawn,
+              ),
       ),
     );
   }
