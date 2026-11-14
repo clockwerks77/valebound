@@ -223,6 +223,67 @@ class HealthEntries extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+/// One weekly Delve, once it has been resolved (DESIGN §3B, §4.2). Added in
+/// schema 3.
+@DataClassName('DelveRow')
+class Delves extends Table {
+  TextColumn get id => text()();
+
+  /// The Delve day that closes the week: the week is the seven days ending
+  /// here.
+  TextColumn get weekEnd => text().unique()();
+  DateTimeColumn get resolvedAt => dateTime()();
+  TextColumn get site => text()();
+
+  /// `cleared`, `scouted` or `rested`.
+  TextColumn get tier => text()();
+  IntColumn get provisions => integer().withDefault(const Constant(0))();
+  IntColumn get trailMarks => integer().withDefault(const Constant(0))();
+  IntColumn get keys => integer().withDefault(const Constant(0))();
+  IntColumn get daysActive => integer().withDefault(const Constant(0))();
+  IntColumn get gold => integer().withDefault(const Constant(0))();
+
+  /// How many of each material came home.
+  IntColumn get eachMaterial => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// What the user decided about one calendar event on one day: accepted as a
+/// quest, or dismissed (DESIGN §9.3). The calendar itself is never changed.
+/// Added in schema 3.
+@DataClassName('CalendarChoiceRow')
+class CalendarChoices extends Table {
+  TextColumn get id => text()();
+  TextColumn get day => text()();
+
+  /// The event instance: event id and start time.
+  TextColumn get externalId => text()();
+
+  /// `accepted` or `dismissed`.
+  TextColumn get choice => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {day, externalId},
+      ];
+}
+
+/// Simple settings, kept beside the data so the JSON backup carries them.
+/// Added in schema 3.
+@DataClassName('SettingRow')
+class AppSettings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
+}
+
 @DriftDatabase(
   tables: [
     Quests,
@@ -233,15 +294,19 @@ class HealthEntries extends Table {
     WorldStates,
     DayLogs,
     HealthEntries,
+    Delves,
+    CalendarChoices,
+    AppSettings,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
 
   /// 1: Phase 1. 2: Phase 2 (completion extras, Fetch flag, the day's quest
-  /// total, equipped cosmetics and gear).
+  /// total, equipped cosmetics and gear). 3: Phase 3 (Delves, calendar
+  /// choices, settings; system keys on the two seeded health quests).
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// Data survives every update (DESIGN §9.2): an older database is carried
   /// forward step by step and nothing in it is rewritten or dropped.
@@ -256,8 +321,28 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(dayLogs, dayLogs.fetchGranted);
             await m.addColumn(dayLogs, dayLogs.questsTotal);
           }
+          if (from < 3) {
+            await m.createTable(delves);
+            await m.createTable(calendarChoices);
+            await m.createTable(appSettings);
+            await tagSeededHealthQuests();
+          }
         },
       );
+
+  /// The two seeded health quests gain their behaviour by key, so renaming
+  /// them later changes nothing. Only untouched seeds are tagged: a quest
+  /// the user has already renamed is theirs to define.
+  Future<void> tagSeededHealthQuests() async {
+    await customStatement(
+      "UPDATE quests SET system_key = 'health_check' "
+      "WHERE system_key IS NULL AND name = 'Morning Health Check'",
+    );
+    await customStatement(
+      "UPDATE quests SET system_key = 'injection' "
+      "WHERE system_key IS NULL AND name = 'Weekly Injection (Mounjaro)'",
+    );
+  }
 
   static QueryExecutor _open() {
     return driftDatabase(

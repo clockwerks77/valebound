@@ -6,11 +6,20 @@ import 'database.dart';
 /// System quest keys.
 const String systemKeyCampfire = 'campfire';
 
+/// Completing it opens the Health Log (DESIGN §12 item 5).
+const String systemKeyHealthCheck = 'health_check';
+
+/// Completing it offers an optional dose note (DESIGN §12 item 6).
+const String systemKeyInjection = 'injection';
+
+/// The single quest offered after time away (DESIGN §4.3).
+const String systemKeyComeback = 'comeback';
+
 /// First-run quests, DESIGN §12. All are editable and archivable.
 ///
 /// "Today's Commitment" (§12 item 3) is a template for accepted calendar
-/// suggestions rather than a fixed quest, so it has no row here; it arrives
-/// with calendar suggestions in Phase 3.
+/// suggestions rather than a fixed quest, so it has no row here: each
+/// accepted suggestion becomes one (see `GameRepository.acceptSuggestion`).
 List<QuestsCompanion> seedQuests({
   required DateTime now,
   required String Function() newId,
@@ -91,7 +100,7 @@ List<QuestsCompanion> seedQuests({
       active: activateFiveMinuteReset,
       sortOrder: 30,
     ),
-    // 2. Fills from Health Connect in Phase 3; manual tap until then.
+    // 2. Fills from Health Connect when connected; a tap always works.
     quest(
       name: '7,000 Steps',
       icon: 'boot',
@@ -117,7 +126,7 @@ List<QuestsCompanion> seedQuests({
       target: 60,
       sortOrder: 50,
     ),
-    // 5. Opens the Health Log in Phase 3.
+    // 5. Opens the Health Log.
     quest(
       name: 'Morning Health Check',
       icon: 'sprig',
@@ -126,6 +135,7 @@ List<QuestsCompanion> seedQuests({
       track: Track.hero,
       scheduleType: ScheduleType.daily,
       type: CompletionType.tap,
+      systemKey: systemKeyHealthCheck,
       sortOrder: 5,
     ),
     // 6. Weekly, Saturday, with an optional dose note.
@@ -139,6 +149,7 @@ List<QuestsCompanion> seedQuests({
       weekdays: '6',
       type: CompletionType.tap,
       notes: 'Add a dose note when you complete it, if you like.',
+      systemKey: systemKeyInjection,
       sortOrder: 60,
     ),
     // 7. The ritual that closes the day.

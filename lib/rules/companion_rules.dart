@@ -50,12 +50,12 @@ const List<Trick> companionTricks = <Trick>[
   ),
 ];
 
-/// Tricks whose effect is live in this build. Comfort unlocks on schedule
-/// and comes into play with the comeback quest (DECISIONS.md D-28).
+/// Tricks whose effect is live in this build: all five.
 const Set<String> tricksInPlay = <String>{
   'sniff_out',
   'fetch',
   'scout',
+  'comfort',
   'old_friend',
 };
 

@@ -65,6 +65,8 @@ class CompletionOutcome {
     this.newRestorationIndexes = const <int>[],
     this.newGear = const <String>[],
     this.newCosmetics = const <String>[],
+    this.bonusHeroXp = 0,
+    this.comfortBond = 0,
   });
 
   final Award award;
@@ -96,11 +98,22 @@ class CompletionOutcome {
   final List<String> newGear;
   final List<String> newCosmetics;
 
+  /// Extra hero XP on top of the difficulty's own: the welcome that comes
+  /// with the comeback quest (DESIGN §4.3).
+  final int bonusHeroXp;
+
+  /// Extra Bond from Comfort, when the companion presents the comeback
+  /// quest (DESIGN §7A.3).
+  final int comfortBond;
+
+  /// Hero XP this completion gave in all.
+  int get heroXpGained => award.heroXp + bonusHeroXp;
+
   /// Heroic and Boss quests wake a Still creature when they are done.
   bool get clearsStill =>
       difficulty == Difficulty.heroic || difficulty == Difficulty.boss;
 
-  int get totalBond => award.bond + bondBonus;
+  int get totalBond => award.bond + bondBonus + comfortBond;
   bool get heroLevelledUp => after.heroLevel > before.heroLevel;
   bool get companionLevelledUp => after.companionLevel > before.companionLevel;
   bool get attributeLevelledUp =>
@@ -119,6 +132,9 @@ class CompletionOutcome {
 /// [fetchAvailable] is true while today's Fetch has not been made. Fetch
 /// carries one material the current restoration still needs, on a companion
 /// or shared quest, once the companion has learned it.
+///
+/// [bonusHeroXp] and [bonusBond] are extras a system quest may carry (the
+/// comeback quest, DESIGN §4.3 and §7A.3). They only ever add.
 CompletionOutcome applyCompletion({
   required PartyTotals totals,
   required Difficulty difficulty,
@@ -127,12 +143,17 @@ CompletionOutcome applyCompletion({
   bool bondLevelBonusGrantedToday = false,
   MaterialKind? sniffOutFind,
   bool fetchAvailable = false,
+  int bonusHeroXp = 0,
+  int bonusBond = 0,
 }) {
   final award = awardFor(difficulty: difficulty, track: track);
+  final extraXp = bonusHeroXp < 0 ? 0 : bonusHeroXp;
+  final extraBond = bonusBond < 0 ? 0 : bonusBond;
 
   final attributeXp = Map<Attribute, int>.of(totals.attributeXp);
-  if (award.attributeXp > 0) {
-    attributeXp[attribute] = (attributeXp[attribute] ?? 0) + award.attributeXp;
+  if (award.attributeXp + extraXp > 0) {
+    attributeXp[attribute] =
+        (attributeXp[attribute] ?? 0) + award.attributeXp + extraXp;
   }
 
   final materials = Map<MaterialKind, int>.of(totals.materials);
@@ -172,10 +193,10 @@ CompletionOutcome applyCompletion({
   final paces = totals.paces + award.paces;
 
   final after = PartyTotals(
-    heroXp: totals.heroXp + award.heroXp,
+    heroXp: totals.heroXp + award.heroXp + extraXp,
     attributeXp: Map<Attribute, int>.unmodifiable(attributeXp),
     companionXp: companionXp,
-    bond: totals.bond + award.bond + bonus,
+    bond: totals.bond + award.bond + bonus + extraBond,
     paces: paces,
     gold: totals.gold + award.gold,
     materials: Map<MaterialKind, int>.unmodifiable(materials),
@@ -211,6 +232,8 @@ CompletionOutcome applyCompletion({
         restored: after.restored,
       ),
     ),
+    bonusHeroXp: extraXp,
+    comfortBond: extraBond,
   );
 }
 

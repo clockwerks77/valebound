@@ -6,8 +6,10 @@ import 'package:uuid/uuid.dart';
 import '../rules/companion_rules.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
+import '../rules/delve.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
+import '../rules/health_fields.dart';
 import '../rules/journey.dart';
 import '../rules/progression.dart';
 import '../rules/schedule.dart';
@@ -15,6 +17,7 @@ import '../rules/world.dart';
 import '../rules/xp_curve.dart';
 import 'database.dart';
 import 'seed.dart';
+import 'settings.dart';
 
 /// One quest as it stands on a given day's board.
 class BoardQuest {
@@ -57,6 +60,7 @@ class QuestDraft {
     this.completionType = CompletionType.tap,
     this.target,
     this.notes = '',
+    this.reminderTime,
   });
 
   factory QuestDraft.fromRow(QuestRow q) => QuestDraft(
@@ -70,6 +74,7 @@ class QuestDraft {
         completionType: q.completionType,
         target: q.target,
         notes: q.notes,
+        reminderTime: q.reminderTime,
       );
 
   String? id;
@@ -82,6 +87,9 @@ class QuestDraft {
   CompletionType completionType;
   int? target;
   String notes;
+
+  /// `HH:mm`, or null for no reminder (the default, DESIGN §6.1).
+  String? reminderTime;
 
   bool get isValid => name.trim().isNotEmpty && attribute != null;
 }
@@ -163,6 +171,60 @@ class BackupResult {
   final bool ok;
   final String message;
 }
+
+/// An Auto quest the app completed by itself when the day's steps reached
+/// its target.
+class AutoCompletion {
+  const AutoCompletion(this.questId, this.outcome);
+  final String questId;
+  final CompletionOutcome outcome;
+}
+
+/// The weekly Delve, waiting to be entered at the Campfire.
+class DelveWaiting {
+  const DelveWaiting({
+    required this.delveDay,
+    required this.site,
+    required this.supplies,
+  });
+
+  /// The day that closes the week.
+  final String delveDay;
+  final String site;
+  final DelveSupplies supplies;
+
+  DelveTier get tier => tierFor(supplies);
+  DelveReward get reward => rewardFor(tier);
+}
+
+/// What came of entering the Delve.
+class DelveResult {
+  const DelveResult({
+    required this.delveDay,
+    required this.site,
+    required this.supplies,
+    required this.tier,
+    required this.reward,
+    required this.newRestorationIndexes,
+  });
+
+  final String delveDay;
+  final String site;
+  final DelveSupplies supplies;
+  final DelveTier tier;
+  final DelveReward reward;
+
+  /// Zero-based indexes of the places the Delve's materials restored.
+  final List<int> newRestorationIndexes;
+}
+
+/// Calendar choices, as stored.
+const String choiceAccepted = 'accepted';
+const String choiceDismissed = 'dismissed';
+
+/// Name used when a calendar event has no title of its own (DESIGN §12
+/// item 3).
+const String commitmentFallbackName = 'Today’s Commitment';
 
 /// Identifies a backup file. Deliberately not the app's display name, which
 /// may change (DESIGN: data must not depend on the name).
@@ -286,8 +348,48 @@ class GameRepository {
           }
         }
       }
+      if (plan.comebackDue) await _offerComeback(plan.today, now);
     });
     return plan;
+  }
+
+  /// Puts the single "Return to the Vale" quest on today's board (DESIGN
+  /// §4.3). One row is kept and re-dated each time, so the Quest Log never
+  /// fills with old welcomes. Nothing about the days away is recorded.
+  Future<void> _offerComeback(String today, DateTime now) async {
+    final existing = await (db.select(db.quests)
+          ..where((q) => q.systemKey.equals(systemKeyComeback))
+          ..limit(1))
+        .getSingleOrNull();
+    if (existing != null) {
+      await (db.update(db.quests)..where((q) => q.id.equals(existing.id)))
+          .write(
+        QuestsCompanion(
+          scheduleAnchorDay: Value(today),
+          active: const Value(true),
+          updatedAt: Value(now),
+        ),
+      );
+      return;
+    }
+    await db.into(db.quests).insert(
+          QuestsCompanion.insert(
+            id: newId(),
+            name: comebackQuestName,
+            iconKey: const Value('lantern'),
+            attribute: Attribute.adventure,
+            difficulty: Difficulty.minor,
+            track: Track.hero,
+            scheduleType: ScheduleType.oneOff,
+            scheduleAnchorDay: Value(today),
+            completionType: CompletionType.tap,
+            source: QuestSource.system,
+            systemKey: const Value(systemKeyComeback),
+            sortOrder: const Value(1),
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
   }
 
   /// Today's quests with their progress and completions.
@@ -398,6 +500,13 @@ class GameRepository {
         sniffOutFind:
             (log?.sniffOutGranted ?? false) ? null : sniffOutMaterial(day),
         fetchAvailable: !(log?.fetchGranted ?? false),
+        // The welcome back (DESIGN §4.3), warmer still once the companion
+        // knows Comfort (§7A.3).
+        bonusHeroXp: quest.systemKey == systemKeyComeback ? comebackBonusXp : 0,
+        bonusBond: quest.systemKey == systemKeyComeback &&
+                companionRow.level >= comfortLevel
+            ? comfortBonusBond
+            : 0,
       );
       final after = outcome.after;
 
@@ -501,7 +610,7 @@ class GameRepository {
               questId: quest.id,
               day: day,
               completedAt: now,
-              xpAwarded: outcome.award.heroXp,
+              xpAwarded: outcome.heroXpGained,
               companionXpAwarded: Value(outcome.award.companionXp),
               pacesAwarded: Value(outcome.award.paces),
               bondAwarded: Value(outcome.totalBond),
@@ -535,6 +644,9 @@ class GameRepository {
                   if (outcome.newGear.isNotEmpty) 'gear': outcome.newGear,
                   if (outcome.newCosmetics.isNotEmpty)
                     'cosmetics': outcome.newCosmetics,
+                  if (outcome.bonusHeroXp > 0) 'bonusXp': outcome.bonusHeroXp,
+                  if (outcome.comfortBond > 0)
+                    'comfortBond': outcome.comfortBond,
                 }),
               ),
             ),
@@ -649,6 +761,7 @@ class GameRepository {
               scheduleAnchorDay: Value(schedule.anchorDay),
               completionType: draft.completionType,
               target: Value(draft.target),
+              reminderTime: Value(draft.reminderTime),
               notes: Value(draft.notes.trim()),
               source: source,
               sortOrder: const Value(100),
@@ -671,6 +784,7 @@ class GameRepository {
         scheduleAnchorDay: Value(schedule.anchorDay),
         completionType: Value(draft.completionType),
         target: Value(draft.target),
+        reminderTime: Value(draft.reminderTime),
         notes: Value(draft.notes.trim()),
         updatedAt: Value(now),
       ),
@@ -834,7 +948,7 @@ class GameRepository {
     return outcome;
   }
 
-  // ---- Health entries (the quick-entry form arrives in Phase 3) -------
+  // ---- Health Log (DESIGN §8.7, §9.3) --------------------------------
 
   Future<List<HealthEntryRow>> healthEntriesOn(String day) =>
       (db.select(db.healthEntries)
@@ -870,7 +984,259 @@ class GameRepository {
     await _touchDay(day, const DayLogsCompanion());
   }
 
+  /// Today's entries by field key.
+  Future<Map<String, HealthEntryRow>> healthEntriesByKey(String day) async =>
+      <String, HealthEntryRow>{
+        for (final h in await healthEntriesOn(day)) h.fieldKey: h,
+      };
+
+  /// Records the day's step count, from Health Connect or typed by hand,
+  /// and lets it fill every Auto quest on today's board (DESIGN §6.2). A
+  /// quest that reaches its target completes itself; those are returned so
+  /// the screen can mark the moment.
+  ///
+  /// The count is information, never a score: nothing is shown or stored
+  /// about a target that was not reached.
+  Future<List<AutoCompletion>> recordSteps(int steps) async {
+    if (steps < 0) return const <AutoCompletion>[];
+    final day = DayKey.of(clock());
+    final existing = (await healthEntriesByKey(day))[stepsFieldKey];
+    if (existing?.value != '$steps') {
+      await setHealthEntry(day, stepsFieldKey, '$steps');
+    }
+    final completed = <AutoCompletion>[];
+    for (final entry in await loadBoard(day)) {
+      final quest = entry.quest;
+      if (quest.completionType != CompletionType.auto || entry.isDone) {
+        continue;
+      }
+      if (entry.banked != steps) {
+        final row = await _ensureProgress(quest.id, day);
+        await (db.update(db.questProgress)..where((p) => p.id.equals(row.id)))
+            .write(QuestProgressCompanion(progress: Value(steps)));
+      }
+      final target = quest.target ?? 0;
+      if (target > 0 && steps >= target) {
+        final outcome = await completeQuest(quest.id, progress: steps);
+        if (outcome != null) completed.add(AutoCompletion(quest.id, outcome));
+      }
+    }
+    return completed;
+  }
+
+  // ---- Calendar suggestions (DESIGN §9.3) -----------------------------
+
+  /// What was decided about each of [day]'s calendar events: event id to
+  /// `accepted` or `dismissed`.
+  Future<Map<String, String>> calendarChoicesOn(String day) async {
+    final rows = await (db.select(db.calendarChoices)
+          ..where((c) => c.day.equals(day)))
+        .get();
+    return <String, String>{for (final r in rows) r.externalId: r.choice};
+  }
+
+  Future<void> _rememberChoice(
+    String day,
+    String externalId,
+    String choice,
+  ) async {
+    await db.into(db.calendarChoices).insert(
+          CalendarChoicesCompanion.insert(
+            id: newId(),
+            day: day,
+            externalId: externalId,
+            choice: choice,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+  }
+
+  /// Accepts a calendar suggestion: it becomes today's commitment, a
+  /// one-off Confirm quest (DESIGN §12 item 3). Order by default; the user
+  /// can re-tag it like any quest. The calendar itself is never touched.
+  /// Returns the quest's id.
+  Future<String> acceptSuggestion({
+    required String externalId,
+    required String title,
+    String timeLabel = '',
+  }) async {
+    final now = clock();
+    final day = DayKey.of(now);
+    return db.transaction(() async {
+      final already = await (db.select(db.quests)
+            ..where(
+              (q) =>
+                  q.externalId.equals(externalId) &
+                  q.scheduleAnchorDay.equals(day),
+            )
+            ..limit(1))
+          .getSingleOrNull();
+      if (already != null) return already.id;
+      await _rememberChoice(day, externalId, choiceAccepted);
+      final id = newId();
+      final name = title.trim().isEmpty ? commitmentFallbackName : title.trim();
+      await db.into(db.quests).insert(
+            QuestsCompanion.insert(
+              id: id,
+              name: name,
+              iconKey: const Value('calendar'),
+              attribute: Attribute.order,
+              difficulty: Difficulty.standard,
+              track: Track.hero,
+              scheduleType: ScheduleType.oneOff,
+              scheduleAnchorDay: Value(day),
+              completionType: CompletionType.confirm,
+              notes: Value(timeLabel),
+              source: QuestSource.calendar,
+              externalId: Value(externalId),
+              sortOrder: const Value(8),
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      return id;
+    });
+  }
+
+  /// Dismisses a calendar suggestion for today. Nothing else happens: it is
+  /// simply not offered again.
+  Future<void> dismissSuggestion(String externalId) =>
+      _rememberChoice(DayKey.of(clock()), externalId, choiceDismissed);
+
+  // ---- The weekly Delve (DESIGN §3B, §4.2) ----------------------------
+
+  Future<List<DelveRow>> delves() => (db.select(db.delves)
+        ..orderBy([(d) => OrderingTerm.desc(d.weekEnd)]))
+      .get();
+
+  /// The Delve that can be entered at the Campfire now, or null.
+  ///
+  /// It opens on the chosen weekday and waits for the next Campfire if that
+  /// day goes by. At most one opens in any seven days, and none for a week
+  /// that ended before this journey began.
+  Future<DelveWaiting?> delveWaiting() async {
+    final today = DayKey.of(clock());
+    final weekday = (await settings()).delveWeekday;
+    final delveDay = latestDelveDay(today, weekday);
+    final first = await (db.select(db.dayLogs)
+          ..orderBy([(d) => OrderingTerm.asc(d.day)])
+          ..limit(1))
+        .getSingleOrNull();
+    if (first == null || delveDay.compareTo(first.day) < 0) return null;
+    final resolved = await delves();
+    if (resolved.isNotEmpty &&
+        DayKey.daysBetween(resolved.first.weekEnd, delveDay) < 7) {
+      return null;
+    }
+    final start = delveWeekStart(delveDay);
+    final week = await (db.select(db.completions)
+          ..where(
+            (c) =>
+                c.day.isBiggerOrEqualValue(start) &
+                c.day.isSmallerOrEqualValue(delveDay),
+          ))
+        .get();
+    return DelveWaiting(
+      delveDay: delveDay,
+      site: delveSiteFor(delveDay),
+      supplies: suppliesFrom(<DelveEntry>[
+        for (final c in week)
+          DelveEntry(c.day, c.trackSnapshot, c.difficultySnapshot),
+      ]),
+    );
+  }
+
+  /// Enters the waiting Delve: one screen, one outcome, and the party comes
+  /// home with something whatever the week was like. Null if none waits.
+  Future<DelveResult?> resolveDelve() async {
+    final now = clock();
+    final today = DayKey.of(now);
+    final result = await db.transaction(() async {
+      final waiting = await delveWaiting();
+      final heroRow = await hero();
+      final worldRow = await world();
+      if (waiting == null || heroRow == null || worldRow == null) return null;
+      final tier = waiting.tier;
+      final reward = waiting.reward;
+      final gathered = decodeMaterials(heroRow.materials);
+      final restoredBefore = restoredCount(gathered);
+      for (final e in reward.materials.entries) {
+        gathered[e.key] = (gathered[e.key] ?? 0) + e.value;
+      }
+      final restoredAfter = restoredCount(gathered);
+      await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+          .write(
+        CharactersCompanion(
+          gold: Value(heroRow.gold + reward.gold),
+          materials: Value(encodeMaterials(gathered)),
+        ),
+      );
+      if (restoredAfter > restoredBefore) {
+        await _recordRestorations(worldRow, restoredAfter, today);
+      }
+      await db.into(db.delves).insert(
+            DelvesCompanion.insert(
+              id: newId(),
+              weekEnd: waiting.delveDay,
+              resolvedAt: now,
+              site: waiting.site,
+              tier: tier.name,
+              provisions: Value(waiting.supplies.provisions),
+              trailMarks: Value(waiting.supplies.trailMarks),
+              keys: Value(waiting.supplies.keys),
+              daysActive: Value(waiting.supplies.daysActive),
+              gold: Value(reward.gold),
+              eachMaterial: Value(reward.eachMaterial),
+            ),
+          );
+      return DelveResult(
+        delveDay: waiting.delveDay,
+        site: waiting.site,
+        supplies: waiting.supplies,
+        tier: tier,
+        reward: reward,
+        newRestorationIndexes: <int>[
+          for (var i = restoredBefore; i < restoredAfter; i++) i,
+        ],
+      );
+    });
+    if (result != null) {
+      // Cosmetics that come with restored places, and today's file again.
+      await syncWorld();
+      await _touchDay(today, const DayLogsCompanion());
+    }
+    return result;
+  }
+
   // ---- Settings ------------------------------------------------------
+
+  Future<GameSettings> settings() async => GameSettings.fromMap(
+        <String, String>{
+          for (final r in await db.select(db.appSettings).get()) r.key: r.value,
+        },
+      );
+
+  /// Stores one setting; null puts it back to its default.
+  Future<void> setSetting(String key, String? value) async {
+    if (value == null) {
+      await (db.delete(db.appSettings)..where((s) => s.key.equals(key))).go();
+      return;
+    }
+    await db.into(db.appSettings).insertOnConflictUpdate(
+          AppSettingsCompanion.insert(key: key, value: value),
+        );
+  }
+
+  Future<void> setDelveWeekday(int weekday) =>
+      setSetting(SettingKey.delveWeekday, '$weekday');
+
+  Future<void> setHealthFields(List<HealthField> fields) =>
+      setSetting(SettingKey.healthFields, encodeHealthFields(fields));
+
+  Future<void> setExcludedCalendars(Set<String> ids) => setSetting(
+        SettingKey.calendarExcluded,
+        jsonEncode(ids.toList()..sort()),
+      );
 
   Future<void> renameHero(String name) async {
     final heroRow = await hero();
@@ -970,6 +1336,13 @@ class GameRepository {
       'healthEntries': [
         for (final r in await db.select(db.healthEntries).get()) r.toJson(),
       ],
+      'delves': [for (final r in await db.select(db.delves).get()) r.toJson()],
+      'calendarChoices': [
+        for (final r in await db.select(db.calendarChoices).get()) r.toJson(),
+      ],
+      'settings': [
+        for (final r in await db.select(db.appSettings).get()) r.toJson(),
+      ],
     };
     return const JsonEncoder.withIndent('  ').convert(<String, Object>{
       'format': backupFormat,
@@ -1022,6 +1395,11 @@ class GameRepository {
       final dayLogs = rows('dayLogs').map(DayLogRow.fromJson).toList();
       final health =
           rows('healthEntries').map(HealthEntryRow.fromJson).toList();
+      // Tables that arrived with schema 3; absent from an older backup.
+      final delveRows = rows('delves').map(DelveRow.fromJson).toList();
+      final choices =
+          rows('calendarChoices').map(CalendarChoiceRow.fromJson).toList();
+      final settingRows = rows('settings').map(SettingRow.fromJson).toList();
       if (characters.isEmpty || companions.isEmpty || worlds.isEmpty) {
         return notABackup;
       }
@@ -1038,7 +1416,13 @@ class GameRepository {
           b.insertAll(db.worldStates, worlds);
           b.insertAll(db.dayLogs, dayLogs);
           b.insertAll(db.healthEntries, health);
+          b.insertAll(db.delves, delveRows);
+          b.insertAll(db.calendarChoices, choices);
+          b.insertAll(db.appSettings, settingRows);
         });
+        // A backup from before schema 3 has the two seeded health quests
+        // without their keys; give them the same step the upgrade does.
+        if (schema < 3) await db.tagSeededHealthQuests();
       });
     } on Object {
       // A row that does not fit the tables: leave everything as it was.

@@ -4,6 +4,19 @@ import 'day_key.dart';
 /// DESIGN §4.3: "not opened for 2+ days". See DECISIONS.md D-11.
 const int comebackAfterFullDaysAway = 2;
 
+/// The single quest offered after time away (DESIGN §4.3): Minor, with
+/// bonus XP. It stands beside today's ordinary board; nothing from the days
+/// away is listed anywhere.
+const String comebackQuestName = 'Return to the Vale';
+
+/// Bonus hero XP on the comeback quest, on top of a Minor quest's 10: the
+/// welcome is worth a Standard quest in all (DECISIONS.md D-48).
+const int comebackBonusXp = 15;
+
+/// Bonus Bond when the companion knows Comfort and presents the comeback
+/// quest (DESIGN §7A.3).
+const int comfortBonusBond = 2;
+
 /// What the app should do the first time it is opened on a given day.
 class DawnPlan {
   const DawnPlan({

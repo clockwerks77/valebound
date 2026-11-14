@@ -196,13 +196,13 @@ so the format cannot drift without the change being made here on purpose.
 | Both postures; nothing critical on the crease; dialogs in one pane | `test/golden/screens_golden_test.dart` |
 | No guilt copy, no banned names, no network packages | `test/copy/copy_audit_test.dart` |
 
-**Not yet verified on a real device:** the folder picker, writing into a
-real vault folder, the Share sheet, and saving or opening a backup file.
-These go through Android's own pickers, which no automated test here can
-drive. The Android code for them compiles and the logic above it is tested
-against a stand-in folder, but until you run steps 3, 4, 5 and 7 on the Fold
-I cannot say they work there. If one does not, tell me what you saw and I
-will fix it.
+**Confirmed on the Galaxy Z Fold 8 by Adam, 13 November 2026:** picked the
+vault folder, completed quests, closed the day at the Campfire with a note,
+and sent back the three files the app wrote (`Character Sheet.md`,
+`Quests.md`, `Daily/2026-11-13.md`). All three match §11 and the numbers in
+them add up against the rules. Saving a backup also worked.
+
+**Still not confirmed on a device:** Share… and restoring from a backup.
 
 Also worth knowing:
 
