@@ -539,7 +539,7 @@ void main() {
       await play();
       final backup = await repo.exportBackupJson();
       final decoded = jsonDecode(backup) as Map<String, dynamic>;
-      expect(decoded['schema'], 3);
+      expect(decoded['schema'], 4);
       final tables = decoded['tables'] as Map<String, dynamic>;
       expect((tables['delves'] as List<dynamic>).length, 1);
       expect((tables['calendarChoices'] as List<dynamic>).length, 2);

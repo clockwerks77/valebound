@@ -59,7 +59,9 @@ class ExportService {
         if (log.exportedAt == null &&
             (daysWithContent.contains(log.day) ||
                 log.campfireAt != null ||
-                log.dayNote.trim().isNotEmpty))
+                log.dayNote.trim().isNotEmpty ||
+                // A day with only a fight in it is still a day.
+                log.encounter != null))
           log.day,
     ];
   }
