@@ -110,8 +110,9 @@ void main() {
       expect(map.paces, app.game.world!.journeyPaces);
       expect(map.discoveries, app.game.discoveries.length);
 
-      await reveal(tester, find.text(app.game.target.name).first);
-      expect(find.textContaining('WORKING TOWARD'), findsOneWidget);
+      await reveal(tester, find.textContaining('WORKING TOWARD'));
+      expect(find.text(app.game.target.name), findsWidgets);
+      expect(find.text('Restored'), findsOneWidget, reason: 'the map key');
       await reveal(tester, find.text('Places'));
       expect(find.text('Hearthmere'), findsWidgets);
     });
@@ -122,8 +123,8 @@ void main() {
       await TestApp.start(tester, now: saturday);
       await openTab(tester, 'Map');
       expect(find.text('Asleep, for now'), findsOneWidget);
-      await reveal(tester, find.text('The Gate Lantern').first);
-      expect(find.text('WORKING TOWARD · HEARTHMERE'), findsOneWidget);
+      await reveal(tester, find.text('WORKING TOWARD · HEARTHMERE'));
+      expect(find.text('The Gate Lantern'), findsWidgets);
     });
 
     testWidgets('a Heroic quest shows its Still creature until it is done',
