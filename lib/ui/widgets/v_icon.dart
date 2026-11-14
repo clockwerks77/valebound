@@ -21,6 +21,21 @@ class VIcon extends StatelessWidget {
   }
 }
 
+/// Paints the icon [name] centred on [center], [size] units across. For
+/// painters that place icons on a canvas of their own, such as the map.
+void paintVIcon(
+  Canvas canvas,
+  String name,
+  Offset center,
+  double size,
+  Color color,
+) {
+  canvas.save();
+  canvas.translate(center.dx - size / 2, center.dy - size / 2);
+  _VIconPainter(name, color).paint(canvas, Size(size, size));
+  canvas.restore();
+}
+
 String attributeIcon(Attribute a) => switch (a) {
       Attribute.vitality => 'sprig',
       Attribute.care => 'home',
@@ -111,6 +126,137 @@ const Map<String, _Spec> _icons = <String, _Spec>{
   'lantern': _Spec(strokes: <String>['M9.5 4 H14.5', 'M12 4 V6.5', 'M8 6.5 H16 L17 9 V16.5 L16 19 H8 L7 16.5 V9 Z', 'M12 11 C13.4 12.4 13.4 14 12 15 C10.6 14 10.6 12.4 12 11 Z']),
   'trick': _Spec(strokes: <String>['M12 3.5 L13.6 9 L19 10.4 L13.6 12 L12 17.5 L10.4 12 L5 10.4 L10.4 9 Z', 'M18 16 L18.7 18.3 L21 19 L18.7 19.7 L18 22 L17.3 19.7 L15 19 L17.3 18.3 Z']),
   'affinity': _Spec(fills: <String>['M12 3.8 L14.4 9.2 L20.2 9.8 L15.8 13.7 L17.1 19.5 L12 16.5 L6.9 19.5 L8.2 13.7 L3.8 9.8 L9.6 9.2 Z']),
+  // ---- Phase 2: map, inventory, campfire, settings ----
+  'undo': _Spec(strokes: <String>[
+    'M9 6 L4.5 10.5 L9 15',
+    'M4.5 10.5 H14 A4.75 4.75 0 0 1 14 20 H10',
+  ]),
+  'settings': _Spec(strokes: <String>[
+    'M4 7 H7',
+    'M11 7 H20',
+    'M9 5 A2 2 0 1 1 8.99 5 Z',
+    'M4 12 H13',
+    'M17 12 H20',
+    'M15 10 A2 2 0 1 1 14.99 10 Z',
+    'M4 17 H6',
+    'M10 17 H20',
+    'M8 15 A2 2 0 1 1 7.99 15 Z',
+  ]),
+  'bag': _Spec(strokes: <String>[
+    'M6 9 H18 L19.2 20 H4.8 Z',
+    'M9 9 V7.5 A3 3 0 0 1 15 7.5 V9',
+    'M9.5 13 H14.5',
+  ]),
+  'folder': _Spec(strokes: <String>[
+    'M3.5 7 A1.5 1.5 0 0 1 5 5.5 H9.5 L11.5 8 H19 A1.5 1.5 0 0 1 20.5 9.5 V17.5 A1.5 1.5 0 0 1 19 19 H5 A1.5 1.5 0 0 1 3.5 17.5 Z',
+  ]),
+  'share': _Spec(strokes: <String>[
+    'M17 3.8 A2.2 2.2 0 1 1 16.99 3.8 Z',
+    'M7 9.8 A2.2 2.2 0 1 1 6.99 9.8 Z',
+    'M17 15.8 A2.2 2.2 0 1 1 16.99 15.8 Z',
+    'M9 11 L15 7.2',
+    'M9 13 L15 16.8',
+  ]),
+  'save': _Spec(strokes: <String>[
+    'M12 4 V14',
+    'M8 10.5 L12 14.5 L16 10.5',
+    'M5 19 H19',
+  ]),
+  'open': _Spec(strokes: <String>[
+    'M12 15 V5',
+    'M8 8.5 L12 4.5 L16 8.5',
+    'M5 19 H19',
+  ]),
+  'tent': _Spec(strokes: <String>[
+    'M3.5 19 L12 5 L20.5 19 Z',
+    'M12 11.5 L9.5 19',
+    'M12 11.5 L14.5 19',
+  ]),
+  'bell': _Spec(strokes: <String>[
+    'M6 16.5 C7.5 15 7.5 12.5 7.5 10.5 A4.5 4.5 0 0 1 16.5 10.5 C16.5 12.5 16.5 15 18 16.5 Z',
+    'M10.5 19 A1.6 1.6 0 0 0 13.5 19',
+    'M12 4 V6',
+  ]),
+  'cloak': _Spec(strokes: <String>[
+    'M9 4.5 H15 L18.5 19.5 H5.5 Z',
+    'M9 4.5 C10 7.5 14 7.5 15 4.5',
+    'M12 7.5 V19.5',
+  ]),
+  'collar': _Spec(strokes: <String>[
+    'M5 9.5 C5 6.8 19 6.8 19 9.5 C19 12.2 5 12.2 5 9.5 Z',
+    'M12 11.6 V13.5',
+    'M12 13.5 A2.3 2.3 0 1 1 11.99 13.5 Z',
+  ]),
+  'blanket': _Spec(strokes: <String>[
+    'M5 6.5 H19 V16.5 H5 Z',
+    'M5 10 H19',
+    'M5 13.2 H19',
+    'M7.5 16.5 V19',
+    'M12 16.5 V19',
+    'M16.5 16.5 V19',
+  ]),
+  'frame': _Spec(strokes: <String>[
+    'M5 4 H19 V20 H5 Z',
+    'M8.2 7.2 H15.8 V16.8 H8.2 Z',
+  ]),
+  'banner': _Spec(strokes: <String>[
+    'M6 3.5 V20.5',
+    'M6 5 H18.5 L15.5 9 L18.5 13 H6',
+  ]),
+  'bunting': _Spec(strokes: <String>[
+    'M3 6 C8 9.5 16 9.5 21 6',
+    'M6 7.6 L7.8 12 L9.8 8.5',
+    'M10.8 8.7 L12 13 L13.2 8.7',
+    'M14.2 8.5 L16.2 12 L18 7.6',
+  ]),
+  'still': _Spec(strokes: <String>[
+    'M5 17 C4 11 8 6.5 12 6.5 C16 6.5 20 11 19 17 C16.5 18.5 7.5 18.5 5 17 Z',
+    'M8.8 12.5 C9.4 13.4 10.6 13.4 11.2 12.5',
+    'M12.8 12.5 C13.4 13.4 14.6 13.4 15.2 12.5',
+    'M17 2.8 H20 L17 5.8 H20',
+  ]),
+  'wheat': _Spec(strokes: <String>[
+    'M12 21 V9',
+    'M12 9 C10 8 10 5.5 12 3.5 C14 5.5 14 8 12 9 Z',
+    'M12 13.5 C9.5 13 8.5 11 8.5 9 C10.5 9.5 12 11 12 13.5 Z',
+    'M12 13.5 C14.5 13 15.5 11 15.5 9 C13.5 9.5 12 11 12 13.5 Z',
+    'M12 18 C9.5 17.5 8.5 15.5 8.5 13.5 C10.5 14 12 15.5 12 18 Z',
+    'M12 18 C14.5 17.5 15.5 15.5 15.5 13.5 C13.5 14 12 15.5 12 18 Z',
+  ]),
+  'mill': _Spec(strokes: <String>[
+    'M9 20.5 L10.4 11.5 H13.6 L15 20.5 Z',
+    'M12 9.5 L5.5 4.5',
+    'M12 9.5 L18.5 4.5',
+    'M12 9.5 L6.5 15.5',
+    'M12 9.5 L17.5 15.5',
+  ]),
+  'bridge': _Spec(strokes: <String>[
+    'M3 10.5 H21',
+    'M5 18.5 V10.5',
+    'M19 18.5 V10.5',
+    'M5 17 C8 11.5 16 11.5 19 17',
+    'M3 7.5 C8 5 16 5 21 7.5',
+  ]),
+  'mountain': _Spec(strokes: <String>[
+    'M3 19 L9.5 6.5 L13 13 L15.5 9.5 L21 19 Z',
+    'M7.8 9.8 L9.5 11.2 L11 9.4',
+  ]),
+  'arch': _Spec(strokes: <String>[
+    'M5 20 V11 A7 7 0 0 1 19 11 V20',
+    'M9 20 V12 A3 3 0 0 1 15 12 V20',
+    'M3.5 20 H9',
+    'M15 20 H20.5',
+  ]),
+  'fog': _Spec(strokes: <String>[
+    'M4 9 H15',
+    'M8 13 H20',
+    'M5 17 H14',
+  ]),
+  'info': _Spec(strokes: <String>[
+    'M12 3.5 A8.5 8.5 0 1 1 11.99 3.5 Z',
+    'M12 11 V16.5',
+    'M12 7.6 V7.7',
+  ]),
 };
 
 class _VIconPainter extends CustomPainter {

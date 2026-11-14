@@ -6,8 +6,9 @@ import '../../theme/palette.dart';
 import '../adaptive.dart';
 import '../board/board_screen.dart';
 import '../log/quest_log_screen.dart';
+import '../map/map_panel.dart';
 import '../party/party_sheet.dart';
-import '../vale/vale_panel.dart';
+import '../settings/settings_screen.dart';
 import '../widgets/v_icon.dart';
 
 class _Destination {
@@ -30,7 +31,7 @@ const double railWidth = 68;
 ///
 /// * Cover screen (compact): one column with bottom navigation.
 /// * Opened Fold (expanded): a slim rail and two panes that meet at the
-///   crease: Board + Vale, hero + companion, Log list + detail.
+///   crease: Board + Map, hero + companion, Log list + detail.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -55,9 +56,14 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Coming back to the app may mean a new day has begun.
-    if (state == AppLifecycleState.resumed && mounted) {
-      GameScope.read(context).refresh();
+    if (!mounted) return;
+    final game = GameScope.read(context);
+    if (state == AppLifecycleState.resumed) {
+      // Coming back to the app may mean a new day has begun.
+      game.refresh();
+    } else {
+      // Leaving: commit anything still inside its Undo window.
+      game.flushPending();
     }
   }
 
@@ -94,7 +100,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       index: _index,
       children: const <Widget>[
         BoardScreen(),
-        ValePanel(),
+        MapPanel(),
         PartySheetScreen(),
         QuestLogScreen(),
       ],
@@ -106,12 +112,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       0 => const TwoPane(
           leadingInset: railWidth,
           start: BoardScreen(),
-          end: ValePanel(),
+          end: MapPanel(brief: true),
         ),
       1 => const TwoPane(
           leadingInset: railWidth,
-          start: ValePanel(showDiscoveries: false),
-          end: JourneyLogPanel(),
+          start: MapPane(),
+          end: MapDetails(),
         ),
       2 => const PartySheetScreen(leadingInset: railWidth),
       _ => const QuestLogScreen(leadingInset: railWidth),
@@ -196,6 +202,16 @@ class _Rail extends StatelessWidget {
                 onTap: () => onSelect(i),
               ),
             ),
+          const Spacer(),
+          SizedBox(
+            height: 64,
+            child: _NavItem(
+              destination: const _Destination('Settings', 'settings'),
+              selected: false,
+              onTap: () => openSettings(context),
+            ),
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );

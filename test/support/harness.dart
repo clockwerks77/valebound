@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/app.dart';
 import 'package:habit_adventure/data/database.dart';
 import 'package:habit_adventure/data/repository.dart';
+import 'package:habit_adventure/export/vault_port.dart';
 import 'package:habit_adventure/rules/enums.dart';
 import 'package:habit_adventure/state/game_controller.dart';
 
@@ -74,6 +75,67 @@ Future<void> loadAppFonts() async {
   _fontsLoaded = true;
 }
 
+/// A vault folder held in memory, standing in for the Android side.
+class MemoryVault implements VaultPort {
+  MemoryVault({this.chosen = false, this.available = true, this.name = 'Quest Log'});
+
+  bool chosen;
+  bool available;
+  String name;
+
+  /// What is "in the folder": relative path to content.
+  final Map<String, String> files = <String, String>{};
+  int writes = 0;
+  Map<String, String>? shared;
+  String? savedName;
+  String? savedDocument;
+
+  /// What the document picker will hand back.
+  String? documentToOpen;
+
+  @override
+  Future<VaultStatus> status() async => VaultStatus(
+        chosen: chosen,
+        available: chosen && available,
+        name: chosen && available ? name : null,
+      );
+
+  @override
+  Future<VaultStatus> pickFolder() async {
+    chosen = true;
+    return status();
+  }
+
+  @override
+  Future<void> forgetFolder() async {
+    chosen = false;
+  }
+
+  @override
+  Future<bool> writeFiles(Map<String, String> newFiles) async {
+    if (!chosen || !available) return false;
+    writes++;
+    files.addAll(newFiles);
+    return true;
+  }
+
+  @override
+  Future<bool> shareFiles(Map<String, String> files) async {
+    shared = Map<String, String>.of(files);
+    return files.isNotEmpty;
+  }
+
+  @override
+  Future<bool> saveDocument(String suggestedName, String content) async {
+    savedName = suggestedName;
+    savedDocument = content;
+    return true;
+  }
+
+  @override
+  Future<String?> openDocument() async => documentToOpen;
+}
+
 /// A running app on an in-memory database with a clock the test controls.
 class TestApp {
   TestApp(this.now);
@@ -88,12 +150,15 @@ class TestApp {
     required DateTime now,
     bool withProfile = true,
     bool withHistory = false,
+    VaultPort? vault,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
     app.db = AppDatabase(NativeDatabase.memory());
     app.repo = GameRepository(app.db, clock: () => app.now);
-    app.game = GameController(app.repo);
+    app.game = vault == null
+        ? GameController(app.repo)
+        : GameController(app.repo, vault: vault);
     addTearDown(app.db.close);
 
     await tester.runAsync(() async {

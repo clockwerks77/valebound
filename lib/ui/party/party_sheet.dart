@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../rules/companion_rules.dart';
 import '../../rules/enums.dart';
+import '../../rules/gear.dart';
 import '../../rules/journey.dart';
 import '../../rules/xp_curve.dart';
 import '../../state/game_controller.dart';
@@ -11,15 +12,25 @@ import '../adaptive.dart';
 import '../art/crests.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
+import 'inventory.dart';
 
-/// Party Sheet (DESIGN §8.3): hero and companion as a pair.
+/// Party Sheet (DESIGN §8.3): hero and companion as a pair, with the
+/// Inventory (§8.4) one tap away.
 ///
 /// Cover screen: stacked cards. Opened Fold: hero on one pane, companion on
-/// the other, the showcase for the two-pane layout.
-class PartySheetScreen extends StatelessWidget {
+/// the other, the showcase for the two-pane layout. The Inventory splits the
+/// same way: the hero's things on one pane, the companion's on the other.
+class PartySheetScreen extends StatefulWidget {
   const PartySheetScreen({super.key, this.leadingInset = 0});
 
   final double leadingInset;
+
+  @override
+  State<PartySheetScreen> createState() => _PartySheetScreenState();
+}
+
+class _PartySheetScreenState extends State<PartySheetScreen> {
+  bool _inventory = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,32 +38,55 @@ class PartySheetScreen extends StatelessWidget {
     if (game.hero == null || game.companion == null) {
       return const SizedBox.shrink();
     }
+    final toggle = Row(
+      children: <Widget>[
+        ChoicePill(
+          label: 'Party',
+          icon: 'party',
+          selected: !_inventory,
+          onTap: () => setState(() => _inventory = false),
+        ),
+        const SizedBox(width: 8),
+        ChoicePill(
+          label: 'Inventory',
+          icon: 'bag',
+          selected: _inventory,
+          onTap: () => setState(() => _inventory = true),
+        ),
+      ],
+    );
+    final Widget first = _inventory ? const HeroInventory() : const HeroPane();
+    final Widget second =
+        _inventory ? const CompanionInventory() : const CompanionPane();
     if (isExpanded(context)) {
       return TwoPane(
-        leadingInset: leadingInset,
+        leadingInset: widget.leadingInset,
         start: ListView(
-          padding: const EdgeInsets.fromLTRB(14, 14, 0, 24),
-          children: const <Widget>[HeroPane()],
+          padding: const EdgeInsets.fromLTRB(14, 12, 0, 24),
+          children: <Widget>[toggle, const SizedBox(height: 12), first],
         ),
         end: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 14, 14, 24),
-          children: const <Widget>[CompanionPane()],
+          padding: const EdgeInsets.fromLTRB(0, 12, 14, 24),
+          // Level with the card on the other pane.
+          children: <Widget>[const SizedBox(height: 56), second],
         ),
       );
     }
     return ListView(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 28),
-      children: const <Widget>[
-        HeroPane(),
-        SizedBox(height: 16),
-        CompanionPane(),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 28),
+      children: <Widget>[
+        toggle,
+        const SizedBox(height: 12),
+        first,
+        const SizedBox(height: 16),
+        second,
       ],
     );
   }
 }
 
-class _PaneHeading extends StatelessWidget {
-  const _PaneHeading(this.text, {this.color = Palette.slateSoft});
+class PaneHeading extends StatelessWidget {
+  const PaneHeading(this.text, {super.key, this.color = Palette.slateSoft});
 
   final String text;
   final Color color;
@@ -85,13 +119,26 @@ class HeroPane extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              HeroPortrait(portraitId: hero.portraitId, size: 84),
+              HeroPortrait(
+                portraitId: hero.portraitId,
+                size: 84,
+                frame: game.frame,
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('HERO', style: AppText.label.copyWith(color: Palette.goldDeep)),
+                    Row(
+                      children: <Widget>[
+                        VIcon('banner', size: 15, color: bannerColor(game.banner)),
+                        const SizedBox(width: 5),
+                        Text(
+                          'HERO',
+                          style: AppText.label.copyWith(color: Palette.goldDeep),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 2),
                     Text(
                       hero.name,
@@ -120,7 +167,7 @@ class HeroPane extends StatelessWidget {
             progress: progress,
             color: Palette.gold,
           ),
-          const _PaneHeading('Attributes'),
+          const PaneHeading('Attributes'),
           for (final a in Attribute.values)
             _AttributeRow(
               attribute: a,
@@ -128,7 +175,7 @@ class HeroPane extends StatelessWidget {
               starred: companion.kind.affinity == a,
               companionName: companion.name,
             ),
-          const _PaneHeading('Totals'),
+          const PaneHeading('Totals'),
           LayoutBuilder(
             builder: (context, constraints) {
               final width = ((constraints.maxWidth - 20) / 3).floorToDouble();
@@ -158,14 +205,14 @@ class HeroPane extends StatelessWidget {
                     _Tile(
                       width: width,
                       icon: materialIcon(m),
-                      value: '${game.materials[m] ?? 0}',
+                      value: '${game.stores[m] ?? 0}',
                       label: m.label,
                     ),
                 ],
               );
             },
           ),
-          const _PaneHeading('Titles earned'),
+          const PaneHeading('Titles earned'),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -225,7 +272,11 @@ class CompanionPane extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              CompanionPortrait(kind: companion.kind, size: 84),
+              CompanionPortrait(
+                kind: companion.kind,
+                size: 84,
+                gearIcon: game.gearWorn?.icon,
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -289,10 +340,25 @@ class CompanionPane extends StatelessWidget {
             color: Palette.companionDeep,
             track: Palette.companion.withValues(alpha: 0.18),
           ),
-          const _PaneHeading('Tricks', color: Palette.companionDeep),
+          const PaneHeading('Tricks', color: Palette.companionDeep),
           for (final trick in companionTricks)
-            _TrickRow(trick: trick, unlocked: progress.level >= trick.level),
-          const _PaneHeading('The road together', color: Palette.companionDeep),
+            TrickRow(trick: trick, unlocked: progress.level >= trick.level),
+          const PaneHeading('Gear', color: Palette.companionDeep),
+          Text(
+            _gearLine(game.gearWorn, game.gearUnlocked.length, companion.name),
+            style: AppText.body.copyWith(color: Palette.slate, fontSize: 14),
+          ),
+          if (progress.level >= oldFriendLevel) ...<Widget>[
+            const PaneHeading('Old friends', color: Palette.companionDeep),
+            OldFriends(
+              portraitId: game.hero!.portraitId,
+              frame: game.frame,
+              kind: companion.kind,
+              caption: '${game.hero!.name} and ${companion.name}, '
+                  '$paces Paces together.',
+            ),
+          ],
+          const PaneHeading('The road together', color: Palette.companionDeep),
           Row(
             children: <Widget>[
               const VIcon('pace', size: 18, color: Palette.companionDeep),
@@ -316,6 +382,81 @@ class CompanionPane extends StatelessWidget {
           const SizedBox(height: 10),
           DiscoveryLog(discoveries: game.discoveries),
         ],
+      ),
+    );
+  }
+}
+
+String _gearLine(GearItem? worn, int found, String name) {
+  if (found == 0) {
+    return 'No gear yet. The first gift comes at Bond ${bondMilestones.first}.';
+  }
+  final count = '$found of ${companionGear.length} pieces found.';
+  return worn == null
+      ? '$count Choose one for $name in the Inventory.'
+      : 'Wearing the ${worn.name}. $count';
+}
+
+/// The Old Friend scene (DESIGN §7A.3, companion level 10): the two of you,
+/// side by side.
+class OldFriends extends StatelessWidget {
+  const OldFriends({
+    super.key,
+    required this.portraitId,
+    required this.kind,
+    required this.caption,
+    this.frame,
+  });
+
+  final String portraitId;
+  final String? frame;
+  final CompanionKind kind;
+  final String caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[Palette.skyDeep, Palette.forestDeep],
+        ),
+        border: Border.all(color: Palette.gold),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 76,
+              width: 132,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 0,
+                    child: HeroPortrait(
+                      portraitId: portraitId,
+                      size: 76,
+                      frame: frame,
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: CompanionPortrait(kind: kind, size: 76),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              caption,
+              textAlign: TextAlign.center,
+              style: AppText.small.copyWith(color: Palette.onDark),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -358,11 +499,11 @@ class DiscoveryLog extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        sceneFor(i).title,
+                        sceneByKey(discoveries[i], i).title,
                         style: AppText.cardTitle.copyWith(color: text, fontSize: 14.5),
                       ),
                       Text(
-                        sceneFor(i).line,
+                        sceneByKey(discoveries[i], i).line,
                         style: AppText.small.copyWith(color: soft),
                       ),
                     ],
@@ -541,8 +682,8 @@ class _Tile extends StatelessWidget {
   }
 }
 
-class _TrickRow extends StatelessWidget {
-  const _TrickRow({required this.trick, required this.unlocked});
+class TrickRow extends StatelessWidget {
+  const TrickRow({super.key, required this.trick, required this.unlocked});
 
   final Trick trick;
   final bool unlocked;
@@ -599,7 +740,7 @@ class _TrickRow extends StatelessWidget {
                       ),
                       if (unlocked && !tricksInPlay.contains(trick.key))
                         Text(
-                          'Learned. It comes into play when the map opens.',
+                          'Learned. It joins the game with the comeback quest.',
                           style: AppText.small.copyWith(
                             color: Palette.companionDeep,
                             fontSize: 12.5,

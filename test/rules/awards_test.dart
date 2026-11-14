@@ -291,11 +291,15 @@ void main() {
       expect(newDiscoveries(8, 31), <int>[0, 1, 2]);
     });
 
-    test('twelve drafted scenes, then plain waymarkers', () {
-      expect(discoveryScenes.length, 12);
-      expect(discoveryScenes.map((s) => s.key).toSet().length, 12);
+    test('twenty drafted scenes, then plain waymarkers', () {
+      expect(discoveryScenes.length, 20);
+      expect(discoveryScenes.map((s) => s.key).toSet().length, 20);
+      expect(discoveryScenes.map((s) => s.title).toSet().length, 20);
       expect(sceneFor(0).key, 'standing_stone');
-      expect(sceneFor(12).title, 'Waymarker 13');
+      expect(sceneFor(20).title, 'Waymarker 21');
+      // A stored key shows what was found, whatever its place in the list.
+      expect(sceneByKey('hot_spring', 7).title, 'Kettle Spring');
+      expect(sceneByKey('from_an_older_build', 2).key, 'merchant_cart');
     });
   });
 

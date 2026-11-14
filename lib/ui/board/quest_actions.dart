@@ -13,22 +13,117 @@ import '../celebrations.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 
-/// Completes a quest and plays whatever it earned.
+/// Marks a quest done and plays whatever it earned.
+///
+/// A completion the user tapped waits five seconds first, with an Undo on the
+/// card, and is only committed when that window closes ([undoable]). One the
+/// app completes by itself, such as a timer reaching its target, commits at
+/// once.
 Future<void> completeEntry(
   BuildContext context,
   BoardQuest entry, {
   String? note,
+  int? progress,
+  bool undoable = true,
 }) async {
   final game = GameScope.read(context);
   // The card that was tapped moves to "Done" and leaves the tree, so hold on
   // to the root navigator, which stays put.
   final navigator = Navigator.of(context, rootNavigator: true);
+  void played(CompletionOutcome outcome) {
+    if (navigator.mounted) {
+      celebrate(navigator.context, outcome, questId: entry.quest.id);
+    }
+  }
+
+  if (undoable) {
+    game.completeSoon(
+      entry,
+      note: note,
+      progress: progress,
+      onCommitted: played,
+    );
+    return;
+  }
   final outcome = entry.quest.completionType == CompletionType.timer
       ? await game.completeTimer(entry)
-      : await game.complete(entry.quest.id, note: note);
-  if (outcome != null && navigator.mounted) {
-    await celebrate(navigator.context, outcome);
+      : await game.complete(entry.quest.id, note: note, progress: progress);
+  if (outcome != null) played(outcome);
+}
+
+/// Shown on a quest for the few seconds its completion can be taken back.
+/// The ring runs down as the window closes.
+class UndoButton extends StatelessWidget {
+  const UndoButton({
+    super.key,
+    required this.questName,
+    required this.onUndo,
+    this.size = 48,
+  });
+
+  final String questName;
+  final VoidCallback onUndo;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Undo $questName',
+      child: Material(
+        color: Palette.forest,
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onUndo,
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 1, end: 0),
+              duration: GameController.undoWindow,
+              builder: (context, remaining, child) => CustomPaint(
+                painter: _UndoRingPainter(remaining),
+                child: child,
+              ),
+              child: Center(
+                child: VIcon('undo', size: size * 0.46, color: Palette.goldBright),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
+}
+
+class _UndoRingPainter extends CustomPainter {
+  _UndoRingPainter(this.remaining);
+
+  final double remaining;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = (Offset.zero & size).deflate(2);
+    final track = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.6
+      ..color = Palette.gold.withValues(alpha: 0.28);
+    canvas.drawArc(rect, 0, 6.2832, false, track);
+    canvas.drawArc(
+      rect,
+      -1.5708,
+      6.2832 * remaining.clamp(0.0, 1.0),
+      false,
+      track
+        ..color = Palette.goldBright
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_UndoRingPainter oldDelegate) =>
+      oldDelegate.remaining != remaining;
 }
 
 /// What a quest will award, in a few words.
@@ -146,11 +241,16 @@ class CountStepper extends StatelessWidget {
 
   Future<void> _set(BuildContext context, int value) async {
     final game = GameScope.read(context);
-    final navigator = Navigator.of(context, rootNavigator: true);
-    final outcome = await game.setCount(entry, value);
-    if (outcome != null && navigator.mounted) {
-      await celebrate(navigator.context, outcome);
+    final target = entry.quest.target ?? 0;
+    if (target > 0 && value >= target) {
+      // The last step: store it, then complete (with Undo, like any tap).
+      await game.setCountOnly(entry.quest.id, target);
+      if (context.mounted) {
+        await completeEntry(context, entry, progress: target);
+      }
+      return;
     }
+    await game.setCountOnly(entry.quest.id, value);
   }
 
   @override
@@ -269,7 +369,8 @@ class _TimerControlState extends State<TimerControl> {
     final game = GameScope.read(context);
     if (entry.timerSeconds(game.now) >= target) {
       _completing = true;
-      completeEntry(context, entry);
+      // Reaching the target is not a tap, so there is nothing to undo.
+      completeEntry(context, entry, undoable: false);
     }
   }
 

@@ -50,12 +50,21 @@ const List<Trick> companionTricks = <Trick>[
   ),
 ];
 
-/// Tricks whose effect is live in this build. The others unlock on schedule
-/// and come into play with the systems they act on (DECISIONS.md D-28).
-const Set<String> tricksInPlay = <String>{'sniff_out'};
+/// Tricks whose effect is live in this build. Comfort unlocks on schedule
+/// and comes into play with the comeback quest (DECISIONS.md D-28).
+const Set<String> tricksInPlay = <String>{
+  'sniff_out',
+  'fetch',
+  'scout',
+  'old_friend',
+};
 
-/// Companion level at which Sniff Out is learned (DESIGN §7A.3).
+/// Companion levels at which each trick is learned (DESIGN §7A.3).
 const int sniffOutLevel = 2;
+const int fetchLevel = 4;
+const int scoutLevel = 6;
+const int comfortLevel = 8;
+const int oldFriendLevel = 10;
 
 /// Sniff Out finds one bonus material on a day a companion quest is done.
 /// The kind rotates by calendar day, so it is the same however the day goes.
@@ -71,8 +80,8 @@ List<String> tricksUnlockedAt(int level) => <String>[
         if (level >= t.level) t.key,
     ];
 
-/// Bond values at which a companion gift or cosmetic unlocks. Draft list;
-/// the gifts themselves arrive with companion gear in Phase 2.
+/// Bond values at which a Companion Gift unlocks: a piece of gear
+/// (see `gear.dart`).
 const List<int> bondMilestones = <int>[10, 25, 50, 100, 175, 275, 400];
 
 /// The next milestone above [bond], or null once all are reached.

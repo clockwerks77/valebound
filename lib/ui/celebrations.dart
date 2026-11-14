@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import '../data/database.dart';
 import '../rules/companion_rules.dart';
 import '../rules/enums.dart';
+import '../rules/gear.dart';
 import '../rules/journey.dart';
 import '../rules/progression.dart';
+import '../rules/still.dart';
+import '../rules/world.dart';
 import '../state/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../theme/palette.dart';
@@ -17,14 +20,28 @@ import 'widgets/v_icon.dart';
 
 /// Everything that should happen on screen after a quest is completed:
 /// the reward chips, then any level-up or Discovery moment, one at a time.
+///
+/// [questId] names the quest just finished, so a Heroic or Boss quest can
+/// wake its Still creature.
 Future<void> celebrate(
   BuildContext context,
-  CompletionOutcome outcome,
-) async {
+  CompletionOutcome outcome, {
+  String? questId,
+}) async {
   final game = GameScope.read(context);
   final companion = game.companion;
   final hero = game.hero;
-  showRewardToast(context, outcome, companionName: game.companionName);
+  showRewardToast(
+    context,
+    outcome,
+    companionName: game.companionName,
+    still: questId != null && outcome.clearsStill ? stillFor(questId) : null,
+  );
+
+  for (final index in outcome.newRestorationIndexes) {
+    if (!context.mounted) return;
+    await showRestoration(context, target: targetAt(index));
+  }
 
   if (outcome.heroLevelledUp && hero != null && context.mounted) {
     await showHeroLevelUp(
@@ -61,9 +78,14 @@ class _Reward {
   final Color color;
 }
 
-List<_Reward> _rewardsFor(CompletionOutcome o, String companionName) {
+List<_Reward> _rewardsFor(
+  CompletionOutcome o,
+  String companionName,
+  StillCreature? still,
+) {
   final a = o.award;
   return <_Reward>[
+    if (still != null) _Reward('still', still.wakes, Palette.slateSoft),
     if (a.heroXp > 0)
       _Reward(
         attributeIcon(o.attribute),
@@ -92,7 +114,23 @@ List<_Reward> _rewardsFor(CompletionOutcome o, String companionName) {
         '$companionName found 1 ${o.sniffOutFound!.label}',
         Palette.companion,
       ),
+    if (o.fetchCarried != null)
+      _Reward(
+        materialIcon(o.fetchCarried!),
+        '$companionName fetched 1 ${o.fetchCarried!.label}',
+        Palette.companion,
+      ),
     if (a.gold > 0) _Reward('coin', '+${a.gold} gold', Palette.goldDeep),
+    for (final key in o.newGear)
+      if (gearByKey(key) != null)
+        _Reward(
+          gearByKey(key)!.icon,
+          'A gift for $companionName: ${gearByKey(key)!.name}',
+          Palette.companionDeep,
+        ),
+    for (final key in o.newCosmetics)
+      if (cosmeticByKey(key) != null)
+        _Reward('star', 'New: ${cosmeticByKey(key)!.name}', Palette.goldDeep),
   ];
 }
 
@@ -102,13 +140,14 @@ void showRewardToast(
   BuildContext context,
   CompletionOutcome outcome, {
   required String companionName,
+  StillCreature? still,
 }) {
   final overlay = Overlay.maybeOf(context, rootOverlay: true);
   if (overlay == null) return;
   late final OverlayEntry entry;
   entry = OverlayEntry(
     builder: (context) => _RewardToast(
-      rewards: _rewardsFor(outcome, companionName),
+      rewards: _rewardsFor(outcome, companionName, still),
       onDone: () {
         if (entry.mounted) entry.remove();
       },
@@ -226,12 +265,14 @@ class _RewardChip extends StatelessWidget {
           children: <Widget>[
             VIcon(reward.icon, size: 17, color: reward.color),
             const SizedBox(width: 7),
-            Text(
-              reward.text,
-              style: AppText.small.copyWith(
-                color: Palette.slate,
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration.none,
+            Flexible(
+              child: Text(
+                reward.text,
+                style: AppText.small.copyWith(
+                  color: Palette.slate,
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
           ],
@@ -348,6 +389,76 @@ Future<void> showCompanionLevelUp(
           ),
         ),
       ),
+      ),
+    ),
+  );
+}
+
+// ---- Restoration: the map moment ----------------------------------------
+
+/// A place wakes (DESIGN §3A): shown once, when the materials for it are in.
+Future<void> showRestoration(
+  BuildContext context, {
+  required RestorationTarget target,
+}) {
+  final villager = target.villager;
+  return showDialog<void>(
+    context: context,
+    barrierColor: Palette.forestNight.withValues(alpha: 0.78),
+    builder: (context) => CreaseAware(
+      child: Dialog(
+        insetPadding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                _Bounce(
+                  child: Roundel(
+                    icon: villager?.icon ?? 'lantern',
+                    color: Palette.forest,
+                    size: 76,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'RESTORED · ${regionByKey(target.region).name.toUpperCase()}',
+                  textAlign: TextAlign.center,
+                  style: AppText.label.copyWith(color: Palette.goldDeep),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  target.name,
+                  textAlign: TextAlign.center,
+                  style: AppText.heading.copyWith(color: Palette.slate),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  target.wakes,
+                  textAlign: TextAlign.center,
+                  style: AppText.body.copyWith(color: Palette.slateSoft),
+                ),
+                if (villager != null) ...<Widget>[
+                  const SizedBox(height: 10),
+                  Text(
+                    '${villager.name} the ${villager.role.toLowerCase()} has '
+                    'come home.',
+                    textAlign: TextAlign.center,
+                    style: AppText.small.copyWith(color: Palette.moss),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                PrimaryButton(
+                  label: 'The Vale wakes',
+                  icon: 'sun',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     ),
   );

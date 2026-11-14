@@ -78,6 +78,11 @@ class Completions extends Table {
   IntColumn get progress => integer().nullable()();
   TextColumn get note => text().nullable()();
 
+  /// JSON map of anything else this completion did: `sniff` and `fetch`
+  /// (material names), `restored` (place keys), `gear` and `cosmetics`
+  /// (keys unlocked). Added in schema 2.
+  TextColumn get extras => text().withDefault(const Constant('{}'))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -126,6 +131,11 @@ class Characters extends Table {
   TextColumn get titles => text().withDefault(const Constant('[]'))();
   IntColumn get heroTrackCompletions =>
       integer().withDefault(const Constant(0))();
+
+  /// JSON map of cosmetic kind to the key in use, e.g. `{"frame":"oak"}`.
+  /// Added in schema 2.
+  TextColumn get equippedCosmetics =>
+      text().withDefault(const Constant('{}'))();
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -143,6 +153,9 @@ class Companions extends Table {
   IntColumn get bond => integer().withDefault(const Constant(0))();
   TextColumn get tricksUnlocked => text().withDefault(const Constant('[]'))();
   TextColumn get gearUnlocked => text().withDefault(const Constant('[]'))();
+
+  /// Key of the gear being worn, or null. Added in schema 2.
+  TextColumn get gearEquipped => text().nullable()();
   TextColumn get portraitId => text()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime()();
@@ -185,6 +198,14 @@ class DayLogs extends Table {
   BoolColumn get sniffOutGranted =>
       boolean().withDefault(const Constant(false))();
 
+  /// Today's Fetch has been made. Added in schema 2.
+  BoolColumn get fetchGranted =>
+      boolean().withDefault(const Constant(false))();
+
+  /// Quests on the board that day, kept so a later export of the day is
+  /// exact. Added in schema 2.
+  IntColumn get questsTotal => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -217,8 +238,26 @@ class HealthEntries extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
 
+  /// 1: Phase 1. 2: Phase 2 (completion extras, Fetch flag, the day's quest
+  /// total, equipped cosmetics and gear).
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  /// Data survives every update (DESIGN §9.2): an older database is carried
+  /// forward step by step and nothing in it is rewritten or dropped.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(completions, completions.extras);
+            await m.addColumn(characters, characters.equippedCosmetics);
+            await m.addColumn(companions, companions.gearEquipped);
+            await m.addColumn(dayLogs, dayLogs.fetchGranted);
+            await m.addColumn(dayLogs, dayLogs.questsTotal);
+          }
+        },
+      );
 
   static QueryExecutor _open() {
     return driftDatabase(

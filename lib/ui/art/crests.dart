@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../rules/enums.dart';
 import '../../theme/palette.dart';
-import '../widgets/v_icon.dart' show parseSvgPath;
+import '../widgets/v_icon.dart' show VIcon, parseSvgPath;
 
 // Code-drawn crest medallions for the hero and each companion kind.
 //
@@ -251,22 +251,76 @@ const Map<String, _Crest> _heroCrests = <String, _Crest>{
   ),
 };
 
+/// Ring colour for a portrait frame (see `heroCosmetics`).
+Color frameColor(String key) => switch (key) {
+      'oak' => const Color(0xFF8A5A2B),
+      'riverstone' => const Color(0xFF7F9AA8),
+      'gilded' => Palette.goldBright,
+      'starlit' => const Color(0xFF6C7FD0),
+      _ => Palette.gold,
+    };
+
+/// Colour of a hero banner (see `heroCosmetics`).
+Color bannerColor(String key) => switch (key) {
+      'dawn' => Palette.dawnRose,
+      'river' => const Color(0xFF4E8FB8),
+      'ember' => Palette.ember,
+      'gold' => Palette.gold,
+      _ => Palette.forest,
+    };
+
 class CompanionPortrait extends StatelessWidget {
-  const CompanionPortrait({super.key, required this.kind, this.size = 56});
+  const CompanionPortrait({
+    super.key,
+    required this.kind,
+    this.size = 56,
+    this.gearIcon,
+  });
 
   final CompanionKind kind;
   final double size;
 
+  /// Icon of the gear being worn, shown as a small badge.
+  final String? gearIcon;
+
   @override
   Widget build(BuildContext context) {
+    final badge = size * 0.36;
     return Semantics(
       label: '${kind.label} portrait',
       image: true,
       child: SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(
-          painter: _CrestPainter(_companionCrests[kind]!, Palette.companion),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _CrestPainter(_companionCrests[kind]!, Palette.companion),
+              ),
+            ),
+            if (gearIcon != null)
+              Positioned(
+                right: -badge * 0.12,
+                bottom: -badge * 0.12,
+                child: Container(
+                  width: badge,
+                  height: badge,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Palette.parchment,
+                    border: Border.all(color: Palette.companionDeep, width: 1.4),
+                  ),
+                  alignment: Alignment.center,
+                  child: VIcon(
+                    gearIcon!,
+                    size: badge * 0.62,
+                    color: Palette.companionDeep,
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -274,10 +328,18 @@ class CompanionPortrait extends StatelessWidget {
 }
 
 class HeroPortrait extends StatelessWidget {
-  const HeroPortrait({super.key, required this.portraitId, this.size = 56});
+  const HeroPortrait({
+    super.key,
+    required this.portraitId,
+    this.size = 56,
+    this.frame,
+  });
 
   final String portraitId;
   final double size;
+
+  /// Key of the portrait frame in use; plain gold when null.
+  final String? frame;
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +350,12 @@ class HeroPortrait extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(painter: _CrestPainter(crest, Palette.gold)),
+        child: CustomPaint(
+          painter: _CrestPainter(
+            crest,
+            frame == null ? Palette.gold : frameColor(frame!),
+          ),
+        ),
       ),
     );
   }

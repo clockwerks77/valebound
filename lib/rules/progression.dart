@@ -1,8 +1,10 @@
 import 'awards.dart';
 import 'companion_rules.dart';
 import 'enums.dart';
+import 'gear.dart';
 import 'journey.dart';
 import 'materials.dart';
+import 'world.dart';
 import 'xp_curve.dart';
 
 /// Bond bonus on a day the companion gains a level (DESIGN §7A.3).
@@ -28,6 +30,9 @@ class PartyTotals {
   final int bond;
   final int paces;
   final int gold;
+
+  /// Materials gathered in all. This only ever grows; what has been built
+  /// and what is left in the stores are worked out from it (`world.dart`).
   final Map<MaterialKind, int> materials;
 
   /// Drives the material rotation.
@@ -38,6 +43,9 @@ class PartyTotals {
   int attributeLevel(Attribute a) => XpCurve.levelForXp(attributeXp[a] ?? 0);
   int materialCount(MaterialKind k) => materials[k] ?? 0;
   int get discoveries => discoveriesEarned(paces);
+
+  /// Places restored so far.
+  int get restored => restoredCount(materials);
 }
 
 /// The result of completing one quest.
@@ -53,6 +61,10 @@ class CompletionOutcome {
     required this.materialKind,
     required this.newDiscoveryIndexes,
     this.sniffOutFound,
+    this.fetchCarried,
+    this.newRestorationIndexes = const <int>[],
+    this.newGear = const <String>[],
+    this.newCosmetics = const <String>[],
   });
 
   final Award award;
@@ -74,6 +86,20 @@ class CompletionOutcome {
   /// The one bonus material the companion found today through Sniff Out.
   final MaterialKind? sniffOutFound;
 
+  /// The one material Fetch carried to the current restoration today.
+  final MaterialKind? fetchCarried;
+
+  /// Zero-based indexes of the places this completion restored.
+  final List<int> newRestorationIndexes;
+
+  /// Keys of companion gear and hero cosmetics this completion unlocked.
+  final List<String> newGear;
+  final List<String> newCosmetics;
+
+  /// Heroic and Boss quests wake a Still creature when they are done.
+  bool get clearsStill =>
+      difficulty == Difficulty.heroic || difficulty == Difficulty.boss;
+
   int get totalBond => award.bond + bondBonus;
   bool get heroLevelledUp => after.heroLevel > before.heroLevel;
   bool get companionLevelledUp => after.companionLevel > before.companionLevel;
@@ -89,6 +115,10 @@ class CompletionOutcome {
 /// [sniffOutFind] is the material Sniff Out would turn up today, or null when
 /// today's find has already been made. It is only granted on a companion or
 /// shared quest, and only once the companion has learned the trick.
+///
+/// [fetchAvailable] is true while today's Fetch has not been made. Fetch
+/// carries one material the current restoration still needs, on a companion
+/// or shared quest, once the companion has learned it.
 CompletionOutcome applyCompletion({
   required PartyTotals totals,
   required Difficulty difficulty,
@@ -96,6 +126,7 @@ CompletionOutcome applyCompletion({
   required Attribute attribute,
   bool bondLevelBonusGrantedToday = false,
   MaterialKind? sniffOutFind,
+  bool fetchAvailable = false,
 }) {
   final award = awardFor(difficulty: difficulty, track: track);
 
@@ -130,6 +161,14 @@ CompletionOutcome applyCompletion({
     materials[sniffOutFind] = (materials[sniffOutFind] ?? 0) + 1;
   }
 
+  MaterialKind? fetchCarried;
+  if (fetchAvailable &&
+      track.travelsWithCompanion &&
+      XpCurve.levelForXp(companionXp) >= fetchLevel) {
+    fetchCarried = stillNeeded(materials);
+    materials[fetchCarried] = (materials[fetchCarried] ?? 0) + 1;
+  }
+
   final paces = totals.paces + award.paces;
 
   final after = PartyTotals(
@@ -154,5 +193,28 @@ CompletionOutcome applyCompletion({
     materialKind: materialKind,
     newDiscoveryIndexes: newDiscoveries(totals.paces, paces),
     sniffOutFound: sniffOutFound,
+    fetchCarried: fetchCarried,
+    newRestorationIndexes: <int>[
+      for (var i = totals.restored; i < after.restored; i++) i,
+    ],
+    newGear: _added(
+      gearUnlockedAt(level: totals.companionLevel, bond: totals.bond),
+      gearUnlockedAt(level: after.companionLevel, bond: after.bond),
+    ),
+    newCosmetics: _added(
+      cosmeticsUnlockedAt(
+        heroLevel: totals.heroLevel,
+        restored: totals.restored,
+      ),
+      cosmeticsUnlockedAt(
+        heroLevel: after.heroLevel,
+        restored: after.restored,
+      ),
+    ),
   );
 }
+
+List<String> _added(List<String> before, List<String> after) => <String>[
+      for (final key in after)
+        if (!before.contains(key)) key,
+    ];

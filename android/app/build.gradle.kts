@@ -29,6 +29,19 @@ android {
         versionName = flutter.versionName
     }
 
+    // A fixed key for personal sideloaded builds, kept in this private
+    // repository, so every build installs over the last one and the data on
+    // the device is kept (DESIGN §9.2). See DECISIONS.md D-34.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("personal-debug.p12")
+            storePassword = "habitadventure"
+            keyAlias = "personal"
+            keyPassword = "habitadventure"
+            storeType = "pkcs12"
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -47,3 +60,10 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // FileProvider, for Settings > Share…. Already on the classpath through
+    // the Flutter embedding; named here so the build does not rely on that.
+    implementation("androidx.core:core:1.13.1")
+}
+

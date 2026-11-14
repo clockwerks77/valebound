@@ -7,9 +7,11 @@ import '../rules/companion_rules.dart';
 import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
 import '../rules/enums.dart';
+import '../rules/gear.dart';
 import '../rules/journey.dart';
 import '../rules/progression.dart';
 import '../rules/schedule.dart';
+import '../rules/world.dart';
 import '../rules/xp_curve.dart';
 import 'database.dart';
 import 'seed.dart';
@@ -136,6 +138,35 @@ String encodeMaterials(Map<MaterialKind, int> materials) => jsonEncode(
 
 List<String> decodeStringList(String json) =>
     (jsonDecode(json) as List<dynamic>).whereType<String>().toList();
+
+/// A JSON object of string values, e.g. place key to the day it woke.
+Map<String, String> decodeStringMap(String json) {
+  final raw = jsonDecode(json);
+  if (raw is! Map<String, dynamic>) return <String, String>{};
+  return <String, String>{
+    for (final e in raw.entries)
+      if (e.value is String) e.key: e.value as String,
+  };
+}
+
+Map<String, dynamic> decodeExtras(String json) {
+  final raw = jsonDecode(json);
+  return raw is Map<String, dynamic> ? raw : <String, dynamic>{};
+}
+
+/// The outcome of reading a backup file.
+class BackupResult {
+  const BackupResult.ok()
+      : ok = true,
+        message = 'Backup restored.';
+  const BackupResult.notUsable(this.message) : ok = false;
+  final bool ok;
+  final String message;
+}
+
+/// Identifies a backup file. Deliberately not the app's display name, which
+/// may change (DESIGN: data must not depend on the name).
+const String backupFormat = 'habit-adventure-backup';
 
 /// All reads and writes go through here. Nothing in this class touches the
 /// network; the only I/O is the local SQLite file.
@@ -318,12 +349,16 @@ class GameRepository {
   /// Completes [questId] for today and applies every award in one
   /// transaction. Returns null if there is nothing to do (already complete
   /// today, or the quest is gone).
+  ///
+  /// [at] is when the quest was actually done, if that was a moment ago (a
+  /// completion waits a few seconds so it can be undone).
   Future<CompletionOutcome?> completeQuest(
     String questId, {
     String? note,
     int? progress,
+    DateTime? at,
   }) async {
-    final now = clock();
+    final now = at ?? clock();
     final day = DayKey.of(now);
     return db.transaction(() async {
       final quest = await questById(questId);
@@ -362,6 +397,7 @@ class GameRepository {
         bondLevelBonusGrantedToday: log?.bondLevelBonusGranted ?? false,
         sniffOutFind:
             (log?.sniffOutGranted ?? false) ? null : sniffOutMaterial(day),
+        fetchAvailable: !(log?.fetchGranted ?? false),
       );
       final after = outcome.after;
 
@@ -379,6 +415,14 @@ class GameRepository {
           materials: Value(encodeMaterials(after.materials)),
           titles: Value(jsonEncode(titlesEarned(grow(heroRow.level, heroLevel)))),
           heroTrackCompletions: Value(after.heroTrackCompletions),
+          unlockedCosmetics: Value(
+            jsonEncode(
+              cosmeticsUnlockedAt(
+                heroLevel: grow(heroRow.level, heroLevel),
+                restored: after.restored,
+              ),
+            ),
+          ),
         ),
       );
 
@@ -394,6 +438,14 @@ class GameRepository {
           tricksUnlocked: Value(
             jsonEncode(
               tricksUnlockedAt(grow(companionRow.level, companionLevel)),
+            ),
+          ),
+          gearUnlocked: Value(
+            jsonEncode(
+              gearUnlockedAt(
+                level: grow(companionRow.level, companionLevel),
+                bond: grow(companionRow.bond, after.bond),
+              ),
             ),
           ),
         ),
@@ -413,14 +465,25 @@ class GameRepository {
           ),
         );
       }
-
-      if (outcome.bondBonus > 0 && log != null) {
-        await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
-            .write(const DayLogsCompanion(bondLevelBonusGranted: Value(true)));
+      if (outcome.newRestorationIndexes.isNotEmpty) {
+        await _recordRestorations(worldRow, after.restored, day);
       }
-      if (outcome.sniffOutFound != null && log != null) {
-        await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
-            .write(const DayLogsCompanion(sniffOutGranted: Value(true)));
+
+      // Today's once-a-day grants, and the day now needs exporting again.
+      if (log != null) {
+        await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id))).write(
+          DayLogsCompanion(
+            bondLevelBonusGranted:
+                outcome.bondBonus > 0 ? const Value(true) : const Value.absent(),
+            sniffOutGranted: outcome.sniffOutFound != null
+                ? const Value(true)
+                : const Value.absent(),
+            fetchGranted: outcome.fetchCarried != null
+                ? const Value(true)
+                : const Value.absent(),
+            exportedAt: const Value(null),
+          ),
+        );
       }
 
       final existingProgress = await _progressFor(questId, day);
@@ -457,6 +520,22 @@ class GameRepository {
               progress: Value(progress ?? existingProgress?.progress),
               note: Value(
                 (note == null || note.trim().isEmpty) ? null : note.trim(),
+              ),
+              extras: Value(
+                jsonEncode(<String, Object>{
+                  if (outcome.sniffOutFound != null)
+                    'sniff': outcome.sniffOutFound!.name,
+                  if (outcome.fetchCarried != null)
+                    'fetch': outcome.fetchCarried!.name,
+                  if (outcome.newRestorationIndexes.isNotEmpty)
+                    'restored': <String>[
+                      for (final i in outcome.newRestorationIndexes)
+                        targetAt(i).key,
+                    ],
+                  if (outcome.newGear.isNotEmpty) 'gear': outcome.newGear,
+                  if (outcome.newCosmetics.isNotEmpty)
+                    'cosmetics': outcome.newCosmetics,
+                }),
               ),
             ),
           );
@@ -640,4 +719,328 @@ class GameRepository {
             ..where((c) => c.day.equals(day))
             ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
           .get();
+
+  // ---- The world -----------------------------------------------------
+
+  /// Writes down every place the gathered materials have restored that is
+  /// not yet on record, dated [day].
+  Future<void> _recordRestorations(
+    WorldStateRow worldRow,
+    int restored,
+    String day,
+  ) async {
+    final buildings = decodeStringMap(worldRow.buildingState);
+    final villagers = decodeStringMap(worldRow.npcReturned);
+    for (var i = 0; i < restored; i++) {
+      final target = targetAt(i);
+      buildings.putIfAbsent(target.key, () => day);
+      final v = target.villager;
+      if (v != null) villagers.putIfAbsent(v.key, () => day);
+    }
+    final perRegion = <String, int>{};
+    for (var i = 0; i < restored; i++) {
+      final region = targetAt(i).region;
+      perRegion[region] = (perRegion[region] ?? 0) + 1;
+    }
+    final points = restorationPointsFor(restored);
+    await (db.update(db.worldStates)..where((w) => w.id.equals(worldRow.id)))
+        .write(
+      WorldStatesCompanion(
+        restorationPoints: Value(
+          points > worldRow.restorationPoints
+              ? points
+              : worldRow.restorationPoints,
+        ),
+        buildingState: Value(jsonEncode(buildings)),
+        npcReturned: Value(jsonEncode(villagers)),
+        regionState: Value(jsonEncode(perRegion)),
+      ),
+    );
+  }
+
+  /// Brings the world, gear and cosmetics on record into line with the
+  /// totals already earned. Needed once after an update from a build that
+  /// gathered materials before the map existed; harmless every other time.
+  Future<void> syncWorld() async {
+    final heroRow = await hero();
+    final companionRow = await companion();
+    final worldRow = await world();
+    if (heroRow == null || companionRow == null || worldRow == null) return;
+    final restored = restoredCount(decodeMaterials(heroRow.materials));
+    final recorded = decodeStringMap(worldRow.buildingState).length;
+    if (restored > recorded) {
+      await _recordRestorations(worldRow, restored, DayKey.of(clock()));
+    }
+    final cosmetics = jsonEncode(
+      cosmeticsUnlockedAt(heroLevel: heroRow.level, restored: restored),
+    );
+    if (cosmetics != heroRow.unlockedCosmetics) {
+      await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+          .write(CharactersCompanion(unlockedCosmetics: Value(cosmetics)));
+    }
+    final gear = jsonEncode(
+      gearUnlockedAt(level: companionRow.level, bond: companionRow.bond),
+    );
+    if (gear != companionRow.gearUnlocked) {
+      await (db.update(db.companions)
+            ..where((c) => c.id.equals(companionRow.id)))
+          .write(CompanionsCompanion(gearUnlocked: Value(gear)));
+    }
+  }
+
+  // ---- Campfire and the day ------------------------------------------
+
+  Future<void> _touchDay(String day, DayLogsCompanion change) async {
+    final now = clock();
+    await db.into(db.dayLogs).insert(
+          DayLogsCompanion.insert(id: newId(), day: day, dawnGeneratedAt: now),
+          mode: InsertMode.insertOrIgnore,
+        );
+    await (db.update(db.dayLogs)..where((d) => d.day.equals(day)))
+        .write(change.copyWith(exportedAt: const Value(null)));
+  }
+
+  /// Saves the day's free-text note, exactly as typed.
+  Future<void> setDayNote(String day, String note) =>
+      _touchDay(day, DayLogsCompanion(dayNote: Value(note)));
+
+  /// Remembers how many quests were on the board on [day].
+  Future<void> recordBoardSize(String day, int total) async {
+    final log = await dayLog(day);
+    if (log == null || log.questsTotal == total) return;
+    await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
+        .write(DayLogsCompanion(questsTotal: Value(total)));
+  }
+
+  /// Campfire (DESIGN §4.1 step 4): saves the note and completes the
+  /// Campfire Review quest, which closes the day. Safe to call again later
+  /// the same evening; the note is updated and nothing is awarded twice.
+  Future<CompletionOutcome?> closeDay({required String note}) async {
+    final day = DayKey.of(clock());
+    await setDayNote(day, note);
+    final campfire = await (db.select(db.quests)
+          ..where((q) => q.systemKey.equals(systemKeyCampfire))
+          ..limit(1))
+        .getSingleOrNull();
+    CompletionOutcome? outcome;
+    if (campfire != null) {
+      outcome = await completeQuest(campfire.id);
+    }
+    final log = await dayLog(day);
+    if (log != null && log.campfireAt == null) {
+      await (db.update(db.dayLogs)..where((d) => d.id.equals(log.id)))
+          .write(DayLogsCompanion(campfireAt: Value(clock())));
+    }
+    return outcome;
+  }
+
+  // ---- Health entries (the quick-entry form arrives in Phase 3) -------
+
+  Future<List<HealthEntryRow>> healthEntriesOn(String day) =>
+      (db.select(db.healthEntries)
+            ..where((h) => h.day.equals(day))
+            ..orderBy([(h) => OrderingTerm.asc(h.fieldKey)]))
+          .get();
+
+  /// Stores exactly what was typed for [fieldKey] on [day]. An empty value
+  /// clears the entry.
+  Future<void> setHealthEntry(
+    String day,
+    String fieldKey,
+    String value, {
+    String unit = '',
+  }) async {
+    await (db.delete(db.healthEntries)
+          ..where((h) => h.day.equals(day) & h.fieldKey.equals(fieldKey)))
+        .go();
+    if (value.trim().isNotEmpty) {
+      await db.into(db.healthEntries).insert(
+            HealthEntriesCompanion.insert(
+              id: newId(),
+              day: day,
+              fieldKey: fieldKey,
+              value: value.trim(),
+              unit: Value(unit),
+            ),
+          );
+    }
+    await _touchDay(day, const DayLogsCompanion());
+  }
+
+  // ---- Settings ------------------------------------------------------
+
+  Future<void> renameHero(String name) async {
+    final heroRow = await hero();
+    if (heroRow == null || name.trim().isEmpty) return;
+    await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+        .write(CharactersCompanion(name: Value(name.trim())));
+  }
+
+  /// A new chapter (DESIGN §7A.1): the companion's kind and name can change
+  /// at any time. XP, level, Bond, tricks, gear and history all carry over.
+  Future<void> changeCompanion({
+    required String name,
+    required CompanionKind kind,
+  }) async {
+    final row = await companion();
+    if (row == null || name.trim().isEmpty) return;
+    await (db.update(db.companions)..where((c) => c.id.equals(row.id))).write(
+      CompanionsCompanion(
+        name: Value(name.trim()),
+        kind: Value(kind),
+        portraitId: Value(kind.name),
+      ),
+    );
+  }
+
+  /// Puts an unlocked frame or banner into use.
+  Future<void> equipCosmetic(String key) async {
+    final heroRow = await hero();
+    final cosmetic = cosmeticByKey(key);
+    if (heroRow == null || cosmetic == null) return;
+    if (!decodeStringList(heroRow.unlockedCosmetics).contains(key)) return;
+    final equipped = decodeStringMap(heroRow.equippedCosmetics);
+    equipped[cosmetic.kind.name] = key;
+    await (db.update(db.characters)..where((c) => c.id.equals(heroRow.id)))
+        .write(CharactersCompanion(equippedCosmetics: Value(jsonEncode(equipped))));
+  }
+
+  /// Wears a piece of unlocked gear, or none when [key] is null.
+  Future<void> equipGear(String? key) async {
+    final row = await companion();
+    if (row == null) return;
+    if (key != null && !decodeStringList(row.gearUnlocked).contains(key)) {
+      return;
+    }
+    await (db.update(db.companions)..where((c) => c.id.equals(row.id)))
+        .write(CompanionsCompanion(gearEquipped: Value(key)));
+  }
+
+  // ---- Export support ------------------------------------------------
+
+  Future<List<CompletionRow>> allCompletions() =>
+      (db.select(db.completions)
+            ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
+          .get();
+
+  Future<List<DayLogRow>> allDayLogs() =>
+      (db.select(db.dayLogs)..orderBy([(d) => OrderingTerm.asc(d.day)])).get();
+
+  /// Days opened so far. Information only, never a score (DESIGN §6.4).
+  Future<int> daysVisited() async {
+    final count = db.dayLogs.id.count();
+    final row =
+        await (db.selectOnly(db.dayLogs)..addColumns([count])).getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  Future<void> markExported(Iterable<String> days) async {
+    final now = clock();
+    for (final day in days) {
+      await (db.update(db.dayLogs)..where((d) => d.day.equals(day)))
+          .write(DayLogsCompanion(exportedAt: Value(now)));
+    }
+  }
+
+  // ---- Backup (DESIGN §9.2) ------------------------------------------
+
+  /// Everything in the database as one JSON document.
+  Future<String> exportBackupJson() async {
+    final tables = <String, List<Map<String, dynamic>>>{
+      'quests': [for (final r in await db.select(db.quests).get()) r.toJson()],
+      'completions': [
+        for (final r in await db.select(db.completions).get()) r.toJson(),
+      ],
+      'questProgress': [
+        for (final r in await db.select(db.questProgress).get()) r.toJson(),
+      ],
+      'characters': [
+        for (final r in await db.select(db.characters).get()) r.toJson(),
+      ],
+      'companions': [
+        for (final r in await db.select(db.companions).get()) r.toJson(),
+      ],
+      'worldStates': [
+        for (final r in await db.select(db.worldStates).get()) r.toJson(),
+      ],
+      'dayLogs': [for (final r in await db.select(db.dayLogs).get()) r.toJson()],
+      'healthEntries': [
+        for (final r in await db.select(db.healthEntries).get()) r.toJson(),
+      ],
+    };
+    return const JsonEncoder.withIndent('  ').convert(<String, Object>{
+      'format': backupFormat,
+      'schema': db.schemaVersion,
+      'exportedAt': clock().toIso8601String(),
+      'tables': tables,
+    });
+  }
+
+  /// Replaces everything on this device with the contents of a backup made
+  /// by [exportBackupJson]. Nothing is changed unless the whole file reads
+  /// cleanly.
+  Future<BackupResult> importBackupJson(String source) async {
+    const notABackup =
+        BackupResult.notUsable('That file is not a backup from this app.');
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(source);
+    } on FormatException {
+      return notABackup;
+    }
+    if (decoded is! Map<String, dynamic> ||
+        decoded['format'] != backupFormat ||
+        decoded['tables'] is! Map<String, dynamic>) {
+      return notABackup;
+    }
+    final schema = decoded['schema'];
+    if (schema is! int || schema < 2) return notABackup;
+    if (schema > db.schemaVersion) {
+      return const BackupResult.notUsable(
+        'This backup comes from a newer version of the app. Update the app, '
+        'then restore it.',
+      );
+    }
+    final tables = decoded['tables'] as Map<String, dynamic>;
+    List<Map<String, dynamic>> rows(String name) => <Map<String, dynamic>>[
+          for (final r in (tables[name] as List<dynamic>? ?? const <dynamic>[]))
+            if (r is Map<String, dynamic>) r,
+        ];
+
+    try {
+      final quests = rows('quests').map(QuestRow.fromJson).toList();
+      final completions =
+          rows('completions').map(CompletionRow.fromJson).toList();
+      final progress =
+          rows('questProgress').map(QuestProgressRow.fromJson).toList();
+      final characters = rows('characters').map(CharacterRow.fromJson).toList();
+      final companions = rows('companions').map(CompanionRow.fromJson).toList();
+      final worlds = rows('worldStates').map(WorldStateRow.fromJson).toList();
+      final dayLogs = rows('dayLogs').map(DayLogRow.fromJson).toList();
+      final health =
+          rows('healthEntries').map(HealthEntryRow.fromJson).toList();
+      if (characters.isEmpty || companions.isEmpty || worlds.isEmpty) {
+        return notABackup;
+      }
+      await db.transaction(() async {
+        for (final table in db.allTables) {
+          await db.delete(table).go();
+        }
+        await db.batch((b) {
+          b.insertAll(db.quests, quests);
+          b.insertAll(db.completions, completions);
+          b.insertAll(db.questProgress, progress);
+          b.insertAll(db.characters, characters);
+          b.insertAll(db.companions, companions);
+          b.insertAll(db.worldStates, worlds);
+          b.insertAll(db.dayLogs, dayLogs);
+          b.insertAll(db.healthEntries, health);
+        });
+      });
+    } on Object {
+      // A row that does not fit the tables: leave everything as it was.
+      return notABackup;
+    }
+    return const BackupResult.ok();
+  }
 }

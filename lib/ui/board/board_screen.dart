@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../../data/repository.dart';
+import '../../data/seed.dart';
 import '../../rules/day_key.dart';
 import '../../rules/enums.dart';
 import '../../rules/journey.dart';
+import '../../rules/still.dart';
+import '../../rules/world.dart';
 import '../../rules/xp_curve.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../art/crests.dart';
 import '../art/vista.dart';
+import '../campfire/campfire_screen.dart';
 import '../log/quest_editor.dart';
+import '../settings/settings_screen.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'quest_actions.dart';
@@ -40,6 +45,7 @@ class BoardScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 104),
           children: <Widget>[
             const DawnHeader(),
+            const _VillagerLine(),
             if (now.isNotEmpty) ...<Widget>[
               SectionHeader('Now', icon: 'sun', count: now.length),
               for (final entry in now) ...<Widget>[
@@ -61,9 +67,12 @@ class BoardScreen extends StatelessWidget {
                 const SizedBox(height: 10),
               ],
             ],
-            if (campfire != null && !campfire.isDone) ...<Widget>[
+            if (campfire != null) ...<Widget>[
               const SectionHeader('Day’s end', icon: 'campfire'),
-              QuestCard(entry: campfire),
+              if (campfire.isDone)
+                const _CampfireLit()
+              else
+                QuestCard(entry: campfire),
             ],
             if (done.isNotEmpty) ...<Widget>[
               SectionHeader('Done', icon: 'check', count: done.length),
@@ -140,14 +149,28 @@ class DawnHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'DAWN IN THE VALE · ${game.questsDoneToday} OF '
-                '${game.questsTotalToday} DONE',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.label.copyWith(color: Palette.goldBright),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      'DAWN IN THE VALE · ${game.questsDoneToday} OF '
+                      '${game.questsTotalToday} DONE',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.label.copyWith(color: Palette.goldBright),
+                    ),
+                  ),
+                  RoundIconButton(
+                    icon: 'settings',
+                    semanticLabel: 'Settings',
+                    size: 34,
+                    background: Palette.forestNight.withValues(alpha: 0.55),
+                    foreground: Palette.onDark,
+                    edge: Palette.onDark.withValues(alpha: 0.25),
+                    onPressed: () => openSettings(context),
+                  ),
+                ],
               ),
-              const SizedBox(height: 3),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
@@ -169,6 +192,7 @@ class DawnHeader extends StatelessWidget {
                       portrait: HeroPortrait(
                         portraitId: hero.portraitId,
                         size: 44,
+                        frame: game.frame,
                       ),
                       name: hero.name,
                       level: heroProgress.level,
@@ -183,6 +207,7 @@ class DawnHeader extends StatelessWidget {
                       portrait: CompanionPortrait(
                         kind: companion.kind,
                         size: 44,
+                        gearIcon: game.gearWorn?.icon,
                       ),
                       name: companion.name,
                       level: companionProgress.level,
@@ -304,8 +329,8 @@ class _PartyBadge extends StatelessWidget {
   }
 }
 
-/// Slim world-progress + journey strip (DESIGN §8.1). Restoration progress
-/// joins it in Phase 2; materials are on the Vale and the Party Sheet.
+/// Slim world-progress + journey strip (DESIGN §8.1): what is being restored
+/// and how far along it is, then the road.
 class _JourneyStrip extends StatelessWidget {
   const _JourneyStrip();
 
@@ -314,8 +339,11 @@ class _JourneyStrip extends StatelessWidget {
     final game = GameScope.of(context);
     final paces = game.world?.journeyPaces ?? 0;
     final toNext = pacesToNextDiscovery(paces);
+    final target = game.target;
+    final progress = targetProgress(game.materials);
     return Semantics(
-      label: '$paces Paces on the road, $toNext to the next discovery',
+      label: 'Restoring ${target.name}, ${(progress * 100).round()} percent. '
+          '$paces Paces on the road, $toNext to the next discovery',
       child: ExcludeSemantics(
         child: _Frost(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 9),
@@ -324,15 +352,14 @@ class _JourneyStrip extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  const VIcon('pace', size: 15, color: Palette.goldBright),
+                  const VIcon('home', size: 15, color: Palette.goldBright),
                   const SizedBox(width: 7),
                   Expanded(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
-                        'the next discovery',
+                        'Restoring ${target.name}',
                         maxLines: 1,
                         style: AppText.small.copyWith(
                           color: Palette.onDark,
@@ -350,7 +377,36 @@ class _JourneyStrip extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
+              XpBar(
+                fraction: progress,
+                color: Palette.gold,
+                height: 5,
+                track: Palette.onDark.withValues(alpha: 0.16),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: <Widget>[
+                  const VIcon('pace', size: 15, color: Palette.dawnPeach),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '$paces ${paces == 1 ? 'Pace' : 'Paces'} · $toNext to '
+                        'the next discovery',
+                        maxLines: 1,
+                        style: AppText.small.copyWith(
+                          color: Palette.onDark,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
               XpBar(
                 fraction: pacesIntoStretch(paces) / pacesPerDiscovery,
                 color: Palette.companion,
@@ -360,6 +416,115 @@ class _JourneyStrip extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A villager who has come home says good morning (DESIGN §7). Presentation
+/// only: a portrait and one line.
+class _VillagerLine extends StatelessWidget {
+  const _VillagerLine();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final greeting = game.dawnLine;
+    if (greeting == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: VillagerCard(greeting: greeting),
+    );
+  }
+}
+
+/// A villager's portrait and one line, on the dark background.
+class VillagerCard extends StatelessWidget {
+  const VillagerCard({super.key, required this.greeting});
+
+  final VillagerLine greeting;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = greeting.villager;
+    return Semantics(
+      label: '${v.name}, ${v.role}, says: ${greeting.line}',
+      child: ExcludeSemantics(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Palette.forestNight.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Palette.gold.withValues(alpha: 0.35)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
+            child: Row(
+              children: <Widget>[
+                Roundel(icon: v.icon, color: Palette.moss, size: 40),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '${v.name.toUpperCase()} · ${v.role.toUpperCase()}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.label.copyWith(
+                          color: Palette.goldBright,
+                          fontSize: 10.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '“${greeting.line}”',
+                        style: AppText.body.copyWith(
+                          color: Palette.onDark,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// After the Campfire: a way back to the evening's review and note.
+class _CampfireLit extends StatelessWidget {
+  const _CampfireLit();
+
+  @override
+  Widget build(BuildContext context) {
+    return ParchmentCard(
+      onTap: () => openCampfire(context),
+      child: Row(
+        children: <Widget>[
+          const Roundel(icon: 'campfire', color: Palette.ember, size: 44),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'The campfire is lit',
+                  style: AppText.cardTitle.copyWith(color: Palette.slate),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Read tonight’s review or change your note.',
+                  style: AppText.small.copyWith(color: Palette.slateSoft),
+                ),
+              ],
+            ),
+          ),
+          const VIcon('chevron', size: 18, color: Palette.slateSoft),
+        ],
       ),
     );
   }
@@ -471,21 +636,42 @@ class QuestCard extends StatelessWidget {
     final game = GameScope.read(context);
     final quest = entry.quest;
     final color = Palette.attribute(quest.attribute);
-    final Widget action = switch (quest.completionType) {
-      CompletionType.count => CountStepper(entry: entry),
-      CompletionType.timer => TimerControl(entry: entry),
-      _ => CompleteButton(
-          label: 'Complete ${quest.name}',
-          color: companionStyle ? Palette.companion : Palette.forest,
-          onComplete: () => completeEntry(context, entry),
-        ),
-    };
+    final isCampfire = quest.systemKey == systemKeyCampfire;
+    final still = drawsStill(quest.difficulty) ? stillFor(quest.id) : null;
+    final pending = game.isPending(quest.id);
+    final Widget action;
+    if (pending) {
+      action = UndoButton(
+        questName: quest.name,
+        onUndo: () => game.undo(quest.id),
+      );
+    } else if (isCampfire) {
+      // The Campfire is a screen of its own: review, note, then close.
+      action = RoundIconButton(
+        icon: 'campfire',
+        semanticLabel: 'Open the Campfire',
+        size: 48,
+        onPressed: () => openCampfire(context),
+      );
+    } else {
+      action = switch (quest.completionType) {
+        CompletionType.count => CountStepper(entry: entry),
+        CompletionType.timer => TimerControl(entry: entry),
+        _ => CompleteButton(
+            label: 'Complete ${quest.name}',
+            color: companionStyle ? Palette.companion : Palette.forest,
+            onComplete: () => completeEntry(context, entry),
+          ),
+      };
+    }
 
     return ParchmentCard(
       tint: companionStyle ? Palette.companionTint : null,
       edge: companionStyle ? Palette.companionEdge : null,
       padding: EdgeInsets.fromLTRB(12, companionStyle ? 9 : 12, 10, companionStyle ? 9 : 12),
-      onTap: () => showQuestSheet(context, quest.id),
+      onTap: () => isCampfire
+          ? openCampfire(context)
+          : showQuestSheet(context, quest.id),
       child: Row(
         children: <Widget>[
           Roundel(
@@ -529,7 +715,9 @@ class QuestCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  rewardLabel(quest, game.companionName),
+                  pending
+                      ? 'Done. Undo if that was a slip.'
+                      : rewardLabel(quest, game.companionName),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppText.small.copyWith(
@@ -538,6 +726,26 @@ class QuestCard extends StatelessWidget {
                     fontSize: 12.5,
                   ),
                 ),
+                if (still != null && !pending) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: <Widget>[
+                      const VIcon('still', size: 14, color: Palette.slateSoft),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          still.sits,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppText.small.copyWith(
+                            color: Palette.slateSoft,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
