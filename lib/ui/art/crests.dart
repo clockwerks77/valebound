@@ -367,13 +367,13 @@ class _CrestPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = ringWidth
-        ..shader = SweepGradient(
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: <Color>[
-            ring,
             Color.lerp(ring, const Color(0xFFFFFFFF), 0.45)!,
             ring,
             Color.lerp(ring, const Color(0xFF000000), 0.3)!,
-            ring,
           ],
         ).createShader(Rect.fromCircle(center: center, radius: radius)),
     );

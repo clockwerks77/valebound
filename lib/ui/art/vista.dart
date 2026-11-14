@@ -97,9 +97,10 @@ class VistaPainter extends CustomPainter {
     // Low sun and its glow.
     final sun = Offset(w * 0.74, h * 0.6);
     final glowRadius = math.max(w, h) * 0.62;
-    canvas.drawCircle(
-      sun,
-      glowRadius,
+    // Painted across the whole sky rather than as a disc, so the glow has no
+    // edge of its own.
+    canvas.drawRect(
+      rect,
       Paint()
         ..shader = RadialGradient(
           colors: <Color>[

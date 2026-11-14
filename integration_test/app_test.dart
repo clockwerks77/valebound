@@ -30,15 +30,20 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('first run, one completed quest, then reopen', (tester) async {
+    void step(String what) => debugPrint('DEVICE-TEST STEP: $what');
+
+    step('open storage');
     var db = AppDatabase();
     var game = GameController(GameRepository(db));
     await game.init();
     expect(game.hasProfile, isFalse, reason: 'a fresh install starts empty');
 
+    step('show the app');
     await tester.pumpWidget(HabitAdventureApp(controller: game));
     await tester.pumpAndSettle();
 
     // Onboarding: name the hero, take the Babs preset, begin.
+    step('onboarding');
     await tester.enterText(find.byType(TextField).first, 'Adam');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue'));
@@ -48,8 +53,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
+    step('create the profile');
     await tester.tap(find.text('Begin at Dawn'));
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
+    step('board is up');
 
     expect(find.byType(AppShell), findsOneWidget);
     expect(game.companion!.kind, CompanionKind.hound);
@@ -58,17 +65,22 @@ void main() {
     final walk = find.byWidgetPredicate(
       (w) => w is CompleteButton && w.label == 'Complete Walk Babs',
     );
+    step('find Walk Babs');
     await reveal(tester, walk);
+    step('complete Walk Babs');
     await tester.tap(walk);
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
+    step('completed');
     expect(game.companion!.totalXp, 25);
     expect(game.hero!.totalXp, 13);
 
     // "Restart": drop the app, close storage, open it all again.
+    step('close everything');
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await db.close();
 
+    step('reopen storage');
     db = AppDatabase();
     game = GameController(GameRepository(db));
     await game.init();
@@ -81,9 +93,11 @@ void main() {
     expect(game.world!.journeyPaces, 1);
     expect(game.doneQuests.map((b) => b.quest.name), contains('Walk Babs'));
 
+    step('show the app again');
     await tester.pumpWidget(HabitAdventureApp(controller: game));
     await tester.pumpAndSettle();
     expect(find.byType(AppShell), findsOneWidget);
+    step('done');
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await db.close();
