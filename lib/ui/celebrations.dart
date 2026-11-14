@@ -441,10 +441,51 @@ Future<void> showRestoration(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 _Bounce(
-                  child: Roundel(
-                    icon: villager?.icon ?? 'lantern',
-                    color: Palette.forest,
-                    size: 76,
+                  child: SizedBox(
+                    width: 132,
+                    height: 112,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        Positioned(
+                          left: 10,
+                          top: 0,
+                          child: ArtMedallion(
+                            asset: placeArt(target.key),
+                            size: 112,
+                            fallback: Padding(
+                              padding: const EdgeInsets.all(18),
+                              child: Roundel(
+                                icon: villager?.icon ?? 'lantern',
+                                color: Palette.forest,
+                                size: 76,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Whoever has come home, at the place's shoulder.
+                        if (villager != null &&
+                            placeArt(target.key) != null &&
+                            villagerArt(villager.key) != null)
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Palette.parchment,
+                              ),
+                              padding: const EdgeInsets.all(2),
+                              child: ArtMedallion(
+                                asset: villagerArt(villager.key),
+                                size: 48,
+                                ring: Palette.moss,
+                                fallback: const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

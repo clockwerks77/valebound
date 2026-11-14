@@ -533,6 +533,7 @@ class ChronicleEntry {
     this.day,
     this.chapter,
     this.icon,
+    this.placeKey,
   });
 
   final ChronicleKind kind;
@@ -543,6 +544,9 @@ class ChronicleEntry {
   final String? day;
   final Chapter? chapter;
   final String? icon;
+
+  /// The place that woke, for the entries that are about one.
+  final String? placeKey;
 }
 
 /// The story so far, oldest first: the arrival, each chapter as it opened,
@@ -591,6 +595,7 @@ List<ChronicleEntry> chronicle({
         day: day,
         chapter: chapterAt(i),
         icon: villager?.icon ?? 'lantern',
+        placeKey: target.key,
       ),
     );
     final closed = chapterClosedBy(i);

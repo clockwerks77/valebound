@@ -53,9 +53,9 @@ android {
             // little and cannot be tried on a device from CI, so it is off.
             isMinifyEnabled = false
             isShrinkResources = false
-            // The release build is for the phone: arm64 only. Without this
-            // it would also carry the database library for two processors
-            // the rest of the app is not built for.
+            // The release build is for the phone: arm64. (The database
+            // library still arrives for two other processors as well; that
+            // is harmless on an arm64 phone and is noted in DECISIONS D-75.)
             ndk {
                 abiFilters.add("arm64-v8a")
             }

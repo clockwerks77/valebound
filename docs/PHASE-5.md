@@ -1,7 +1,8 @@
-# The narrator, and a first polish pass: version 0.5.0
+# The narrator, and a first polish pass: versions 0.5.0 and 0.5.1
 
 Branch `phase-5` (built on `phase-4`). Built and tested on GitHub Actions
-with Flutter 3.47.9 (Dart 3.13.7). App version 0.5.0.
+with Flutter 3.47.9 (Dart 3.13.7). App version 0.5.1 (0.5.0 without the
+new art).
 
 This is what Adam asked for on 14 November 2026 after 0.4.0: Health Connect
 read again while the app is open, something that puts the player into the
@@ -38,8 +39,8 @@ Nothing here has been run on a phone yet.
     is waking next, where the camp is, Discoveries), then the story so far
     with dates. The prologue can be read again from there.
   - The tour has a twelfth bubble for the narrator's line.
-- **A release build.** The file to install is `Valebound-0.5.0.apk`:
-  24 MB instead of 163 MB, compiled ahead of time, with no internet
+- **A release build.** The file to install is `Valebound-0.5.1.apk`:
+  about 25 MB instead of 163 MB, compiled ahead of time, with no internet
   permission at all (CI checks the built file). The debug build is beside
   it as a fallback. Same signing key, so either installs over 0.4.0 and
   over each other, and your data stays.
@@ -59,7 +60,7 @@ Nothing here has been run on a phone yet.
 
 1. On the phone, open the repository's **Releases** page and the `latest`
    release (the old `latest-debug` page is gone). Download
-   **`Valebound-0.5.0.apk`** and install it over the app you have.
+   **`Valebound-0.5.1.apk`** and install it over the app you have.
 2. Open it. The launch screen should be green with the lantern, then the
    prologue. Read it or Skip.
 3. On the board, read the heading and the italic line under the date. Tap
@@ -71,7 +72,7 @@ Nothing here has been run on a phone yet.
 7. Try it again in the evening: the heading and the sky should have changed.
 
 If the release build misbehaves in any way, install
-`Valebound-0.5.0-debug.apk` from the same page over it. Nothing is lost
+`Valebound-0.5.1-debug.apk` from the same page over it. Nothing is lost
 either way.
 
 ## (c) Screenshots
@@ -95,6 +96,23 @@ On the opened Fold the story pages put the picture on one pane and the
 words on the other, and the Chronicle puts where things stand beside the
 story; a test checks that no words or buttons sit on the crease.
 
+## Added in 0.5.1: the first of the new art
+
+All 96 pieces on the art list were generated in Firefly on 14 Nov 2026
+(ASSETS.md section 4 lists every one with its Subject line). The 57 that
+are shown small are in the app:
+
+- **Villagers:** the villager who speaks on the board now has a face, and
+  so does whoever comes home when a place wakes.
+- **Places:** each place has its picture on the Map (grey while it sleeps),
+  on the card when it wakes, and in the Chronicle.
+- **The Still:** the day's creature is pictured on its row of the board.
+- **Gear:** the Inventory shows each piece you have found.
+
+The 38 that are shown large (Discovery cards, the scenes, the story
+pictures, the map) are generated and waiting: they need the full-size
+files, which need a folder on the PC connected to the chat.
+
 ## What is not done
 
 - **Not run on a phone.** The release build, the haptics, the launch
@@ -102,8 +120,9 @@ story; a test checks that no words or buttons sit on the crease.
   built file, not by hand.
 - **The story pictures are still drawn in code.** The painted ones are
   being generated (see ASSETS.md) and need full-size files from the PC.
-- **Art.** Generation of the full list is in progress in Firefly; no new
-  piece is in this build.
+- **Large art.** 38 generated pieces are not in the app yet (see above).
+- **The clockwork sprite** portrait is still the earlier one; two new
+  takes came out glossy and three-dimensional.
 
 ## Tests
 

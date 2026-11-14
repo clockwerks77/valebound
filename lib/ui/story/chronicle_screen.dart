@@ -8,6 +8,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../adaptive.dart';
+import '../art/painted.dart';
 import '../motion.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
@@ -354,10 +355,16 @@ class _EntryView extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Roundel(
-                  icon: entry.icon ?? 'lantern',
-                  color: Palette.forest,
-                  size: 40,
+                ArtMedallion(
+                  asset: entry.placeKey == null
+                      ? null
+                      : placeArt(entry.placeKey!),
+                  size: 48,
+                  fallback: Roundel(
+                    icon: entry.icon ?? 'lantern',
+                    color: Palette.forest,
+                    size: 40,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

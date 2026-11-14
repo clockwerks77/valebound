@@ -92,7 +92,7 @@ Install on a connected device:
 | `lib/state/` | One controller that the screens listen to. |
 | `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout; `tour/` holds the first-run tour and the one-time screen hints; `story/` holds the prologue, the chapter pages and the Chronicle; `motion.dart` and `feel.dart` hold the app's motion and haptics. |
 | `lib/ui/art/` | Code-drawn stand-in art, and the widgets that show the illustrated pieces (see ASSETS.md). |
-| `assets/art/` | The illustrated pieces: ten portraits and the first Discovery card. |
+| `assets/art/` | The illustrated pieces: ten portraits, the first Discovery card, and since 0.5.1 the 20 places, 20 villagers, six Still creatures and 11 pieces of gear. |
 | `test/rules/` | Unit tests for every rule. |
 | `test/data/` | Repository tests on an in-memory database, including persistence across restart, time away, the backup, and the upgrades from the Phase 1 and Phase 2 databases. |
 | `test/export/` | The Markdown contract field by field, the export queue, and the generator for `docs/samples`. |

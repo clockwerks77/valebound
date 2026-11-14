@@ -8,6 +8,7 @@ import '../../rules/world.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
+import '../art/painted.dart';
 import '../party/party_sheet.dart';
 import '../story/chronicle_screen.dart';
 import '../widgets/common.dart';
@@ -242,10 +243,14 @@ class TargetCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Roundel(
-                icon: target.villager?.icon ?? 'lantern',
-                color: Palette.forest,
-                size: 42,
+              ArtMedallion(
+                asset: placeArt(target.key),
+                size: 52,
+                fallback: Roundel(
+                  icon: target.villager?.icon ?? 'lantern',
+                  color: Palette.forest,
+                  size: 42,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -588,7 +593,20 @@ class _PlaceRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 3.5),
           child: Row(
             children: <Widget>[
-              VIcon(awake ? 'check' : (current ? 'sun' : 'moon'), size: 15, color: color),
+              ArtMedallion(
+                asset: placeArt(place.key),
+                size: 30,
+                ring: awake ? Palette.gold : Palette.goldDeep,
+                asleep: !awake && !current,
+                fallback: SizedBox(
+                  width: 30,
+                  child: VIcon(
+                    awake ? 'check' : (current ? 'sun' : 'moon'),
+                    size: 15,
+                    color: color,
+                  ),
+                ),
+              ),
               const SizedBox(width: 9),
               Expanded(
                 child: Text(

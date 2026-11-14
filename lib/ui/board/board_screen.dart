@@ -18,6 +18,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../art/crests.dart';
+import '../art/painted.dart';
 import '../art/vista.dart';
 import '../campfire/campfire_screen.dart';
 import '../health/health_log_screen.dart';
@@ -604,10 +605,15 @@ class _DailyStillRow extends StatelessWidget {
     final awake = today.still.awake;
     return Row(
       children: <Widget>[
-        VIcon(
-          awake ? 'sun' : 'still',
-          size: 15,
-          color: awake ? Palette.goldBright : Palette.onDarkSoft,
+        ArtMedallion(
+          asset: stillArt(today.still.creature.key),
+          size: 22,
+          ring: awake ? Palette.goldBright : Palette.onDarkSoft,
+          fallback: VIcon(
+            awake ? 'sun' : 'still',
+            size: 15,
+            color: awake ? Palette.goldBright : Palette.onDarkSoft,
+          ),
         ),
         const SizedBox(width: 7),
         Expanded(
@@ -698,7 +704,11 @@ class VillagerCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
             child: Row(
               children: <Widget>[
-                Roundel(icon: v.icon, color: Palette.moss, size: 40),
+                ArtMedallion(
+                  asset: villagerArt(v.key),
+                  size: 44,
+                  fallback: Roundel(icon: v.icon, color: Palette.moss, size: 40),
+                ),
                 const SizedBox(width: 11),
                 Expanded(
                   child: Column(

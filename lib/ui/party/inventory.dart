@@ -8,6 +8,7 @@ import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
 import '../art/crests.dart';
+import '../art/painted.dart';
 import '../widgets/common.dart';
 import '../widgets/v_icon.dart';
 import 'party_sheet.dart';
@@ -185,6 +186,7 @@ class CompanionInventory extends StatelessWidget {
                 final wearing = worn == g.key;
                 return UnlockRow(
                   icon: g.icon,
+                  art: gearArt(g.key),
                   color: Palette.companion,
                   name: g.name,
                   line: g.line,
@@ -220,9 +222,13 @@ class UnlockRow extends StatelessWidget {
     required this.unlocked,
     this.highlighted = false,
     this.onTap,
+    this.art,
   });
 
   final String icon;
+
+  /// A picture of the thing, shown in place of [icon] once it is found.
+  final String? art;
   final Color color;
   final String name;
   final String line;
@@ -239,6 +245,14 @@ class UnlockRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: Row(
         children: <Widget>[
+          if (art != null && unlocked)
+            ArtMedallion(
+              asset: art,
+              size: 40,
+              ring: highlighted ? Palette.goldDeep : Palette.parchmentEdge,
+              fallback: const SizedBox(width: 40, height: 40),
+            )
+          else
           Opacity(
             opacity: unlocked ? 1 : 0.5,
             child: Container(
