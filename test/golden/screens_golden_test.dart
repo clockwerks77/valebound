@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/rules/journey.dart';
+import 'package:habit_adventure/rules/world.dart';
 import 'package:habit_adventure/ui/adaptive.dart';
 import 'package:habit_adventure/ui/board/quest_actions.dart';
+import 'package:habit_adventure/ui/campfire/campfire_screen.dart';
 import 'package:habit_adventure/ui/celebrations.dart';
+import 'package:habit_adventure/ui/map/vale_map.dart';
+import 'package:habit_adventure/ui/settings/settings_screen.dart';
 import 'package:habit_adventure/ui/shell/app_shell.dart';
 import 'package:habit_adventure/ui/widgets/common.dart';
 
 import '../support/harness.dart';
 
-// Renders the Phase 1 screens at the cover-screen and opened-Fold sizes and
+// Renders every screen at the cover-screen and opened-Fold sizes and
 // writes them to test/golden/goldens/. CI publishes those PNGs as the phase
 // screenshots. The same runs assert that nothing critical sits on the crease.
 
@@ -39,6 +43,7 @@ void expectCreaseClear(WidgetTester tester, TestDevice device) {
     find.byType(XpBar),
     find.byType(TextField),
     find.byType(CompleteButton),
+    find.byType(UndoButton),
     find.byType(RoundIconButton),
     find.byType(PrimaryButton),
     find.byType(QuietButton),
@@ -262,6 +267,178 @@ void main() {
       await tester.pumpAndSettle();
       expectCreaseClear(tester, TestDevice.foldOpen);
       await shot(tester, '25_onboarding_open_companion');
+    });
+  });
+
+  group('Phase 2 on the cover screen', () {
+    screenTest('World Map', (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await openTab(tester, 'Map');
+      expect(find.byType(ValeMap), findsOneWidget);
+      await shot(tester, '40_map_cover');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -520));
+      await tester.pumpAndSettle();
+      await shot(tester, '41_map_cover_target_and_road');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -520));
+      await tester.pumpAndSettle();
+      await shot(tester, '42_map_cover_places');
+    });
+
+    screenTest('Inventory', (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await openTab(tester, 'Character');
+      await tester.tap(find.text('Inventory'));
+      await tester.pumpAndSettle();
+      await shot(tester, '43_inventory_cover_hero');
+      await reveal(tester, find.text('GEAR'));
+      await shot(tester, '44_inventory_cover_companion');
+    });
+
+    screenTest('Campfire', (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await reveal(tester, find.text('Campfire Review'));
+      await tester.tap(find.text('Campfire Review'));
+      await tester.pumpAndSettle();
+      expect(find.byType(CampfireScreen), findsOneWidget);
+      await shot(tester, '45_campfire_cover_scene');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -420));
+      await tester.pumpAndSettle();
+      await shot(tester, '46_campfire_cover_review');
+      await reveal(tester, find.byType(TextField));
+      await tester.enterText(
+        find.byType(TextField),
+        'Long walk by the river with Babs before the rain.',
+      );
+      await tester.pumpAndSettle();
+      await shot(tester, '47_campfire_cover_note');
+    });
+
+    screenTest('Settings', (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      await TestApp.start(
+        tester,
+        now: saturday,
+        withHistory: true,
+        vault: MemoryVault(chosen: true),
+      );
+      await tester.tap(
+        find.byWidgetPredicate(
+          (w) => w is RoundIconButton && w.semanticLabel == 'Settings',
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      await shot(tester, '48_settings_cover');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -520));
+      await tester.pumpAndSettle();
+      await shot(tester, '49_settings_cover_more');
+    });
+
+    screenTest('A place is restored; a quest waits to be undone',
+        (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      final context = tester.element(find.byType(AppShell));
+      showRestoration(context, target: restorationTargets[2]);
+      await tester.pumpAndSettle();
+      await shot(tester, '50_restoration_cover');
+      await tester.tap(find.text('The Vale wakes'));
+      await tester.pumpAndSettle();
+
+      final steps = find.byWidgetPredicate(
+        (w) => w is CompleteButton && w.label == 'Complete 7,000 Steps',
+      );
+      await reveal(tester, steps);
+      await tester.tap(steps);
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 1500));
+      expect(find.byType(UndoButton), findsOneWidget);
+      await shot(tester, '51_board_cover_undo');
+      await tester.tap(find.byType(UndoButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(UndoButton), findsNothing);
+    });
+  });
+
+  group('Phase 2 on the opened Fold', () {
+    screenTest('World Map: the map on one pane, the details on the other',
+        (tester) async {
+      useDevice(tester, TestDevice.foldOpen);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await openTab(tester, 'Map');
+      final crease = TestDevice.foldOpen.size.width / 2;
+      expect(tester.getRect(find.byType(ValeMap)).right < crease, isTrue);
+      expect(
+        tester.getRect(find.textContaining('WORKING TOWARD')).left > crease,
+        isTrue,
+      );
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '60_map_open');
+    });
+
+    screenTest('Inventory: the hero’s things and the companion’s',
+        (tester) async {
+      useDevice(tester, TestDevice.foldOpen);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await openTab(tester, 'Character');
+      await tester.tap(find.text('Inventory'));
+      await tester.pumpAndSettle();
+      final crease = TestDevice.foldOpen.size.width / 2;
+      expect(tester.getRect(find.text('The stores')).right < crease, isTrue);
+      expect(tester.getRect(find.text('GEAR AND TRICKS')).left > crease, isTrue);
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '61_inventory_open');
+    });
+
+    screenTest('Campfire: the camp on one pane, the review on the other',
+        (tester) async {
+      useDevice(tester, TestDevice.foldOpen);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      await reveal(tester, find.text('Campfire Review'));
+      await tester.tap(find.text('Campfire Review'));
+      await tester.pumpAndSettle();
+      final crease = TestDevice.foldOpen.size.width / 2;
+      expect(tester.getRect(find.text('CAMPFIRE')).right < crease, isTrue);
+      expect(tester.getRect(find.text('TODAY')).left > crease, isTrue);
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '62_campfire_open');
+      await tester.drag(find.byType(ListView).last, const Offset(0, -600));
+      await tester.pumpAndSettle();
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '63_campfire_open_note');
+    });
+
+    screenTest('Settings', (tester) async {
+      useDevice(tester, TestDevice.foldOpen);
+      await TestApp.start(
+        tester,
+        now: saturday,
+        withHistory: true,
+        vault: MemoryVault(chosen: true),
+      );
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expectCreaseClear(tester, TestDevice.foldOpen);
+      await shot(tester, '64_settings_open');
+    });
+
+    screenTest('The restoration moment stays on one side of the crease',
+        (tester) async {
+      useDevice(tester, TestDevice.foldOpen);
+      await TestApp.start(tester, now: saturday, withHistory: true);
+      final context = tester.element(find.byType(AppShell));
+      showRestoration(context, target: restorationTargets[2]);
+      await tester.pumpAndSettle();
+      final crease = TestDevice.foldOpen.size.width / 2;
+      final button = tester.getRect(find.byType(PrimaryButton).last);
+      expect(button.right <= crease || button.left >= crease, isTrue);
+      await shot(tester, '65_restoration_open');
+      await tester.tap(find.text('The Vale wakes'));
+      await tester.pumpAndSettle();
     });
   });
 

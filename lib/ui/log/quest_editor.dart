@@ -189,7 +189,8 @@ class _QuestEditorState extends State<QuestEditor> {
     }
     widget.onClose();
     if (entry != null && navigator.mounted) {
-      await completeEntry(navigator.context, entry);
+      // "I already did this" is a deliberate choice, so it commits at once.
+      await completeEntry(navigator.context, entry, undoable: false);
     }
   }
 

@@ -842,6 +842,9 @@ class GameRepository {
             ..orderBy([(h) => OrderingTerm.asc(h.fieldKey)]))
           .get();
 
+  Future<Set<String>> daysWithHealthEntries() async =>
+      <String>{for (final h in await db.select(db.healthEntries).get()) h.day};
+
   /// Stores exactly what was typed for [fieldKey] on [day]. An empty value
   /// clears the entry.
   Future<void> setHealthEntry(

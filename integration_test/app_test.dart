@@ -69,6 +69,8 @@ void main() {
     await reveal(tester, walk);
     step('complete Walk Babs');
     await tester.tap(walk);
+    // A tapped completion waits five seconds so it can be undone.
+    await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle(const Duration(milliseconds: 200));
     step('completed');
     expect(game.companion!.totalXp, 25);

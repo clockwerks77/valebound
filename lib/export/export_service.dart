@@ -45,25 +45,30 @@ class ExportService {
   Future<List<String>> _pending() async {
     final logs = await repo.allDayLogs();
     final completions = await repo.allCompletions();
-    final daysWithQuests = <String>{for (final c in completions) c.day};
-    final out = <String>[];
-    for (final log in logs) {
-      if (log.exportedAt != null) continue;
-      final hasContent = daysWithQuests.contains(log.day) ||
-          log.campfireAt != null ||
-          log.dayNote.trim().isNotEmpty ||
-          (await repo.healthEntriesOn(log.day)).isNotEmpty;
-      if (hasContent) out.add(log.day);
-    }
-    return out;
+    final daysWithContent = <String>{
+      for (final c in completions) c.day,
+      ...await repo.daysWithHealthEntries(),
+    };
+    return <String>[
+      for (final log in logs)
+        if (log.exportedAt == null &&
+            (daysWithContent.contains(log.day) ||
+                log.campfireAt != null ||
+                log.dayNote.trim().isNotEmpty))
+          log.day,
+    ];
   }
 
   Future<void> refreshStatus() async {
     vaultStatus = await vault.status();
-    pendingDays = (await _pending()).length;
     if (!vaultStatus.chosen) {
+      // Nothing is queued anywhere until there is a folder to queue for.
       state = ExportState.noFolder;
-    } else if (!vaultStatus.available) {
+      pendingDays = 0;
+      return;
+    }
+    pendingDays = (await _pending()).length;
+    if (!vaultStatus.available) {
       state = ExportState.waiting;
     } else {
       state = pendingDays == 0 ? ExportState.upToDate : ExportState.waiting;

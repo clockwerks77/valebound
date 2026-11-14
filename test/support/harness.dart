@@ -236,11 +236,17 @@ class TestApp {
   }
 
   /// Lets database work started by a tap finish, then settles animations.
+  ///
+  /// Done in a few rounds, because one can start the other: a tapped quest
+  /// waits out its five-second Undo window (an animation) before it is
+  /// committed (database work), and committing starts the reward toast.
   Future<void> settle(WidgetTester tester) async {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 30)),
-    );
-    await tester.pumpAndSettle();
+    for (var round = 0; round < 4; round++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 30)),
+      );
+      await tester.pumpAndSettle();
+    }
   }
 }
 
