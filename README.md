@@ -13,11 +13,14 @@ analytics, no network calls.
 
 - **Phase 1, the playable day:** done and confirmed on the Fold
   ([report](docs/PHASE-1.md)). Branch `phase-1`.
-- **Phase 2, the world, the journey and the vault:** built and tested
-  ([report](docs/PHASE-2.md), [sample export files](docs/samples)). Branch
-  `phase-2`. The vault folder picker, Share and backup still need their
-  first run on a real phone.
-- **Phase 3, real life connects:** next.
+- **Phase 2, the world, the journey and the vault:** done; the vault export
+  and backup were confirmed on the Fold ([report](docs/PHASE-2.md),
+  [sample export files](docs/samples)). Branch `phase-2`. Share… and
+  restoring from a backup have not been tried on a phone yet.
+- **Phase 3, real life connects:** built and tested, version 0.3.0
+  ([report](docs/PHASE-3.md), [acceptance checklist](docs/ACCEPTANCE.md)).
+  Branch `phase-3`. The calendar, Health Connect steps and the reminder
+  need their first run on a real phone.
 
 ## Getting the app
 
@@ -63,17 +66,20 @@ Install on a connected device: `flutter install` or
 
 | Path | What lives there |
 |---|---|
-| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still, schedules, day rollover. No Flutter, no database. |
+| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields. No Flutter, no database. |
 | `lib/data/` | Local SQLite storage (Drift): schema and its migrations, seeded quests, the repository, the JSON backup. |
 | `lib/export/` | The Markdown export: the three documents as pure text builders, the queue, and the door to the vault folder. |
-| `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. |
+| `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. Also the device door: reading the calendar, reading steps from Health Connect, and the one local reminder. |
+| `lib/device/` | The app's side of the device door, with a do-nothing version so the app is whole without any of it. |
 | `lib/state/` | One controller that the screens listen to. |
 | `lib/ui/` | Screens and widgets. `adaptive.dart` holds the fold-aware two-pane layout. |
-| `lib/ui/art/` | Code-drawn stand-in art (see ASSETS.md). |
+| `lib/ui/art/` | Code-drawn stand-in art, and the widgets that show the illustrated pieces (see ASSETS.md). |
+| `assets/art/` | The illustrated pieces: ten portraits and the first Discovery card. |
 | `test/rules/` | Unit tests for every rule. |
-| `test/data/` | Repository tests on an in-memory database, including persistence across restart, time away, the backup, and the upgrade from the Phase 1 database. |
+| `test/data/` | Repository tests on an in-memory database, including persistence across restart, time away, the backup, and the upgrades from the Phase 1 and Phase 2 databases. |
 | `test/export/` | The Markdown contract field by field, the export queue, and the generator for `docs/samples`. |
-| `test/ui/` | Screen flow tests: onboarding, completing quests, Undo, the quest creator, Map, Inventory, Campfire, Settings. |
+| `test/ui/` | Screen flow tests: onboarding, completing quests, Undo, the quest creator, Map, Inventory, Campfire, Settings, calendar suggestions, steps, the Health Log, the Delve, the reminder. |
+| `test/acceptance/` | A quest of each completion type, created and completed (DESIGN §15). |
 | `test/golden/` | Renders the screens at cover-screen and opened-Fold sizes and checks nothing sits on the crease. |
 | `test/copy/` | Copy audit: no guilt language, no banned names, no network packages. |
 | `.github/workflows/build.yml` | The build. Logs and screenshots are published to the `ci-results` branch. |

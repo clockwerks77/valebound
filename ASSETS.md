@@ -56,8 +56,8 @@ illustration in the design. Each has a matching entry in section 3.
 
 | Stand-in | Where | Replaces | Since | Status |
 |---|---|---|---|---|
-| Hero crests ×4 (hooded figure medallions) | `lib/ui/art/crests.dart` | Hero portraits | Phase 1 | placeholder |
-| Companion crests ×6 (Hound, Cat, Fox, Owl, Hare, Clockwork Sprite) | `lib/ui/art/crests.dart` | Companion portraits | Phase 1 | placeholder |
+| Hero crests ×4 (hooded figure medallions) | `lib/ui/art/crests.dart` | Hero portraits | Phase 1 | replaced 14 Nov 2026 by the four illustrated portraits; the crest stays in the code as the fallback if a picture cannot be shown |
+| Companion crests ×6 (Hound, Cat, Fox, Owl, Hare, Clockwork Sprite) | `lib/ui/art/crests.dart` | Companion portraits | Phase 1 | replaced 14 Nov 2026 by the six illustrated portraits; the crest stays in the code as the fallback |
 | Dawn valley vista (sky, sun, ridges, mist, lanterns) | `lib/ui/art/vista.dart` | Dawn header scene, onboarding scene | Phase 1 | placeholder |
 | The Vale map: 86 hand-laid shapes on a 400×500 grid (peaks, ruins, river, hills, village, woods), each region draining to grey when asleep | `lib/ui/map/map_art.dart` | Painted map, asleep and awake | Phase 2 | placeholder |
 | Fog banks over sleeping regions | `lib/ui/map/vale_map.dart` | Painted fog | Phase 2 | placeholder (may simply stay coded) |
@@ -82,14 +82,19 @@ The largest on-screen use on the Fold 8 is noted so nothing ships oversized.
 
 | File | Size | Subject line to append to the style prompt | Status |
 |---|---|---|---|
-| `assets/art/portraits/companion_hound.jpg` | 512×512 | `Subject: a friendly tricolour hound with a black saddle, tan head and ears, and a white muzzle and chest, soft drooping ears, shown from the chest up, looking toward the viewer, centred, simple meadow background.` | generated 14 Nov 2026 |
-| `assets/art/portraits/hero_wayfarer.jpg` | 512×512 | `Subject: a traveller in a deep green hooded cloak with a small gold leaf clasp, calm friendly expression, shown from the chest up, centred, simple soft background.` | generated 14 Nov 2026 |
+| `assets/art/portraits/companion_hound.jpg` | 512×512 | `Subject: a friendly tricolour hound with a black saddle, tan head and ears, and a white muzzle and chest, soft drooping ears, shown from the chest up, looking toward the viewer, centred, simple meadow background.` | in the app; generated 14 Nov 2026, look approved by Adam |
+| `assets/art/portraits/hero_wayfarer.jpg` | 512×512 | `Subject: a traveller in a deep green hooded cloak with a small gold leaf clasp, calm friendly expression, shown from the chest up, centred, simple soft background.` | in the app; generated 14 Nov 2026, approved by Adam |
 | `assets/art/discoveries/standing_stone.jpg` | 600×466 working copy; 1200×900 wanted | `Subject: a tall weathered standing stone beside a country road at dawn, one side lit warm, wildflowers at its base.` | generated 14 Nov 2026; full-size file still to come from Adam's PC |
 
 Once these three are approved they become the reference every later asset
 is checked against.
 
 ### Portraits (shown up to 132dp; shipped at 512×512)
+
+All ten portraits (four heroes, six companions) are in the app as of version
+0.3.0. Adam approved the hound, the wayfarer and the cat by eye and said to
+carry on with the rest; the other seven are in the app for him to judge on
+the Fold.
 
 | File | Size | Subject | Status |
 |---|---|---|---|

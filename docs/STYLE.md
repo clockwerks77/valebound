@@ -122,7 +122,7 @@ direction, mood).
 | Slot | Asset | Status |
 |---|---|---|
 | 1 | Companion: Hound | generated 14 Nov 2026; look approved by Adam |
-| 2 | Hero: Wayfarer | generated 14 Nov 2026; awaiting Adam's eye |
+| 2 | Hero: Wayfarer | generated 14 Nov 2026; approved by Adam |
 | 3 | Discovery card: the standing stone | generated 14 Nov 2026; look approved by Adam |
 
 The superseded painterly trial (three pieces) and the retro animation pair
