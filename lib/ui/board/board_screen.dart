@@ -979,6 +979,11 @@ class _SuggestionCard extends StatelessWidget {
     final title = event.title.trim().isEmpty
         ? commitmentFallbackName
         : event.title.trim();
+    // An event that repeats a quest already on the board says so, and
+    // Dismiss becomes the main button. Both choices stay.
+    final match = game.boardQuestMatching(event);
+    void accept() => game.acceptSuggestion(event);
+    void dismiss() => game.dismissSuggestion(event);
     return ParchmentCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1013,20 +1018,28 @@ class _SuggestionCard extends StatelessWidget {
               ),
             ],
           ),
+          if (match != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Looks like “$match”, which is already on today’s board.',
+              style: AppText.small.copyWith(
+                color: Palette.slateSoft,
+                fontSize: 12.5,
+              ),
+            ),
+          ],
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: <Widget>[
-              PrimaryButton(
-                label: 'Accept',
-                icon: 'plus',
-                onPressed: () => game.acceptSuggestion(event),
-              ),
-              QuietButton(
-                label: 'Dismiss',
-                onPressed: () => game.dismissSuggestion(event),
-              ),
+              if (match == null) ...<Widget>[
+                PrimaryButton(label: 'Accept', icon: 'plus', onPressed: accept),
+                QuietButton(label: 'Dismiss', onPressed: dismiss),
+              ] else ...<Widget>[
+                QuietButton(label: 'Accept', icon: 'plus', onPressed: accept),
+                PrimaryButton(label: 'Dismiss', onPressed: dismiss),
+              ],
             ],
           ),
         ],

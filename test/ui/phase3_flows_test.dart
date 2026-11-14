@@ -135,6 +135,106 @@ void main() {
       expect(find.text('Today’s calendar, as quests?'), findsNothing);
     });
 
+    testWidgets('one event in two calendars is offered once', (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      final device = MemoryDevice()
+        ..events = <CalendarEvent>[
+          ...twoEvents(),
+          // The dentist again, as it shows in a second calendar.
+          CalendarEvent(
+            id: '77@1',
+            title: 'dentist ',
+            begin: DateTime(2026, 11, 14, 10, 30),
+            end: DateTime(2026, 11, 14, 11, 15),
+            calendarId: '2',
+          ),
+        ];
+      final app = await TestApp.start(tester, now: saturday, device: device);
+      await tester.runAsync(() => app.game.connectCalendar());
+      await app.settle(tester);
+      expect(app.game.suggestions.map((e) => e.title), <String>[
+        'Dentist',
+        'Team lunch',
+      ]);
+
+      // A choice about one copy counts for the other.
+      await tester.runAsync(
+        () => app.game.dismissSuggestion(app.game.suggestions.first),
+      );
+      await app.settle(tester);
+      expect(app.game.suggestions.single.title, 'Team lunch');
+    });
+
+    testWidgets('leaving out one calendar still offers the copy in the other',
+        (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      final device = MemoryDevice()
+        ..events = <CalendarEvent>[
+          CalendarEvent(
+            id: '41@1',
+            title: 'Dentist',
+            begin: DateTime(2026, 11, 14, 10, 30),
+            end: DateTime(2026, 11, 14, 11, 15),
+            calendarId: '1',
+          ),
+          CalendarEvent(
+            id: '77@1',
+            title: 'Dentist',
+            begin: DateTime(2026, 11, 14, 10, 30),
+            end: DateTime(2026, 11, 14, 11, 15),
+            calendarId: '2',
+          ),
+        ];
+      final app = await TestApp.start(tester, now: saturday, device: device);
+      await tester.runAsync(() async {
+        await app.game.connectCalendar();
+        await app.game.setCalendarExcluded('1', excluded: true);
+      });
+      await tester.pumpAndSettle();
+      expect(app.game.suggestions.single.id, '77@1');
+    });
+
+    testWidgets('an event that repeats a quest on the board says so',
+        (tester) async {
+      useDevice(tester, TestDevice.foldCover);
+      final device = MemoryDevice()
+        ..events = <CalendarEvent>[
+          CalendarEvent(
+            id: '51@1',
+            title: 'Mounjaro',
+            begin: DateTime(2026, 11, 14, 9),
+            end: DateTime(2026, 11, 14, 9, 30),
+            calendarId: '1',
+          ),
+        ];
+      final app = await TestApp.start(tester, now: saturday, device: device);
+      await tester.runAsync(() => app.game.connectCalendar());
+      await app.settle(tester);
+
+      // Still offered: nothing is decided for you.
+      final event = app.game.suggestions.single;
+      expect(event.title, 'Mounjaro');
+      expect(app.game.boardQuestMatching(event), 'Weekly Injection (Mounjaro)');
+      final hint = find.text(
+        'Looks like “Weekly Injection (Mounjaro)”, which is already on '
+        'today’s board.',
+      );
+      await reveal(tester, hint);
+      expect(hint, findsOneWidget);
+
+      // Dismiss is the main button here, and Accept is still there.
+      expect(quiet('Accept'), findsOneWidget);
+      await reveal(tester, primary('Dismiss'));
+      await tester.tap(primary('Dismiss'));
+      await app.settle(tester);
+      expect(app.game.suggestions, isEmpty);
+      expect(app.game.board.any((b) => b.quest.name == 'Mounjaro'), isFalse);
+      expect(
+        app.game.board.any((b) => b.quest.name == 'Weekly Injection (Mounjaro)'),
+        isTrue,
+      );
+    });
+
     testWidgets('an excluded calendar is left out', (tester) async {
       useDevice(tester, TestDevice.foldCover);
       final device = MemoryDevice()..events = twoEvents();

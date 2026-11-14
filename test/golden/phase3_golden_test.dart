@@ -189,4 +189,36 @@ void main() {
   screenTest('Coming back, on the opened Fold', (tester) async {
     await comebackAndReminder(tester, TestDevice.foldOpen, 'open');
   });
+
+  screenTest('A calendar event that repeats a quest on the board',
+      (tester) async {
+    useDevice(tester, TestDevice.foldCover);
+    final device = MemoryDevice()
+      ..events = <CalendarEvent>[
+        CalendarEvent(
+          id: '51@1',
+          title: 'Mounjaro',
+          begin: DateTime(2026, 11, 14, 9),
+          end: DateTime(2026, 11, 14, 9, 30),
+          calendarId: '1',
+        ),
+        CalendarEvent(
+          id: '52@1',
+          title: 'Covid and Flu Shots',
+          begin: DateTime(2026, 11, 14, 14),
+          end: DateTime(2026, 11, 14, 14, 30),
+          calendarId: '1',
+        ),
+      ];
+    final app = await TestApp.start(
+      tester,
+      now: saturday,
+      withHistory: true,
+      device: device,
+    );
+    await tester.runAsync(() => app.game.connectCalendar());
+    await app.settle(tester);
+    await reveal(tester, find.text('Covid and Flu Shots'));
+    await shot(tester, '79_board_calendar_match_cover');
+  });
 }

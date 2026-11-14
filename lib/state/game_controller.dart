@@ -18,6 +18,7 @@ import '../rules/health_fields.dart';
 import '../rules/progression.dart';
 import '../rules/reminders.dart';
 import '../rules/still.dart';
+import '../rules/suggestions.dart';
 import '../rules/world.dart';
 
 /// A quest tapped done a moment ago and not yet committed, so it can still
@@ -282,13 +283,33 @@ class GameController extends ChangeNotifier {
       return;
     }
     final choices = await repo.calendarChoicesOn(day);
+    // One event often sits in two calendars. It is offered once, and a
+    // choice made about one copy counts for them all.
+    final settled = <String>{
+      for (final e in _eventsToday)
+        if (choices.containsKey(e.id)) e.sameAs,
+    };
     suggestions = <CalendarEvent>[
       for (final e in _eventsToday)
         if (!choices.containsKey(e.id) &&
-            !settings.excludedCalendars.contains(e.calendarId))
+            !settings.excludedCalendars.contains(e.calendarId) &&
+            settled.add(e.sameAs))
           e,
     ];
   }
+
+  /// The quest already on today's board that [event] looks to be about, or
+  /// null. A hint for the suggestion card only: the suggestion is still
+  /// offered, and the choice stays with the user.
+  String? boardQuestMatching(CalendarEvent event) => questMatching(
+        event.title,
+        <String>[
+          for (final b in board)
+            if (b.quest.source != QuestSource.calendar &&
+                b.quest.systemKey != systemKeyComeback)
+              b.quest.name,
+        ],
+      );
 
   /// Plans the week's reminders for quests that have one. The device is only
   /// told when the plan has changed.

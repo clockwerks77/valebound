@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 import '../rules/reminders.dart';
+import '../rules/suggestions.dart';
 
 /// One of the device's calendars (DESIGN §9.3).
 class DeviceCalendar {
@@ -29,6 +30,10 @@ class CalendarEvent {
   final DateTime end;
   final bool allDay;
   final String calendarId;
+
+  /// The same for every copy of one event: it often sits in two calendars.
+  String get sameAs =>
+      eventKey(title: title, begin: begin, end: end, allDay: allDay);
 
   /// e.g. `10:30 – 11:15`, or `All day`.
   String get timeLabel {
