@@ -67,27 +67,21 @@ inner 816×616dp with a centre fold, 3× density). Half-size copies:
 
 ## On a real Android runtime
 
-The build installs the APK on an Android 14 emulator in CI and captures the
-screen. Verified there (commit `c7e1e4f`, the same app code as the current
-build):
+**Confirmed on the Galaxy Z Fold 8 by Adam, 13 November 2026:** installed
+the APK, went through onboarding to the board, completed Walk Babs, swiped
+the app away and reopened it to find the quest still under Done; then moved
+around the app on the cover screen and with the Fold open.
 
-- The APK installs, starts, survives a force-stop and starts again, with no
-  crash in the device log.
-- The first screen appears, which means the on-device SQLite database opened.
-- It lays out as one column at phone size and at the Fold's cover size, and
-  as two panes at the Fold's inner size
-  ([phone](screenshots/phase-1/emulator-first-launch.png),
-  [cover size](screenshots/phase-1/emulator-cover-size.png),
-  [inner size](screenshots/phase-1/emulator-open-size.png)).
-
-Not yet verified on a device or emulator: going through onboarding,
-completing a quest, and finding it still there after a restart. That path is
-covered by the host tests (including closing and reopening a database file),
-and a scripted on-device run exists (`integration_test/app_test.dart`), but
-it has not completed on the hosted emulator, which ran out of memory when a
-build ran beside it. The job has been reworked; until it reports, the
-quickest proof is on the Fold itself: onboard, complete Walk Babs, swipe the
-app away, reopen.
+On the CI emulator (Android 14), one run also showed the APK installing,
+starting, surviving a force-stop and starting again with no crash in the
+device log, laid out as one column at phone and cover size and as two panes
+at the inner size
+([phone](screenshots/phase-1/emulator-first-launch.png),
+[cover size](screenshots/phase-1/emulator-cover-size.png),
+[inner size](screenshots/phase-1/emulator-open-size.png)).
+In two later runs the hosted emulator stopped responding about 30 seconds
+after the app launched, with nothing in the logs to say why, so that job now
+runs only on demand. The phone is the proof.
 
 ## Evidence
 
@@ -96,6 +90,7 @@ app away, reopen.
 | `flutter analyze` | No issues |
 | `flutter test` | 109 tests, all passing |
 | `flutter build apk --debug` | Succeeds; `build/app/outputs/flutter-apk/app-debug.apk` |
+| Installs, runs offline, data persists across restart | Confirmed on the Fold |
 | XP curve matches the formula for every level, and the worked examples (100, 280, 520, 800, 2,700) | `test/rules/xp_curve_test.dart` |
 | Difficulty awards, track splits, Bond, Paces, Discovery every 10 Paces, Sniff Out, nothing ever decreases | `test/rules/awards_test.dart` |
 | Schedules, day rollover, comeback trigger | `test/rules/schedule_and_day_test.dart` |

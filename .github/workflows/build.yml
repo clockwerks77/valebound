@@ -1,8 +1,12 @@
 name: build
 
-# Builds and tests the app on every push, then publishes:
-#   * logs and rendered screenshots to the `ci-results` branch
-#   * the debug APK as a workflow artifact and on the `latest-debug` release
+# On every push: code generation, analysis and the full test suite, with logs
+# and rendered screenshots published to the `ci-results` branch.
+#
+# The debug APK is built (and the `latest-debug` release replaced) only when
+# the commit message contains [apk], or when the workflow is run by hand from
+# the Actions tab. That keeps the download link steady between releases and
+# saves the account's included Actions minutes.
 #
 # Nothing here ships inside the app. The app itself makes no network calls.
 
@@ -109,6 +113,7 @@ jobs:
 
       - name: Build debug APK
         id: apk
+        if: contains(github.event.head_commit.message, '[apk]') || github.event_name == 'workflow_dispatch'
         continue-on-error: true
         run: |
           set -o pipefail
@@ -149,7 +154,7 @@ jobs:
         run: bash tool/ci_publish.sh final
 
       - name: Fail the run if anything did not pass
-        if: steps.pub_get.outcome != 'success' || steps.codegen.outcome != 'success' || steps.analyze.outcome != 'success' || steps.test.outcome != 'success' || steps.apk.outcome != 'success'
+        if: steps.pub_get.outcome != 'success' || steps.codegen.outcome != 'success' || steps.analyze.outcome != 'success' || steps.test.outcome != 'success' || steps.apk.outcome == 'failure'
         run: exit 1
 
   # Installs the APK on an Android emulator, launches and relaunches it, and

@@ -16,13 +16,15 @@ the order in the build brief.
 
 ## Getting the app
 
-Every push builds a debug APK on GitHub Actions.
+Every push is analysed and tested on GitHub Actions. A debug APK is built
+when a commit message contains `[apk]`, or when the workflow is run by hand
+from the Actions tab.
 
 - **Latest build:** the `latest-debug` release on this repository's Releases
   page. Open it on the phone (signed in to GitHub), download
   `app-debug.apk`, and allow installation from your browser when Android
   asks.
-- The same file is attached to each workflow run as the `app-debug-apk`
+- The same file is attached to that workflow run as the `app-debug-apk`
   artifact.
 
 Debug builds are large (about 150 MB) because they carry every CPU
