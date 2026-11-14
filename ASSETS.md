@@ -110,7 +110,7 @@ The coded map is 400×500 units. Painted replacements must keep the same
 composition so the road, lanterns, camp and place medallions (which stay
 coded) land in the right spots: **peaks top-left, ruins top-right, river
 across the middle, hills centre-right, village bottom-left.** A print of the
-coded map (`docs/screenshots/phase-2/40_map_cover.png`) is the layout guide.
+coded map (`docs/screenshots/phase-2/map-cover.png`) is the layout guide.
 
 | File | Size | Subject | Status |
 |---|---|---|---|

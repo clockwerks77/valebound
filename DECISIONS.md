@@ -32,7 +32,7 @@ any line here and I will follow it.
 | D-08 | **Gold and materials.** Gold from any quest: Minor 2, Standard 5, Heroic 12, Boss 30. Materials from Hero-track quests only: Minor 1, Standard 2, Heroic 4, Boss 10; kind rotates Timber → Stone → Star Shards. Companion and Shared quests earn Paces instead (§7A.4). | §5.3 names the drops but gives no amounts. Easy to retune in `lib/rules/awards.dart`. |
 | D-09 | **Titles** beyond "Vale Walker" (L5) are drafted: Newcomer to the Vale (1), Lantern Bearer (2), Path Finder (3), Hearth Keeper (7), Friend of the Waking Vale (10), Bridge Mender (13), Keeper of Lanterns (16), Warden of the Vale (20), Dawnbringer (25). | §5.3 lets the builder draft them. |
 | D-10 | **Attribute levels** use the same XP curve as the hero. | §5.2 says attributes have levels but not which curve. |
-| D-11 | **Day boundary** is local midnight. **Comeback** triggers after two full calendar days with no visit (opened Monday, back Thursday). | §4.3 says "not opened for 2+ days". One constant, `comebackAfterFullDaysAway`, flips it to the looser reading (Monday → Wednesday). The trigger is built and tested now; the quest itself is Phase 3. |
+| D-11 | **Day boundary** is local midnight. **Comeback** triggers after two full calendar days with no visit (opened Monday, back Thursday). | §4.3 says "not opened for 2+ days". One constant, `comebackAfterFullDaysAway`, flips it to the looser reading (Monday → Wednesday). The trigger is built and tested now; the quest itself is Phase 3. **Confirmed by Adam, 13 Nov 2026: two days.** |
 | D-12 | Partial progress for Count and Timer quests lives in its own small table (`QuestProgress`), one row per quest per day. | §10's `Completion` holds finished quests only. |
 | D-13 | A quest can be completed once per day. | Not stated; simplest reading of "done". |
 | D-15 | **Bond +3** on a companion level-up day is given once per day, at the first level-up that day. | §7A.3. |
@@ -45,6 +45,9 @@ any line here and I will follow it.
 | D-26 | **Default difficulty** for a new quest is Standard, whatever the completion type. | §5.4 points to a defaults table in §6 that is not there. |
 
 ## Phase 1 scope calls
+
+D-20, D-21, D-27 and D-28 were stopgaps. Phase 2 replaced them: see D-31
+(the map), D-41 (Inventory), D-42 (Campfire) and D-36 (tricks).
 
 | # | Decision | Notes |
 |---|---|---|

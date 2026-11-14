@@ -184,9 +184,9 @@ so the format cannot drift without the change being made here on purpose.
 
 | Check | Result |
 |---|---|
-| `flutter analyze` | No errors or warnings |
+| `flutter analyze` | No issues |
 | `flutter test` | 219 tests, all passing |
-| `flutter build apk --debug` | Succeeds, signed with the fixed key |
+| `flutter build apk --debug` | Succeeds; the APK carries the fixed key (certificate SHA-256 `8dcf398e…7a3b61`, checked in CI) |
 | World rules: restoration order and cost, stores, Fetch, gear, cosmetics, the road, the Still | `test/rules/world_test.dart` |
 | Restoration on record, Campfire, export queue stamps, new chapter, backup round trip, wrong files turned away | `test/data/phase2_test.dart` |
 | **A Phase 1 database opens under this build with every row intact** | `test/data/phase2_test.dart`, on a database built from the Phase 1 table definitions |
