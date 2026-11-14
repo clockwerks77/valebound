@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'app.dart';
 import 'data/database.dart';
 import 'data/repository.dart';
+import 'device/device_port.dart';
 import 'export/vault_port.dart';
 import 'state/game_controller.dart';
 import 'theme/palette.dart';
@@ -21,9 +22,12 @@ Future<void> main() async {
   // Everything is on the device: one local SQLite file, no network.
   final database = AppDatabase();
   // The one door out: Markdown and backup files, written only where asked.
+  // Calendar, Health Connect steps and the reminder: each optional, each
+  // asked for only when the user turns it on.
   final controller = GameController(
     GameRepository(database),
     vault: const ChannelVault(),
+    device: const ChannelDevice(),
   );
   runApp(HabitAdventureApp(controller: controller));
   await controller.start();

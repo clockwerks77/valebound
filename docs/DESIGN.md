@@ -255,6 +255,8 @@ Seeded from the user's actual life. Times are defaults, not surveillance.
 - Use the original vocabulary in this document: quests, XP, gold, materials, Heart → **Vitality**, containers → **Milestones**, dungeon → **Delve** is acceptable as a generic word.
 - All illustration is original, generated or drawn for this app, in the style of §Visual (below). No traced or "in the style of [living artist / specific game]" assets.
 
+**Amendment, 14 Nov 2026 (Adam):** the rendering style below is changed from painterly to **cel-shaded animation** (clean ink lines, flat colour, hard-edged shading). Everything else in this paragraph stands. See `docs/STYLE.md` and `DECISIONS.md` D-48.
+
 **Visual direction (LOCKED):** Premium modern painterly fantasy — rich, saturated colour; soft light; layered illustrated scenes. The *era feel* comes from subject matter (banners, stone, lanterns, arched doors, a hand-drawn-feeling map), rendered to today's graphical standard. **Not pixel art.** Not flat corporate vector. Not a cartoon clone of any existing game. UI: deep greens, warm gold, parchment-cream cards, dark slate text; a display serif for headings, a clean sans for body; generous spacing — it should feel expensive, not busy.
 
 **Asset & tool pipeline (LOCKED — added v0.2, answering Adam's Blender question):**

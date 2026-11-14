@@ -65,5 +65,7 @@ dependencies {
     // FileProvider, for Settings > Share…. Already on the classpath through
     // the Flutter embedding; named here so the build does not rely on that.
     implementation("androidx.core:core:1.13.1")
+    // @RequiresApi, for the Health Connect call that exists from Android 14.
+    implementation("androidx.annotation:annotation:1.9.1")
 }
 

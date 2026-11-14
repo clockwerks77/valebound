@@ -87,3 +87,12 @@ D-20, D-21, D-27 and D-28 were stopgaps. Phase 2 replaced them: see D-31
 - **Navigation when open.** When the Fold is open the navigation is a slim left rail rather than a bottom bar, to keep vertical space on a 4:3 screen. §9.1 specifies bottom navigation for the cover screen only.
 - **Kind-specific gear art.** §7A.3 asks for gear illustrated per companion kind. That needs painted art; today gear is a name, a line and a badge.
 - **Tapping the map.** The map is a picture with a list beneath it. Tapping a place to read about it would be a small addition if you want it.
+
+## Phase 3 and the art direction
+
+| # | Decision | Why |
+|---|---|---|
+| D-48 | **The look changes from painterly to cel-shaded, at Adam's instruction (14 Nov 2026).** DESIGN §13 locks "premium modern painterly fantasy". Adam saw a painterly trial (three pieces), asked for "a retro or cel shaded artistic feel", compared a cel-shaded pair with a retro animation pair, and chose cel-shaded. STYLE.md §§1, 3, 6 and 7 are rewritten to match and `docs/DESIGN.md` carries a dated note at the Visual direction line. Palette, lighting, mood, type, the interface and every IP guardrail are unchanged: still original, still no "in the style of" any artist, studio or game, still not pixel art. | The design is Adam's; this is his change, not a builder's preference. Recorded so no later session "corrects" it back. |
+| D-49 | Illustrated art is generated in **Adobe Firefly on the web** with Adobe's own Firefly Image 5 model, driven in Adam's Chrome with his go-ahead, 10 credits a piece. The Adobe connector in Claude is used to find, preview and finish the pieces; it cannot generate. | Adobe's setup notes for the connector say text-to-image is not available there. Firefly Image 5 is Adobe's model, trained on licensed and public-domain work, which fits DESIGN §13. Partner models offered in the same menu are not used. |
+| D-50 | Working copies of portraits come into the project from the connector's own preview, which is capped at 600 pixels; they ship at 512×512. Larger pieces (Discovery cards, scenes, the map) need the full-size file from Adam's PC. | The cloud workspace cannot reach Adobe's servers, and it cannot request a folder on the PC by itself. 600 pixels is more than a portrait is ever shown at (132dp, 396 pixels on the Fold). |
+

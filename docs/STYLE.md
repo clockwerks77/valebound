@@ -6,11 +6,18 @@ checked against it.
 
 ## 1. The look in one paragraph
 
-Premium modern painterly fantasy: rich, saturated colour, soft light, layered
-illustrated scenes. The era feel comes from the subject matter (banners,
-stone, lanterns, arched doors, a hand-drawn-feeling map), rendered to today's
-standard. Not pixel art. Not flat corporate vector. Not a cartoon clone of
-any existing game. The interface should feel expensive, not busy.
+Premium cel-shaded fantasy, like a still from a modern hand-drawn animated
+feature: clean ink lines, flat rich colour, two or three hard-edged tones of
+shading, layered scenes with morning mist. The era feel comes from the
+subject matter (banners, stone, lanterns, arched doors, a hand-drawn-feeling
+map). Not pixel art. Not flat corporate vector. Not a copy of any existing
+game, film or studio's look. The interface should feel expensive, not busy.
+
+**Changed on 14 November 2026, by Adam.** The look was "modern painterly"
+with no outlines (DESIGN §13 as written). After seeing a painterly trial he
+asked for an animation feel instead, compared a cel-shaded pair with a retro
+animation pair, and chose cel-shaded. See DECISIONS.md D-48. Palette,
+lighting, mood, type and the interface are unchanged.
 
 ## 2. Palette
 
@@ -43,13 +50,14 @@ Materials: Timber `#9A6B3F`, Stone `#7F8C92`, Star Shards `#6C7FD0`.
 about 20% saturation and lifted slightly toward grey. Restoration brings the
 full palette back. Nothing is ever darkened into menace.
 
-## 3. Brush and line treatment
+## 3. Line and shading treatment
 
-- Soft, visible brushwork, like gouache or oil sketch. Edges are painted, not
-  inked: **no hard black outlines**.
-- Large simple shapes first, then two or three passes of smaller strokes.
-- Texture comes from brush direction and a light canvas grain, not from noise
-  or photographic detail.
+- **Clean, confident ink outlines** of varying weight: heavier on the
+  silhouette, lighter inside the form.
+- **Flat colour fills** with two or three hard-edged tones of shading. No
+  soft airbrushing and no photographic detail.
+- Large simple shapes; detail is drawn with line, not rendered.
+- Backgrounds are simpler and softer than the subject, so it reads first.
 - Silhouettes read clearly at thumbnail size.
 
 ## 4. Lighting
@@ -72,36 +80,53 @@ full palette back. Nothing is ever darkened into menace.
 
 ## 6. Style prompt (reuse verbatim for every illustrated asset)
 
-> Original painterly fantasy illustration, modern digital gouache with soft
-> visible brushwork and no hard outlines. Rich saturated colour built on deep
-> forest greens and warm gold light, with parchment-cream highlights and cool
-> slate-blue shadows. Low warm dawn light from the upper left, a thin warm rim
+> Original cel-shaded fantasy animation still, in the manner of a modern
+> hand-drawn animated feature. Clean confident ink outlines of varying
+> weight, flat colour fills with two or three hard-edged tones of shading, no
+> soft airbrushing. Rich saturated colour built on deep forest greens and
+> warm gold light, with parchment-cream highlights and cool slate-blue
+> shadows. Low warm dawn light from the upper left with a crisp warm rim
 > light, light morning mist between layered depths. Subject matter from an
-> old pastoral valley: banners, weathered stone, glass lanterns, arched wooden
-> doors, hand-built timber. Warm, welcoming and calm; nothing frightening.
-> Clear readable silhouette, simple uncluttered background, generous negative
-> space. High modern rendering standard. Not pixel art, not flat vector, not
-> cartoon, not photorealistic. No text, no lettering, no logos, no watermark,
-> no border.
+> old pastoral valley: banners, weathered stone, glass lanterns, arched
+> wooden doors, hand-built timber. Warm, welcoming and calm; nothing
+> frightening. Clear readable silhouette, bold simple shapes, simple
+> uncluttered background, generous negative space. Not pixel art, not
+> photorealistic, not a 3D render, not an oil painting. No text, no
+> lettering, no logos, no watermark, no border.
 
 Each asset adds one line after it, starting `Subject:` (listed per asset in
 ASSETS.md). Nothing else in the prompt changes. Never add "in the style of"
 any artist, studio or game.
 
+Notes from the first pieces, for writing Subject lines:
+
+- Say "shown from the chest up" for a character; the word "portrait" pulls
+  the result toward oil portraiture.
+- Name coat and clothing colours outright (the palette words otherwise leak
+  into fur: the first hound came out green).
+- For companions, name a bright setting ("simple sunlit green meadow
+  background at dawn"); left open, the background drifts dark and moody.
+
+**How the pieces are made.** Adobe Firefly on the web, model **Firefly
+Image 5** (Adobe's own model), 1K, 1:1 for characters and 4:3 for scenes,
+one generation per piece, in Adam's Adobe account. The Adobe connector in
+Claude cannot generate; it finds the generations and can crop, resize and
+grade them. Every piece and its Subject line is recorded in ASSETS.md.
+
 ## 7. Reference board
 
-The first three approved illustrated assets become the reference board that
-all later ones are checked against (palette match, brush treatment, light
+The first three approved illustrated assets are the reference board that all
+later ones are checked against (line weight, flat shading, palette, light
 direction, mood).
 
 | Slot | Asset | Status |
 |---|---|---|
-| 1 | Companion portrait: Hound | not yet generated |
-| 2 | Hero portrait: Wayfarer | not yet generated |
-| 3 | Discovery card: The Listening Stone | not yet generated |
+| 1 | Companion: Hound | generated 14 Nov 2026; look approved by Adam |
+| 2 | Hero: Wayfarer | generated 14 Nov 2026; awaiting Adam's eye |
+| 3 | Discovery card: the standing stone | generated 14 Nov 2026; look approved by Adam |
 
-Until these exist, Phase 1 uses code-drawn stand-ins that follow sections 2–5
-(see ASSETS.md for exactly which).
+The superseded painterly trial (three pieces) and the retro animation pair
+stay in Adam's Firefly history and are not used.
 
 ## 8. IP guardrails (DESIGN §13)
 

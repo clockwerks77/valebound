@@ -9,21 +9,27 @@ followed by its own `Subject:` line.
 
 | Capability | Available? | Notes |
 |---|---|---|
-| Image generation (any model) | **No** | No image-generation tool or MCP is connected. |
+| Image generation | **Yes, through Adam's Chrome** | Adobe Firefly on the web, model Firefly Image 5, in Adam's Adobe account (Creative Cloud Pro trial from 13 Nov 2026). 10 credits a piece. Nothing in Claude's own environment generates images. |
 | Blender / 3D | **No** | Not installed, not connected, not wanted (DESIGN §13). |
 | Rive | **No** | Animation is done in Flutter. |
 | Vector drawing in code | Yes | Flutter `CustomPaint`, SVG path data. |
 | Code-painted raster | Yes | Python (Pillow), ImageMagick, rsvg. Good for textures, gradients, terrain and light. Not good enough for premium portraits or scenes. |
 | Fonts | Yes | Fraunces and Figtree, SIL OFL 1.1, bundled. |
 | Adam's PC and Chrome | With per-app / per-site approval | Nothing used for art so far. |
-| Image connectors offered (Adobe, Hugging Face) | **Not connected** | Suggested to Adam on 13 Nov 2026. Either could generate the painted pieces; which image tools each exposes can only be confirmed once connected. |
+| Adobe connector | Connected 13 Nov 2026 | Finds Firefly generations, previews them (up to 600 pixels), crops, resizes, grades, removes backgrounds. **Cannot generate.** |
+| Hugging Face connector | Connected 13 Nov 2026 | Browsing only; running a model is switched off in the built-in connector. Not used. |
 
-**Consequence:** I can deliver everything vector, coded and animated myself.
-I cannot produce the painterly raster illustration the design calls for.
-Those assets are marked **needed-from-Adam** below with exact sizes, and
-Phases 1 and 2 use clearly listed code-drawn stand-ins in their place.
-Nothing in the app is a grey box: every stand-in is drawn, on-palette and
-listed in section 2.
+**Consequence:** I deliver everything vector, coded and animated myself, and
+the illustrated pieces are generated in Firefly with the style prompt in
+STYLE.md §6, one at a time, each checked against the reference board. Until a
+piece exists the app shows its code-drawn stand-in (section 2). Nothing in
+the app is a grey box.
+
+**Getting files into the project.** The cloud workspace cannot reach Adobe's
+servers. Portraits come through the connector's preview (600 pixels, shipped
+at 512×512). Anything larger needs the full-size file from Adam's PC: a
+folder connected to the session in the Claude desktop app, or the files
+attached in chat.
 
 Status values: `generated` · `coded` · `placeholder` · `needed-from-Adam`.
 
@@ -76,9 +82,9 @@ The largest on-screen use on the Fold 8 is noted so nothing ships oversized.
 
 | File | Size | Subject line to append to the style prompt | Status |
 |---|---|---|---|
-| `portraits/companion_hound.png` | 1024×1024 | `Subject: head-and-shoulders portrait of a friendly tricolour hound with soft drooping ears, looking toward the viewer, centred, plain soft-focus meadow background.` | needed-from-Adam |
-| `portraits/hero_wayfarer.png` | 1024×1024 | `Subject: head-and-shoulders portrait of a traveller in a deep green hooded cloak with a small gold leaf clasp, calm expression, centred, plain soft-focus background.` | needed-from-Adam |
-| `discoveries/standing_stone.png` | 1200×800 | `Subject: a tall weathered standing stone beside a country road at dawn, one side lit warm, wildflowers at its base.` | needed-from-Adam |
+| `assets/art/portraits/companion_hound.jpg` | 512×512 | `Subject: a friendly tricolour hound with a black saddle, tan head and ears, and a white muzzle and chest, soft drooping ears, shown from the chest up, looking toward the viewer, centred, simple meadow background.` | generated 14 Nov 2026 |
+| `assets/art/portraits/hero_wayfarer.jpg` | 512×512 | `Subject: a traveller in a deep green hooded cloak with a small gold leaf clasp, calm friendly expression, shown from the chest up, centred, simple soft background.` | generated 14 Nov 2026 |
+| `assets/art/discoveries/standing_stone.jpg` | 600×466 working copy; 1200×900 wanted | `Subject: a tall weathered standing stone beside a country road at dawn, one side lit warm, wildflowers at its base.` | generated 14 Nov 2026; full-size file still to come from Adam's PC |
 
 Once these three are approved they become the reference every later asset
 is checked against.
@@ -90,7 +96,7 @@ is checked against.
 | `portraits/hero_lamplighter.png` | 1024×1024 | traveller in an amber cloak carrying a small glass lantern | needed-from-Adam |
 | `portraits/hero_riverwarden.png` | 1024×1024 | traveller in a river-blue cloak with a reed-and-wave clasp | needed-from-Adam |
 | `portraits/hero_emberkeeper.png` | 1024×1024 | traveller in a rust-red cloak warmed by firelight | needed-from-Adam |
-| `portraits/companion_cat.png` | 1024×1024 | a composed grey cat with gold eyes | needed-from-Adam |
+| `assets/art/portraits/companion_cat.jpg` | 512×512 | `Subject: a composed grey cat with gold eyes, shown from the chest up, looking toward the viewer, centred, simple sunlit green meadow background at dawn.` | generated 14 Nov 2026 (second try; the first came out too dark) |
 | `portraits/companion_fox.png` | 1024×1024 | a bright-eyed red fox with a white chest | needed-from-Adam |
 | `portraits/companion_owl.png` | 1024×1024 | a small brown owl with large amber eyes | needed-from-Adam |
 | `portraits/companion_hare.png` | 1024×1024 | a sandy-brown hare with tall ears | needed-from-Adam |

@@ -10,7 +10,7 @@ const int comebackAfterFullDaysAway = 2;
 const String comebackQuestName = 'Return to the Vale';
 
 /// Bonus hero XP on the comeback quest, on top of a Minor quest's 10: the
-/// welcome is worth a Standard quest in all (DECISIONS.md D-48).
+/// welcome is worth a Standard quest in all (DECISIONS.md D-51).
 const int comebackBonusXp = 15;
 
 /// Bonus Bond when the companion knows Comfort and presents the comeback

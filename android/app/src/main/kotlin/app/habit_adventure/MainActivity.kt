@@ -36,10 +36,30 @@ class MainActivity : FlutterActivity() {
     private var pending: MethodChannel.Result? = null
     private var pendingContent: String? = null
 
+    /** Calendar, Health Connect steps and the reminder: see DeviceChannel. */
+    private val device = DeviceChannel(this)
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
             .setMethodCallHandler { call, result -> handle(call, result) }
+        device.noteIntent(intent)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, DeviceChannel.CHANNEL)
+            .setMethodCallHandler { call, result -> device.handle(call, result) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        device.noteIntent(intent)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        if (device.onPermissionsResult(requestCode)) return
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun handle(call: MethodCall, result: MethodChannel.Result) {
