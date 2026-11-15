@@ -39,8 +39,17 @@ analytics, no network calls.
   over, to Amendment v0.3 in
   [`docs/AMENDMENTS_v0.3_v0.4.md`](docs/AMENDMENTS_v0.3_v0.4.md)
   ([report, with the balance numbers](docs/PHASE-7.md)). Branch `phase-7`.
-  Built and tested; not yet run on a phone. Part B of the amendments
-  (the questionnaire and quest generation) is the next build.
+  Built and tested; not yet run on a phone.
+- **First Dawn, and a board made from goals, version 0.8.0:** a
+  questionnaire in seven short chapters, and a board composed each Dawn
+  from what it heard: goal, to habit plan, to that day's quests, joined
+  with the mapped calendar, every quest saying what it is for. Habit
+  quests come in three sizes (Tiny counts in full), the weekly check-in
+  proposes at most one change, and existing quests are reviewed, never
+  replaced. To Amendment v0.4 in
+  [`docs/AMENDMENTS_v0.3_v0.4.md`](docs/AMENDMENTS_v0.3_v0.4.md)
+  ([report](docs/PHASE-8.md)). Branch `phase-8`. Built and tested; not yet
+  run on a phone.
 
 ## Getting the app
 
@@ -92,9 +101,9 @@ Install on a connected device:
 
 | Path | What lives there |
 |---|---|
-| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still and the day's creature, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields, calendar suggestions, and the narrator's words (`narrator.dart`). No Flutter, no database. |
+| `lib/rules/` | The game rules in pure Dart: XP curve, awards, track splits, Bond, Paces, Discoveries, the Vale and its restoration, gear, the Still and the day's creature, schedules, day rollover, the comeback quest, the weekly Delve, reminders, Health Log fields, calendar suggestions, the narrator's words (`narrator.dart`), classes and the fight (`classes.dart`, `combat.dart`), and since 0.8 goals and habit plans, First Dawn's questions, the composing of the board and the weekly check-in (`goals.dart`, `first_dawn.dart`, `generation.dart`, `checkin.dart`). No Flutter, no database. |
 | `lib/data/` | Local SQLite storage (Drift): schema and its migrations, seeded quests, the repository, the JSON backup. |
-| `lib/export/` | The Markdown export: the three documents as pure text builders, the queue, and the door to the vault folder. |
+| `lib/export/` | The Markdown export: the four documents as pure text builders, the queue, and the door to the vault folder. |
 | `android/app/src/main/kotlin/` | The Android side of that door: folder picker, writing files, Share, backup save and open. Storage Access Framework only. Also the device door: reading the calendar, reading steps and glucose from Health Connect, and the one local reminder. |
 | `lib/device/` | The app's side of the device door, with a do-nothing version so the app is whole without any of it. |
 | `lib/state/` | One controller that the screens listen to. |
