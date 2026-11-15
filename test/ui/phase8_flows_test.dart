@@ -273,18 +273,25 @@ void main() {
 
       expect(find.text('The quests you already have'), findsOneWidget);
       expect(find.text('Walk Babs'), findsOneWidget);
-      expect(find.text('7,000 Steps'), findsOneWidget);
       final walk = app.game.quests.firstWhere((q) => q.name == 'Walk Babs');
       final steps = app.game.quests.firstWhere((q) => q.name == '7,000 Steps');
       final wasActive = <String>{
         for (final q in app.game.quests)
           if (q.active) q.id,
       };
-      // The cards come in the Quest Log's order: Morning Health Check, Walk
-      // Babs, Play / Train with Babs, 7,000 Steps. Quests already archived
-      // (the optional Five-Minute Reset) are not asked about.
-      await tap(find.text('For: More unhurried evenings').at(1));
-      await tap(find.text('Archive').at(3));
+      // One card a quest, in the Quest Log's order; the list builds them as
+      // they scroll into reach. Quests already archived (the optional
+      // Five-Minute Reset) are not asked about.
+      Finder pill(String quest, String label) => find.descendant(
+            of: find
+                .ancestor(of: find.text(quest), matching: find.byType(Column))
+                .first,
+            matching: find.text(label),
+          );
+      expect(find.text('Five-Minute Reset'), findsNothing);
+      await tap(pill('Walk Babs', 'For: More unhurried evenings'));
+      await reveal(tester, find.text('7,000 Steps'));
+      await tap(pill('7,000 Steps', 'Archive'));
       await tap(primary('Next'));
       await tap(primary('Next'));
       await tap(primary('Begin'));
