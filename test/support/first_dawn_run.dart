@@ -182,9 +182,10 @@ class FirstDawnRun {
     await next();
     expect(find.text('Your recurring events'), findsOneWidget);
     await app.settle(tester);
+    await mark('c6_calendar_series');
     // The painting night is the painting habit: one quest, not two.
     await tap('This is my habit');
-    await mark('c6_calendar_series');
+    await mark('c6_calendar_series_habit');
     await next('Confirm all');
     await mark('c6_calendar_mirror');
     await next('That’s right');

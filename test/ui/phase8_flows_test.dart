@@ -273,11 +273,16 @@ void main() {
 
       expect(find.text('The quests you already have'), findsOneWidget);
       expect(find.text('Walk Babs'), findsOneWidget);
-      expect(find.text('Five-Minute Reset'), findsOneWidget);
+      expect(find.text('7,000 Steps'), findsOneWidget);
       final walk = app.game.quests.firstWhere((q) => q.name == 'Walk Babs');
-      final reset =
-          app.game.quests.firstWhere((q) => q.name == 'Five-Minute Reset');
-      // The pills come in the board's order: Health Check, then Walk Babs.
+      final steps = app.game.quests.firstWhere((q) => q.name == '7,000 Steps');
+      final wasActive = <String>{
+        for (final q in app.game.quests)
+          if (q.active) q.id,
+      };
+      // The cards come in the Quest Log's order: Morning Health Check, Walk
+      // Babs, Play / Train with Babs, 7,000 Steps. Quests already archived
+      // (the optional Five-Minute Reset) are not asked about.
       await tap(find.text('For: More unhurried evenings').at(1));
       await tap(find.text('Archive').at(3));
       await tap(primary('Next'));
@@ -290,9 +295,11 @@ void main() {
       final goal = game.goals.single;
       expect(goal.text, 'More unhurried evenings');
       expect(game.quests.firstWhere((q) => q.id == walk.id).goalId, goal.id);
-      expect(game.quests.firstWhere((q) => q.id == reset.id).active, isFalse);
+      expect(game.quests.firstWhere((q) => q.id == steps.id).active, isFalse);
       for (final q in game.quests) {
-        if (q.id != reset.id) expect(q.active, isTrue, reason: q.name);
+        if (q.id != steps.id) {
+          expect(q.active, wasActive.contains(q.id), reason: q.name);
+        }
       }
       expect(find.text('Tell Valebound your goals'), findsNothing);
       await reveal(tester, find.text('For: More unhurried evenings'));

@@ -877,8 +877,8 @@ class _FirstDawnScreenState extends State<FirstDawnScreen> {
         );
     return _Page(
       ask: 'Size it',
-      help: 'Every habit comes in three sizes, chosen on the day. Change any '
-          'of these.',
+      help: 'Every habit comes in three sizes, chosen on the day. Reword '
+          'the Tiny and the Stretch until they fit.',
       body: <Widget>[
         size(
           'Tiny',
@@ -1024,7 +1024,8 @@ class _FirstDawnScreenState extends State<FirstDawnScreen> {
   ) =>
       _Page(
         ask: ask,
-        help: 'Roughly. It is only used to order the board.',
+        help: 'Roughly is fine. It is kept with your rhythm; nothing is timed '
+            'by it yet.',
         body: <Widget>[
           for (final c in choices) _option(c, '', current == c, () => set(c)),
         ],
@@ -1655,9 +1656,14 @@ class _FirstDawnScreenState extends State<FirstDawnScreen> {
           : 'Your banners are up. The board is made from them each dawn.',
       next: 'Begin',
       body: <Widget>[
-        const ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(18)),
-          child: CampScene(),
+        ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(18)),
+          child: CampScene(
+            // The day has not been lived yet: the Campfire's own line
+            // about the evening does not belong here.
+            story: 'This is your camp. Whatever a day holds, it ends here, '
+                'by this fire, with ${_game.companionName} beside you.',
+          ),
         ),
         const SizedBox(height: 12),
         for (final b in banners)

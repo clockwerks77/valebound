@@ -503,7 +503,11 @@ class _Back extends StatelessWidget {
 
 /// Hero and companion at tonight's camp, placed by total Paces (§7A.4).
 class CampScene extends StatelessWidget {
-  const CampScene({super.key});
+  const CampScene({super.key, this.story});
+
+  /// What the narrator says under the picture. The Campfire's line for the
+  /// day when left out.
+  final String? story;
 
   @override
   Widget build(BuildContext context) {
@@ -635,7 +639,7 @@ class CampScene extends StatelessWidget {
                   const SizedBox(height: 8),
                   // The narrator closes the day (DECISIONS D-76).
                   Text(
-                    game.campfireStory,
+                    story ?? game.campfireStory,
                     textAlign: TextAlign.center,
                     style: AppText.narrator.copyWith(
                       color: Palette.onDark,

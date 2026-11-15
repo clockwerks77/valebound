@@ -114,6 +114,14 @@ class _QuestSheetState extends State<_QuestSheet> {
     final type = quest.completionType;
     final isSystem = quest.source == QuestSource.system;
     final isCampfire = quest.systemKey == systemKeyCampfire;
+    // What it is for (Amendment v0.4 §1), and for a quest of the user's
+    // own, a way to pin it to a goal.
+    final line = game.lineFor(quest.id);
+    final plan = line?.plan;
+    final ownQuest = quest.planId == null &&
+        (quest.source == QuestSource.manual ||
+            quest.source == QuestSource.recurring ||
+            quest.source == QuestSource.health);
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottom),
@@ -134,17 +142,21 @@ class _QuestSheetState extends State<_QuestSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      quest.name,
+                      game.titleFor(entry),
                       style: AppText.heading.copyWith(color: Palette.slate),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${quest.attribute.label} · ${quest.difficulty.label} · '
+                      '${quest.attribute.label} · ${game.worthFor(entry).label} · '
                       '${quest.track == Track.hero ? 'Hero' : quest.track == Track.shared ? 'Shared with ${game.companionName}' : 'With ${game.companionName}'}',
                       style: AppText.small.copyWith(color: Palette.slateSoft),
                     ),
                     Text(
-                      rewardLabel(quest, game.companionName),
+                      rewardLabel(
+                        quest,
+                        game.companionName,
+                        worth: game.worthFor(entry),
+                      ),
                       style: AppText.small.copyWith(
                         color: Palette.goldDeep,
                         fontWeight: FontWeight.w700,
@@ -160,6 +172,42 @@ class _QuestSheetState extends State<_QuestSheet> {
             Text(
               quest.notes,
               style: AppText.body.copyWith(color: Palette.slateSoft),
+            ),
+          ],
+          if (line != null) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              line.forLine,
+              style: AppText.small.copyWith(
+                color: Palette.slateSoft,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+          if (plan != null) ...<Widget>[
+            const SizedBox(height: 6),
+            Text(
+              'Tiny: ${plan.tiny}\nTarget: ${plan.target}\n'
+              'Stretch: ${plan.stretch}',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+          ],
+          if (ownQuest && game.goals.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: <Widget>[
+                for (final goal in game.goals)
+                  ChoicePill(
+                    label: 'For: ${goal.text}',
+                    selected: quest.goalId == goal.id,
+                    onTap: () => game.pinQuestToGoal(
+                      quest.id,
+                      quest.goalId == goal.id ? null : goal.id,
+                    ),
+                  ),
+              ],
             ),
           ],
           const SizedBox(height: 18),

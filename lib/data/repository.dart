@@ -990,13 +990,61 @@ class GameRepository {
         updatedAt: Value(now),
       ),
     );
+    await _planFollowsQuest(id, draft);
     return id;
+  }
+
+  /// A habit plan's quest edited in the Quest Log: the plan takes the new
+  /// words, track and days, so the board and the plan never disagree.
+  Future<void> _planFollowsQuest(String questId, QuestDraft draft) async {
+    final plans = (await settings()).plans;
+    final at = plans.indexWhere((p) => p.questId == questId);
+    if (at < 0) return;
+    final schedule = draft.schedule;
+    final PlanFrequency frequency;
+    var weekdays = const <int>{};
+    if (schedule.type == ScheduleType.weekdays ||
+        schedule.type == ScheduleType.weekly) {
+      final workdays = schedule.weekdays.length == 5 &&
+          schedule.weekdays.containsAll(const <int>{1, 2, 3, 4, 5});
+      if (workdays) {
+        frequency = PlanFrequency.weekdays;
+      } else {
+        weekdays = schedule.weekdays;
+        frequency = weekdays.length == 1
+            ? PlanFrequency.weekly
+            : PlanFrequency.days;
+      }
+    } else {
+      frequency = PlanFrequency.daily;
+    }
+    final name = draft.name.trim();
+    final minutes = minutesIn(name);
+    final next = List<HabitPlan>.of(plans);
+    next[at] = plans[at].copyWith(
+      target: name,
+      track: draft.track,
+      frequency: frequency,
+      weekdays: weekdays,
+      minutes: minutes,
+      clearMinutes: minutes == null,
+    );
+    await _savePlans(next);
   }
 
   Future<void> setQuestActive(String questId, {required bool active}) async {
     await (db.update(db.quests)..where((q) => q.id.equals(questId))).write(
       QuestsCompanion(active: Value(active), updatedAt: Value(clock())),
     );
+    // A habit plan's quest archived in the Quest Log archives the plan
+    // with it, and bringing it back brings the plan back.
+    final plans = (await settings()).plans;
+    if (plans.any((p) => p.questId == questId && p.active != active)) {
+      await _savePlans(<HabitPlan>[
+        for (final p in plans)
+          p.questId == questId ? p.copyWith(active: active) : p,
+      ]);
+    }
   }
 
   Future<int> completionCount() async {

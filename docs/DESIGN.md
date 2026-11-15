@@ -238,12 +238,17 @@ Files (UTF-8, LF, YAML frontmatter):
    - `## Encounter` — added 14 Nov 2026 by Amendment v0.3: the creature met that day and its type, how the fight went, and the class it was fought as; a boss attempt is named on its day. Omitted on a day with no fight. Nothing about HP is ever written.
    - `## Notes` — the Campfire free-text note, verbatim. Omit if empty.
 3. **`Quests.md`** — overwritten on export. The active quest definitions as a readable list (name, attribute, difficulty, schedule, type), so the vault alone explains the current system.
+4. **`Goals & Habits.md`** — added 14 Nov 2026 by Amendment v0.4, overwritten on export: the active goals with their why-lines, the habit plans that serve each (anchor, frequency, the three sizes), and the current class and companion.
+
+**Amendment, 14 Nov 2026 (Adam, Amendment v0.4):** the day's quest table gains a `For` column saying what each quest was for. A calendar event's title is written to these files only if the user turns on "Include event names in exports" (off by default); otherwise it reads "Calendar commitment".
 
 Rules: export is **one-way** (app → Markdown) in v1; never read, parse, or delete vault files; never write outside the picked folder; if the folder is unavailable (permission revoked, vault not yet synced to device), queue silently and show a calm "Export waiting for vault folder" line in Settings — no error dialogs during the day. Also provide **Share…** export of the same files from Settings as a fallback.
 
 A complete sample of each file, with realistic data, is a Phase-2 deliverable — the format above is the contract, the sample proves it.
 
 ## 12. Seeded quests (v1 first run, all editable/archivable)
+
+**Amendment, 14 Nov 2026 (Adam, Amendment v0.4): this list is the template library, not the starting board.** A new user starts with **First Dawn**, a short questionnaire in seven chapters (their story, goals, habit design, rhythm, class and companion, calendar, first week), and the board is then made each Dawn from what they said: stated goal, to habit plan, to that day's quests, joined with the mapped calendar and pointed at the day's encounter by class. Every quest says what it is for. Habit quests come in three sizes chosen on the day (Tiny, Target, Stretch), and Tiny counts in full. The weekly check-in may propose one change and never makes one by itself. The quests below remain, in the Quest Log, for anyone who skips the questionnaire or wants one of them. The full text is `docs/AMENDMENTS_v0.3_v0.4.md`, Part B; what was built from it is in `DECISIONS.md` (D-102 onward) and `docs/PHASE-8.md`. Where this amendment and §§4, 8, 9.3, 10 or 11 conflict, the amendment wins.
 
 Seeded from the user's actual life. Times are defaults, not surveillance.
 
