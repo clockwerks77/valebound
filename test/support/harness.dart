@@ -15,6 +15,7 @@ import 'package:habit_adventure/rules/classes.dart';
 import 'package:habit_adventure/device/device_port.dart';
 import 'package:habit_adventure/export/vault_port.dart';
 import 'package:habit_adventure/rules/enums.dart';
+import 'package:habit_adventure/rules/first_dawn.dart';
 import 'package:habit_adventure/state/game_controller.dart';
 import 'package:habit_adventure/ui/art/painted.dart';
 import 'package:habit_adventure/ui/tour/tours.dart';
@@ -307,6 +308,7 @@ class TestApp {
     bool hints = false,
     bool prologue = false,
     HeroClass? heroClass = HeroClass.warden,
+    FirstDawnState? firstDawn = FirstDawnState.done,
   }) async {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final app = TestApp(now);
@@ -333,6 +335,10 @@ class TestApp {
           jsonEncode(HintId.all),
         );
       }
+      // First Dawn opens over everything for a new hero, so it is marked
+      // as finished unless a test asks for it: [firstDawn] null leaves a
+      // new hero fresh, and a hero with history offered it on the board.
+      if (firstDawn != null) await app.repo.setFirstDawn(firstDawn);
       if (withProfile) {
         if (withHistory) {
           await app._seedHistory();

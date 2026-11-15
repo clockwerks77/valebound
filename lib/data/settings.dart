@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import '../rules/checkin.dart';
 import '../rules/combat.dart' show ItemKind;
 import '../rules/delve.dart';
 import '../rules/encounter.dart';
+import '../rules/first_dawn.dart';
+import '../rules/goals.dart';
 import '../rules/health_fields.dart';
 
 /// Keys of the simple settings kept in the database (so the JSON backup
@@ -45,6 +48,31 @@ abstract final class SettingKey {
 
   /// The boss campaign as a `BossState` in JSON (Amendment v0.3 §5).
   static const String boss = 'boss';
+
+  // Amendment v0.4. Goals, habit plans, calendar mappings and the rhythm
+  // answers are small lists the user wrote: kept here as JSON so the
+  // backup carries them and no table is needed (DECISIONS D-102).
+  static const String goals = 'goals';
+  static const String plans = 'plans';
+  static const String mappings = 'mappings';
+  static const String rhythm = 'rhythm';
+
+  /// The class scores of Chapter 5 with the recommendation that was shown.
+  static const String classScore = 'class_score';
+
+  /// Where First Dawn stands (`FirstDawnState`), and the answers so far.
+  static const String firstDawn = 'first_dawn';
+  static const String firstDawnDraft = 'first_dawn_draft';
+
+  /// The Sunday Check-Ins: answers, and suggestions declined or accepted.
+  static const String checkIns = 'checkins';
+
+  /// `1` to write calendar event names into exports. Off unless set.
+  static const String exportEventNames = 'export_event_names';
+
+  /// The day the calendar was last asked for, so a "not now" is not asked
+  /// about again for a season.
+  static const String calendarAskedOn = 'calendar_asked_on';
 }
 
 /// Reads the pouch as stored. Anything unreadable is an empty pouch.
@@ -93,6 +121,16 @@ class GameSettings {
     this.prologueSeen = false,
     this.pouch = const <ItemKind, int>{},
     this.boss = const BossState(),
+    this.goals = const <Goal>[],
+    this.plans = const <HabitPlan>[],
+    this.mappings = const <CalendarMapping>[],
+    this.rhythm = const Rhythm(),
+    this.classScore,
+    this.firstDawn,
+    this.firstDawnDraft,
+    this.checkIns = const CheckIns(),
+    this.exportEventNames = false,
+    this.calendarAskedOn,
   });
 
   factory GameSettings.fromMap(Map<String, String> raw) {
@@ -112,7 +150,29 @@ class GameSettings {
       prologueSeen: raw[SettingKey.prologueSeen] == '1',
       pouch: decodePouch(raw[SettingKey.pouch]),
       boss: decodeBoss(raw[SettingKey.boss]),
+      goals: decodeGoals(raw[SettingKey.goals]),
+      plans: decodePlans(raw[SettingKey.plans]),
+      mappings: decodeMappings(raw[SettingKey.mappings]),
+      rhythm: decodeRhythm(raw[SettingKey.rhythm]),
+      classScore: _classScore(raw[SettingKey.classScore]),
+      firstDawn: raw[SettingKey.firstDawn] == null
+          ? null
+          : FirstDawnState.byName(raw[SettingKey.firstDawn]),
+      firstDawnDraft: raw[SettingKey.firstDawnDraft],
+      checkIns: CheckIns.decode(raw[SettingKey.checkIns]),
+      exportEventNames: raw[SettingKey.exportEventNames] == '1',
+      calendarAskedOn: raw[SettingKey.calendarAskedOn],
     );
+  }
+
+  static ClassScore? _classScore(String? json) {
+    if (json == null || json.isEmpty) return null;
+    try {
+      final raw = jsonDecode(json);
+      return raw is Map<String, dynamic> ? ClassScore.fromJson(raw) : null;
+    } on FormatException {
+      return null;
+    }
   }
 
   final int delveWeekday;
@@ -131,6 +191,27 @@ class GameSettings {
 
   /// The weekly boss: which one, what it has left, Marks, titles.
   final BossState boss;
+
+  /// Everything the user has stated (Amendment v0.4 §2), archived ones
+  /// included.
+  final List<Goal> goals;
+  final List<HabitPlan> plans;
+  final List<CalendarMapping> mappings;
+  final Rhythm rhythm;
+  final ClassScore? classScore;
+
+  /// Null for a hero from before 0.8 who has not been offered it yet.
+  final FirstDawnState? firstDawn;
+
+  /// The answers so far, as saved, or null.
+  final String? firstDawnDraft;
+  final CheckIns checkIns;
+  final bool exportEventNames;
+  final String? calendarAskedOn;
+
+  List<Goal> get activeGoals => <Goal>[for (final g in goals) if (g.active) g];
+  List<HabitPlan> get activePlans =>
+      <HabitPlan>[for (final p in plans) if (p.active) p];
 
   static Set<String> _stringSet(String? json) {
     if (json == null || json.isEmpty) return const <String>{};

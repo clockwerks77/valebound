@@ -338,7 +338,7 @@ void main() {
       await play();
       final backup = await repo.exportBackupJson();
       expect(jsonDecode(backup)['format'], backupFormat);
-      expect(jsonDecode(backup)['schema'], 4);
+      expect(jsonDecode(backup)['schema'], 5);
 
       final other = AppDatabase(NativeDatabase.memory());
       addTearDown(other.close);

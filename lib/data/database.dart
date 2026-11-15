@@ -42,6 +42,11 @@ class Quests extends Table {
 
   /// Set for quests the app itself owns, e.g. `campfire`.
   TextColumn get systemKey => text().nullable()();
+
+  /// The goal this quest is for, and the habit plan it is the quest of
+  /// (Amendment v0.4 §8). Both null for a quest not pinned to a goal.
+  TextColumn get goalId => text().nullable()();
+  TextColumn get planId => text().nullable()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
@@ -315,7 +320,7 @@ class AppDatabase extends _$AppDatabase {
   /// choices, settings; system keys on the two seeded health quests).
   /// 4: version 0.7 (the hero's class, the day's encounter).
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   /// Data survives every update (DESIGN §9.2): an older database is carried
   /// forward step by step and nothing in it is rewritten or dropped.
@@ -339,6 +344,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.addColumn(characters, characters.classId);
             await m.addColumn(dayLogs, dayLogs.encounter);
+          }
+          if (from < 5) {
+            await m.addColumn(quests, quests.goalId);
+            await m.addColumn(quests, quests.planId);
           }
         },
       );

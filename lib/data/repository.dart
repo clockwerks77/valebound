@@ -16,6 +16,9 @@ import '../rules/gear.dart';
 import '../rules/health_fields.dart';
 import '../rules/journey.dart';
 import '../rules/progression.dart';
+import '../rules/checkin.dart';
+import '../rules/first_dawn.dart';
+import '../rules/goals.dart';
 import '../rules/schedule.dart';
 import '../rules/world.dart';
 import '../rules/xp_curve.dart';
@@ -55,6 +58,25 @@ class BoardQuest {
 /// Key in a completion's `extras` for the gift the day's Still creature
 /// left on the quest that woke it (DECISIONS D-70).
 const String dailyStillExtra = 'dailyStill';
+
+/// Keys in a completion's `extras` (Amendment v0.4 §8): the size a habit
+/// was done at, the For-line it carried, and what kind of thing it came
+/// from.
+const String sizeExtra = 'size';
+const String forExtra = 'for';
+const String sourceExtra = 'source';
+
+/// The size a completion was done at, or null for a quest with no sizes.
+QuestSize? sizeOf(CompletionRow c) =>
+    QuestSize.byName(decodeExtras(c.extras)[sizeExtra] as String?);
+
+/// The For-line a completion carried, or empty for one from before 0.8.
+String forLineOf(CompletionRow c) =>
+    '${decodeExtras(c.extras)[forExtra] ?? ''}';
+
+/// The source kind a completion recorded, or empty.
+String sourceOf(CompletionRow c) =>
+    '${decodeExtras(c.extras)[sourceExtra] ?? ''}';
 
 /// The material the day's Still creature left on [c], or null when [c] is
 /// not the quest that woke it.
@@ -379,6 +401,11 @@ class GameRepository {
       for (final seed in seeds) {
         await db.into(db.quests).insert(seed);
       }
+      // A new hero is asked about their goals once the story has been
+      // told (Amendment v0.4 §3).
+      if ((await settings()).firstDawn == null) {
+        await setFirstDawn(FirstDawnState.fresh);
+      }
     });
   }
 
@@ -475,7 +502,10 @@ class GameRepository {
   }
 
   /// Today's quests with their progress and completions.
-  Future<List<BoardQuest>> loadBoard(String day) async {
+  Future<List<BoardQuest>> loadBoard(
+    String day, {
+    Set<String> alsoDue = const <String>{},
+  }) async {
     final quests = await (db.select(db.quests)
           ..orderBy([
             (q) => OrderingTerm.asc(q.sortOrder),
@@ -497,7 +527,8 @@ class GameRepository {
     final out = <BoardQuest>[];
     for (final q in quests) {
       final done = doneByQuest[q.id];
-      final due = q.active && scheduleOf(q).isDueOn(day);
+      final due =
+          q.active && (scheduleOf(q).isDueOn(day) || alsoDue.contains(q.id));
       if (due || done != null) {
         out.add(
           BoardQuest(
@@ -541,6 +572,7 @@ class GameRepository {
     String? note,
     int? progress,
     DateTime? at,
+    QuestSize? size,
   }) async {
     final now = at ?? clock();
     final day = DayKey.of(now);
@@ -556,6 +588,54 @@ class GameRepository {
         return null;
       }
       if (await _completionFor(questId, day) != null) return null;
+
+      // A habit plan's quest is done at one of three sizes, and is worth
+      // what that size is worth (Amendment v0.4 §4). Anything else is
+      // worth what the quest says.
+      final prefs = await settings();
+      HabitPlan? plan;
+      for (final p in prefs.plans) {
+        if (p.id == quest.planId) plan = p;
+      }
+      final doneSize = plan == null
+          ? null
+          : (size ??
+              plan.defaultSize(day, restDay: prefs.rhythm.isRestDay(day)));
+      final worth = plan == null || doneSize == null
+          ? quest.difficulty
+          : plan.difficultyFor(doneSize);
+      final kind = sourceKindOf(
+        source: quest.source,
+        systemKey: quest.systemKey,
+        goalId: quest.goalId,
+        planId: quest.planId,
+      );
+      Goal? goal;
+      for (final g in prefs.goals) {
+        if (g.id == (plan?.goalId ?? quest.goalId)) goal = g;
+      }
+      final fromCalendar = kind == SourceKind.calendar ||
+          kind == SourceKind.prep ||
+          kind == SourceKind.followThrough;
+      // A calendar event's title is not written into the log unless the
+      // user has asked for that (Amendment v0.4 §8).
+      final String loggedName;
+      if (plan != null && doneSize != null) {
+        loggedName = doneSize == QuestSize.target
+            ? targetTextOn(plan, prefs.rhythm.calibrationOn(day))
+            : plan.textFor(doneSize);
+      } else if (fromCalendar && !prefs.exportEventNames) {
+        loggedName = calendarStandIn(kind);
+      } else {
+        loggedName = quest.name;
+      }
+      final loggedFor = forLine(
+        kind: kind,
+        goal: goal,
+        anchor: plan?.anchor ?? '',
+        calendarTime: kind == SourceKind.calendar ? quest.notes : '',
+        systemKey: quest.systemKey ?? '',
+      );
 
       await db.into(db.dayLogs).insert(
             DayLogsCompanion.insert(id: newId(), day: day, dawnGeneratedAt: now),
@@ -576,7 +656,7 @@ class GameRepository {
       final doneToday = await completionsOn(day);
       final outcome = applyCompletion(
         totals: totals,
-        difficulty: quest.difficulty,
+        difficulty: worth,
         track: quest.track,
         attribute: quest.attribute,
         bondLevelBonusGrantedToday: log?.bondLevelBonusGranted ?? false,
@@ -708,16 +788,19 @@ class GameRepository {
                 outcome.award.materials +
                     (outcome.sniffOutFound == null ? 0 : 1),
               ),
-              difficultySnapshot: quest.difficulty,
+              difficultySnapshot: worth,
               trackSnapshot: quest.track,
               attributeSnapshot: quest.attribute,
-              questNameSnapshot: quest.name,
+              questNameSnapshot: loggedName,
               progress: Value(progress ?? existingProgress?.progress),
               note: Value(
                 (note == null || note.trim().isEmpty) ? null : note.trim(),
               ),
               extras: Value(
                 jsonEncode(<String, Object>{
+                  if (doneSize != null) sizeExtra: doneSize.name,
+                  forExtra: loggedFor,
+                  sourceExtra: kind.exportName,
                   if (outcome.sniffOutFound != null)
                     'sniff': outcome.sniffOutFound!.name,
                   if (outcome.fetchCarried != null)
@@ -1218,6 +1301,9 @@ class GameRepository {
     required String externalId,
     required String title,
     String timeLabel = '',
+    Attribute attribute = Attribute.order,
+    QuestSource source = QuestSource.calendar,
+    Difficulty difficulty = Difficulty.standard,
   }) async {
     final now = clock();
     final day = DayKey.of(now);
@@ -1239,14 +1325,16 @@ class GameRepository {
               id: id,
               name: name,
               iconKey: const Value('calendar'),
-              attribute: Attribute.order,
-              difficulty: Difficulty.standard,
+              attribute: attribute,
+              difficulty: difficulty,
               track: Track.hero,
               scheduleType: ScheduleType.oneOff,
               scheduleAnchorDay: Value(day),
-              completionType: CompletionType.confirm,
+              completionType: source == QuestSource.calendar
+                  ? CompletionType.confirm
+                  : CompletionType.tap,
               notes: Value(timeLabel),
-              source: QuestSource.calendar,
+              source: source,
               externalId: Value(externalId),
               sortOrder: const Value(8),
               createdAt: now,
@@ -1607,6 +1695,262 @@ class GameRepository {
   }
 
   // ---- Settings ------------------------------------------------------
+
+  // ---- Goals, habit plans and First Dawn (Amendment v0.4) -------------
+
+  Future<void> _saveGoals(List<Goal> goals) =>
+      setSetting(SettingKey.goals, encodeGoals(goals));
+
+  Future<void> _savePlans(List<HabitPlan> plans) =>
+      setSetting(SettingKey.plans, encodePlans(plans));
+
+  int _sortOrderOf(DayWindow window) => switch (window) {
+        DayWindow.morning => 20,
+        DayWindow.afternoon => 30,
+        DayWindow.anytime => 35,
+        DayWindow.evening => 40,
+      };
+
+  /// Writes the quest row that puts [plan] on the board, creating it the
+  /// first time, and returns the plan carrying that quest's id.
+  Future<HabitPlan> _syncPlanQuest(HabitPlan plan, {String? icon}) async {
+    final now = clock();
+    final schedule = plan.schedule;
+    final questId = plan.questId;
+    final existing = questId == null ? null : await questById(questId);
+    if (existing == null) {
+      final id = newId();
+      await db.into(db.quests).insert(
+            QuestsCompanion.insert(
+              id: id,
+              name: plan.target,
+              iconKey: Value(icon ?? 'star'),
+              attribute: plan.attribute,
+              difficulty: plan.difficultyFor(QuestSize.target),
+              track: plan.track,
+              scheduleType: schedule.type,
+              scheduleWeekdays:
+                  Value(Schedule.encodeWeekdays(schedule.weekdays)),
+              completionType: CompletionType.tap,
+              source: QuestSource.habit,
+              goalId: Value(plan.goalId),
+              planId: Value(plan.id),
+              active: Value(plan.active),
+              sortOrder: Value(_sortOrderOf(plan.window)),
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      return plan.copyWith(questId: id);
+    }
+    await (db.update(db.quests)..where((q) => q.id.equals(existing.id))).write(
+      QuestsCompanion(
+        name: Value(plan.target),
+        iconKey: icon == null ? const Value.absent() : Value(icon),
+        attribute: Value(plan.attribute),
+        difficulty: Value(plan.difficultyFor(QuestSize.target)),
+        track: Value(plan.track),
+        scheduleType: Value(schedule.type),
+        scheduleWeekdays: Value(Schedule.encodeWeekdays(schedule.weekdays)),
+        goalId: Value(plan.goalId),
+        planId: Value(plan.id),
+        active: Value(plan.active),
+        sortOrder: Value(_sortOrderOf(plan.window)),
+        updatedAt: Value(now),
+      ),
+    );
+    return plan;
+  }
+
+  /// Adds a goal, or replaces the one with the same id.
+  Future<void> saveGoal(Goal goal) async {
+    final goals = (await settings()).goals;
+    final at = goals.indexWhere((g) => g.id == goal.id);
+    final next = List<Goal>.of(goals);
+    if (at < 0) {
+      next.add(goal);
+    } else {
+      next[at] = goal;
+    }
+    await _saveGoals(next);
+  }
+
+  /// Adds a habit plan, or replaces the one with the same id, and keeps
+  /// its quest in step. Returns the plan as stored.
+  Future<HabitPlan> savePlan(HabitPlan plan) async {
+    final prefs = await settings();
+    String? icon;
+    for (final g in prefs.goals) {
+      if (g.id == plan.goalId) icon = g.domain.icon;
+    }
+    final stored = await _syncPlanQuest(plan, icon: icon);
+    final next = List<HabitPlan>.of(prefs.plans);
+    final at = next.indexWhere((p) => p.id == stored.id);
+    if (at < 0) {
+      next.add(stored);
+    } else {
+      next[at] = stored;
+    }
+    await _savePlans(next);
+    return stored;
+  }
+
+  /// Archives a goal with its habits, or brings it back. Nothing is
+  /// deleted: what was done for it stays in the log.
+  Future<void> setGoalActive(String goalId, {required bool active}) async {
+    final prefs = await settings();
+    await _saveGoals(<Goal>[
+      for (final g in prefs.goals)
+        g.id == goalId ? g.copyWith(active: active) : g,
+    ]);
+    for (final p in prefs.plans) {
+      if (p.goalId == goalId && p.active != active) {
+        await savePlan(p.copyWith(active: active));
+      }
+    }
+  }
+
+  Future<void> setPlanActive(String planId, {required bool active}) async {
+    for (final p in (await settings()).plans) {
+      if (p.id == planId) await savePlan(p.copyWith(active: active));
+    }
+  }
+
+  /// Pins a quest of the user's own to a goal, or unpins it with null.
+  Future<void> pinQuestToGoal(String questId, String? goalId) async {
+    await (db.update(db.quests)..where((q) => q.id.equals(questId))).write(
+      QuestsCompanion(goalId: Value(goalId), updatedAt: Value(clock())),
+    );
+  }
+
+  Future<void> setMappings(List<CalendarMapping> mappings) =>
+      setSetting(SettingKey.mappings, encodeMappings(mappings));
+
+  Future<void> setFirstDawn(FirstDawnState state) =>
+      setSetting(SettingKey.firstDawn, state.name);
+
+  Future<void> saveFirstDawnDraft(FirstDawnDraft? draft) =>
+      setSetting(SettingKey.firstDawnDraft, draft?.encode());
+
+  /// The quests First Dawn's review looks at for a hero who already has a
+  /// board (Chapter 7, migration): active, the user's own, not yet pinned.
+  Future<List<QuestRow>> unpinnedQuests() async => <QuestRow>[
+        for (final q in await allQuests())
+          if (q.active &&
+              q.planId == null &&
+              q.goalId == null &&
+              q.scheduleType != ScheduleType.oneOff &&
+              (q.source == QuestSource.manual ||
+                  q.source == QuestSource.recurring ||
+                  q.source == QuestSource.health))
+            q,
+      ];
+
+  /// Turns First Dawn's answers into data (Amendment v0.4 §3): goals,
+  /// habit plans with their quests, the rhythm, the class and its scores.
+  ///
+  /// [fresh] is a hero who has never had a board of their own: once they
+  /// have designed habits, the untouched starter quests step back into the
+  /// Quest Log as a library. For anyone else every existing quest is dealt
+  /// with by the user's own choice in [draft], and nothing is archived that
+  /// they did not archive. [wholeFlow] is false for a goal added later,
+  /// which leaves the rhythm and class alone.
+  Future<void> commitFirstDawn(
+    FirstDawnDraft draft, {
+    required bool fresh,
+    bool wholeFlow = true,
+  }) async {
+    final today = DayKey.of(clock());
+    await db.transaction(() async {
+      final prefs = await settings();
+      final made = plansFrom(draft, newId: newId, startDay: today);
+      final goals = <Goal>[...prefs.goals, ...made.goals];
+      await _saveGoals(goals);
+      final plans = List<HabitPlan>.of(prefs.plans);
+      for (final p in made.plans) {
+        String? icon;
+        for (final g in made.goals) {
+          if (g.id == p.goalId) icon = g.domain.icon;
+        }
+        plans.add(await _syncPlanQuest(p, icon: icon));
+      }
+      await _savePlans(plans);
+
+      for (final entry in draft.existing.entries) {
+        final choice = entry.value;
+        if (choice == 'archive') {
+          await setQuestActive(entry.key, active: false);
+        } else if (choice.startsWith('goal:')) {
+          final index = int.tryParse(choice.substring(5));
+          if (index != null && index >= 0 && index < made.goals.length) {
+            await pinQuestToGoal(entry.key, made.goals[index].id);
+          }
+        }
+      }
+
+      if (fresh && made.plans.isNotEmpty) {
+        final touched = <String>{
+          for (final c in await allCompletions()) c.questId,
+        };
+        for (final q in await unpinnedQuests()) {
+          if (!touched.contains(q.id)) {
+            await setQuestActive(q.id, active: false);
+          }
+        }
+      }
+
+      if (wholeFlow) {
+        await setSetting(
+          SettingKey.rhythm,
+          jsonEncode(draft.rhythm(startDay: today).toJson()),
+        );
+        await setSetting(
+          SettingKey.classScore,
+          jsonEncode(draft.classScore.toJson()),
+        );
+        final cls = HeroClass.byId(draft.chosenClass);
+        if (cls != null && cls.offered) await setHeroClass(cls);
+        await setFirstDawn(FirstDawnState.done);
+        await saveFirstDawnDraft(null);
+      }
+    });
+  }
+
+  /// How many times each habit plan was done at each size from [fromDay]
+  /// on. Information for the Sunday Check-In, never a grade.
+  Future<Map<String, SizeCounts>> sizeCountsSince(String fromDay) async {
+    final planOf = <String, String>{
+      for (final q in await allQuests())
+        if (q.planId != null) q.id: q.planId!,
+    };
+    final out = <String, SizeCounts>{};
+    for (final c in await allCompletions()) {
+      if (DayKey.daysBetween(fromDay, c.day) < 0) continue;
+      final planId = planOf[c.questId];
+      if (planId == null) continue;
+      final size = sizeOf(c) ?? QuestSize.target;
+      out[planId] = (out[planId] ?? const SizeCounts()).plus(size);
+    }
+    return out;
+  }
+
+  Future<void> _saveCheckIns(CheckIns checkIns) =>
+      setSetting(SettingKey.checkIns, checkIns.encode());
+
+  Future<void> recordFelt(String day, Felt felt) async =>
+      _saveCheckIns((await settings()).checkIns.withFelt(day, felt));
+
+  /// Declining is final for that suggestion (Amendment v0.4 §6).
+  Future<void> declineProposal(Proposal proposal) async =>
+      _saveCheckIns((await settings()).checkIns.withDeclined(proposal.key));
+
+  /// The user said yes: the plan changes, and that is remembered.
+  Future<void> acceptProposal(Proposal proposal) async {
+    await savePlan(proposal.changed);
+    await _saveCheckIns(
+      (await settings()).checkIns.withAccepted(proposal.key),
+    );
+  }
 
   Future<GameSettings> settings() async => GameSettings.fromMap(
         <String, String>{

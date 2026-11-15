@@ -73,6 +73,7 @@ void main() {
       expect(vault.files.keys.toSet(), <String>{
         'Character Sheet.md',
         'Quests.md',
+        'Goals & Habits.md',
         'Daily/2026-11-12.md',
       });
       expect(export.state, ExportState.upToDate);
@@ -124,6 +125,7 @@ void main() {
       expect(vault.files.keys.toSet(), <String>{
         'Character Sheet.md',
         'Quests.md',
+        'Goals & Habits.md',
         'Daily/2026-11-12.md',
         'Daily/2026-11-13.md',
         'Daily/2026-11-14.md',
@@ -181,6 +183,7 @@ void main() {
       expect(files.keys.toSet(), <String>{
         'Character Sheet.md',
         'Quests.md',
+        'Goals & Habits.md',
         'Daily/2026-11-12.md',
       });
     });

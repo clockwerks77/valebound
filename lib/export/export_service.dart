@@ -7,6 +7,7 @@ import '../rules/day_key.dart';
 import '../rules/encounter.dart';
 import '../rules/enums.dart';
 import '../rules/gear.dart';
+import '../rules/goals.dart';
 import '../rules/journey.dart';
 import '../rules/world.dart';
 import '../rules/xp_curve.dart';
@@ -130,7 +131,55 @@ class ExportService {
     final logs = <String, DayLogRow>{
       for (final l in await repo.allDayLogs()) l.day: l,
     };
+    final prefs = await repo.settings();
+    // A calendar event's title is written only if the user asked for that
+    // (Amendment v0.4 §8).
+    String nameOf(QuestRow q) {
+      final kind = sourceKindOf(
+        source: q.source,
+        systemKey: q.systemKey,
+        goalId: q.goalId,
+        planId: q.planId,
+      );
+      final fromCalendar = kind == SourceKind.calendar ||
+          kind == SourceKind.prep ||
+          kind == SourceKind.followThrough;
+      return fromCalendar && !prefs.exportEventNames
+          ? calendarStandIn(kind)
+          : q.name;
+    }
+
     final files = <String, String>{
+      goalsFile: goalsMarkdown(
+        GoalsData(
+          updated: now,
+          heroClass: HeroClass.byId(hero.classId)?.label ?? '',
+          companionName: companion.name,
+          companionKind: companion.kind.label,
+          goals: <GoalBlock>[
+            for (final g in prefs.activeGoals)
+              GoalBlock(
+                text: g.text,
+                domain: g.domain.label,
+                why: g.why,
+                horizon: g.horizon.label,
+                check: g.check,
+                habits: <HabitLine>[
+                  for (final p in prefs.activePlans)
+                    if (p.goalId == g.id)
+                      HabitLine(
+                        target: p.target,
+                        tiny: p.tiny,
+                        stretch: p.stretch,
+                        anchor: p.anchor,
+                        frequency: p.frequencyLabel,
+                        track: p.track,
+                      ),
+                ],
+              ),
+          ],
+        ),
+      ),
       characterSheetFile: characterSheetMarkdown(
         await _sheet(hero, companion, world, completions.length, now),
       ),
@@ -143,7 +192,7 @@ class ExportService {
               // The welcome-back quest is the app's own, not a definition.
               if (q.active && q.systemKey != systemKeyComeback)
                 QuestLine(
-                  name: q.name,
+                  name: nameOf(q),
                   attribute: q.attribute,
                   difficulty: q.difficulty,
                   schedule: scheduleOf(q).describe(),
@@ -309,6 +358,7 @@ class ExportService {
             difficulty: c.difficultySnapshot,
             heroXp: c.xpAwarded,
             companionXp: c.companionXpAwarded,
+            forWhat: _forWhat(c),
           ),
       ],
       pacesTotal: pacesTotal,
@@ -334,4 +384,10 @@ class ExportService {
       note: log?.dayNote ?? '',
     );
   }
+}
+
+/// A completion's For-line as the table shows it: without the "For:".
+String _forWhat(CompletionRow c) {
+  final line = forLineOf(c);
+  return line.startsWith('For: ') ? line.substring(5) : line;
 }

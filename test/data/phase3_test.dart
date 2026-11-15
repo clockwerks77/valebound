@@ -539,7 +539,7 @@ void main() {
       await play();
       final backup = await repo.exportBackupJson();
       final decoded = jsonDecode(backup) as Map<String, dynamic>;
-      expect(decoded['schema'], 4);
+      expect(decoded['schema'], 5);
       final tables = decoded['tables'] as Map<String, dynamic>;
       expect((tables['delves'] as List<dynamic>).length, 1);
       expect((tables['calendarChoices'] as List<dynamic>).length, 2);
@@ -650,6 +650,34 @@ void main() {
       expect(after.gold, hero.gold);
       expect(after.materials, hero.materials);
       expect(after.attributeXp, hero.attributeXp);
+    });
+
+    test('gains the goal and plan columns, both empty; First Dawn is '
+        'offered, and nothing on the board is moved', () async {
+      final old = AppDatabase(
+        NativeDatabase.memory(
+          setup: (raw) {
+            for (final statement in v2) {
+              raw.execute(statement);
+            }
+          },
+        ),
+      );
+      addTearDown(old.close);
+      final upgraded = GameRepository(old, clock: () => now);
+      final quests = await upgraded.allQuests();
+      expect(quests, hasLength(5));
+      expect(quests.every((q) => q.goalId == null && q.planId == null), isTrue);
+      expect(quests.every((q) => q.active), isTrue);
+      final settings = await upgraded.settings();
+      expect(settings.firstDawn, isNull, reason: 'offered, not begun');
+      expect(settings.goals, isEmpty);
+      expect(settings.plans, isEmpty);
+      final reviewed = <String>[
+        for (final q in await upgraded.unpinnedQuests()) q.id,
+      ];
+      expect(reviewed, contains('q-walk'));
+      expect(reviewed, isNot(contains('q-fire')));
     });
 
     test('opens, keeps every row, and gains what Phase 3 adds', () async {

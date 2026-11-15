@@ -112,6 +112,7 @@ DayData day({
               difficulty: Difficulty.minor,
               heroXp: 10,
               companionXp: 0,
+              forWhat: 'Feel stronger · after coffee',
             ),
             DayQuestLine(
               completedAt: DateTime(2026, 11, 14, 8, 25),
@@ -319,19 +320,92 @@ void main() {
       ]);
     });
 
-    test('the quest table: Time | Quest | Track | Attribute | Difficulty | XP',
-        () {
+    test('the quest table: Time | Quest | Track | Attribute | Difficulty | XP '
+        '| For (Amendment v0.4 §8)', () {
       final text = dailyMarkdown(day());
       expect(
         text,
         contains(
-          '| Time | Quest | Track | Attribute | Difficulty | XP |\n'
-          '|---|---|---|---|---|---|\n'
-          '| 07:40 | Morning Health Check | Hero | Vitality | Minor | 10 XP |\n'
-          '| 08:25 | Walk Babs | Shared | Care | Standard | 13 XP + 25 Companion XP |\n'
-          '| 16:10 | Play / Train with Babs | Companion | Care | Minor | 10 Companion XP |\n',
+          '| Time | Quest | Track | Attribute | Difficulty | XP | For |\n'
+          '|---|---|---|---|---|---|---|\n'
+          '| 07:40 | Morning Health Check | Hero | Vitality | Minor | 10 XP | Feel stronger · after coffee |\n'
+          '| 08:25 | Walk Babs | Shared | Care | Standard | 13 XP + 25 Companion XP |  |\n'
+          '| 16:10 | Play / Train with Babs | Companion | Care | Minor | 10 Companion XP |  |\n',
         ),
       );
+    });
+
+    test('Goals & Habits.md: goals with their why-lines, habits in three '
+        'sizes, class and companion', () {
+      final text = goalsMarkdown(
+        GoalsData(
+          updated: DateTime(2026, 11, 14, 21, 30),
+          heroClass: 'Warden',
+          companionName: 'Babs',
+          companionKind: 'Hound',
+          goals: const <GoalBlock>[
+            GoalBlock(
+              text: 'Feel stronger',
+              domain: 'Body & Health',
+              why: 'Stairs without thinking about them',
+              horizon: 'This season',
+              check: 'I take the stairs',
+              habits: <HabitLine>[
+                HabitLine(
+                  target: 'Walk for 20 minutes',
+                  tiny: 'Walk for 5 minutes',
+                  stretch: 'Walk for 30 minutes',
+                  anchor: 'At lunch',
+                  frequency: 'Every day',
+                  track: Track.hero,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(goalsFile, 'Goals & Habits.md');
+      expect(
+        text,
+        '---\n'
+        'type: valebound-goals\n'
+        'updated: 2026-11-14T21:30:00\n'
+        'active_goals: 1\n'
+        'class: "Warden"\n'
+        'companion_name: "Babs"\n'
+        'companion_kind: "Hound"\n'
+        '---\n'
+        '\n'
+        '# Goals & Habits\n'
+        '\n'
+        '## Feel stronger\n'
+        '\n'
+        '- Part of life: Body & Health\n'
+        '- Why: Stairs without thinking about them\n'
+        '- Horizon: This season\n'
+        '- Working when: I take the stairs\n'
+        '\n'
+        '| Habit (Target) | When | How often | Tiny | Stretch | Track |\n'
+        '|---|---|---|---|---|---|\n'
+        '| Walk for 20 minutes | At lunch | Every day | Walk for 5 minutes | Walk for 30 minutes | Hero |\n'
+        '\n'
+        '## Class and companion\n'
+        '\n'
+        '- Class: Warden\n'
+        '- Companion: Babs (Hound)\n',
+      );
+      final empty = goalsMarkdown(
+        GoalsData(
+          updated: DateTime(2026, 11, 14, 21, 30),
+          heroClass: '',
+          companionName: 'Babs',
+          companionKind: 'Hound',
+          goals: const <GoalBlock>[],
+        ),
+      );
+      expect(empty, contains('No goals stated yet.'));
+      expect(empty, contains('- Class: not chosen yet'));
+      expect(empty, isNot(contains('class: "')));
     });
 
     test('a quest name with a pipe cannot break the table', () {

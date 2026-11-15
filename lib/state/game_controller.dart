@@ -10,6 +10,7 @@ import '../data/settings.dart';
 import '../device/device_port.dart';
 import '../export/export_service.dart';
 import '../export/vault_port.dart';
+import '../rules/checkin.dart';
 import '../rules/classes.dart';
 import '../rules/combat.dart';
 import '../rules/companion_rules.dart';
@@ -17,7 +18,10 @@ import '../rules/day_cycle.dart';
 import '../rules/day_key.dart';
 import '../rules/encounter.dart';
 import '../rules/enums.dart';
+import '../rules/first_dawn.dart';
 import '../rules/gear.dart';
+import '../rules/generation.dart';
+import '../rules/goals.dart';
 import '../rules/health_fields.dart';
 import '../rules/narrator.dart';
 import '../rules/progression.dart';
@@ -100,6 +104,22 @@ class GameController extends ChangeNotifier {
 
   /// Today's calendar events not yet accepted or dismissed.
   List<CalendarEvent> suggestions = const <CalendarEvent>[];
+
+  /// Today's board as Dawn composed it (Amendment v0.4 §§2, 5): the order,
+  /// and for every quest what it is for.
+  ComposedBoard composed =
+      const ComposedBoard(order: <String>[], lines: <String, BoardLine>{});
+
+  /// Prep and Follow-through quests that may be offered for a heavy
+  /// calendar event today. Offers, never additions.
+  List<CalendarOffer> offers = const <CalendarOffer>[];
+
+  /// Today's calendar events that are a quest already on the board.
+  Map<String, EventFact> _merged = const <String, EventFact>{};
+
+  /// The size picked on a habit quest's card, until it is done.
+  final Map<String, QuestSize> _sizeChoice = <String, QuestSize>{};
+  String _sizeDay = '';
   List<DeviceCalendar> calendars = const <DeviceCalendar>[];
   bool calendarGranted = false;
   List<CalendarEvent> _eventsToday = const <CalendarEvent>[];
@@ -142,7 +162,13 @@ class GameController extends ChangeNotifier {
   }
 
   /// The calendar offer on the Dawn board: made once, in context.
-  bool get calendarOfferDue => !settings.calendarAsked && !settings.calendarOn;
+  bool get calendarOfferDue {
+    if (settings.calendarOn) return false;
+    if (!settings.calendarAsked) return true;
+    // "Not now" is not asked about again for a season (Amendment v0.4 §3).
+    final askedOn = settings.calendarAskedOn;
+    return askedOn != null && DayKey.daysBetween(askedOn, day) >= 90;
+  }
 
   bool get stepsConnected =>
       settings.stepsOn && stepsAccess == StepsAccess.connected;
@@ -272,15 +298,23 @@ class GameController extends ChangeNotifier {
     final readDevice = fromDevice || today != day;
     day = today;
     settings = await repo.settings();
+    if (_sizeDay != day) {
+      _sizeChoice.clear();
+      _sizeDay = day;
+    }
     if (readDevice) {
       await _readSteps();
       await _readGlucose();
+      await _readCalendar();
     }
     await repo.syncWorld();
     hero = await repo.hero();
     companion = await repo.companion();
     world = await repo.world();
-    board = await repo.loadBoard(day);
+    await _planCalendar();
+    board = await repo.loadBoard(day, alsoDue: _merged.keys.toSet());
+    encounterToday = decodeEncounter((await repo.dayLog(day))?.encounter);
+    _compose();
     quests = await repo.allQuests();
     history = await repo.history();
     completionCount = await repo.completionCount();
@@ -310,8 +344,6 @@ class GameController extends ChangeNotifier {
     questsDone = await repo.questsDoneOn(day);
     encounterToday = decodeEncounter(this.today?.encounter);
     delve = await repo.delveWaiting();
-    if (readDevice) await _readCalendar();
-    await _filterSuggestions();
     await _syncReminders();
   }
 
@@ -365,24 +397,130 @@ class GameController extends ChangeNotifier {
     _eventsToday = await device.eventsBetween(start, end);
   }
 
-  Future<void> _filterSuggestions() async {
+  /// Works out what today's calendar becomes (Amendment v0.4 §2): a mapped
+  /// event is put on the board, one that is a habit plan (or repeats a
+  /// quest already there) merges into it, and an unmapped one is only ever
+  /// offered. Also finds the Prep and Follow-through offers.
+  Future<void> _planCalendar() async {
+    _merged = const <String, EventFact>{};
+    offers = const <CalendarOffer>[];
     if (!settings.calendarOn || _eventsToday.isEmpty) {
       suggestions = const <CalendarEvent>[];
       return;
     }
     final choices = await repo.calendarChoicesOn(day);
-    // One event often sits in two calendars. It is offered once, and a
-    // choice made about one copy counts for them all.
+    // One event often sits in two calendars. It is one event, and a choice
+    // made about one copy counts for them all.
+    final byKey = <String, CalendarEvent>{};
+    final facts = <EventFact>[];
+    for (final e in _eventsToday) {
+      if (settings.excludedCalendars.contains(e.calendarId)) continue;
+      if (byKey.containsKey(e.sameAs)) continue;
+      byKey[e.sameAs] = e;
+      facts.add(_factOf(e));
+    }
     final settled = <String>{
       for (final e in _eventsToday)
         if (choices.containsKey(e.id)) e.sameAs,
     };
+    final plans = settings.activePlans;
+    final planByQuest = <String, HabitPlan>{
+      for (final p in plans)
+        if (p.questId != null) p.questId!: p,
+    };
+    final names = <String, List<String>>{};
+    for (final b in await repo.loadBoard(day)) {
+      final q = b.quest;
+      if (q.source == QuestSource.calendar ||
+          q.source == QuestSource.prep ||
+          q.source == QuestSource.followThrough ||
+          q.systemKey == systemKeyComeback) {
+        continue;
+      }
+      final plan = planByQuest[q.id];
+      names[q.id] = plan == null
+          ? <String>[q.name]
+          : <String>[plan.target, plan.tiny, plan.stretch];
+    }
+    final today = planCalendar(
+      events: facts,
+      mappings: settings.mappings,
+      plans: plans,
+      boardNames: names,
+    );
+    final kindOf = <String, MappingKind>{
+      for (final m in settings.mappings) m.seriesKey: m.kind,
+    };
+    for (final f in today.asQuests) {
+      final e = byKey[f.key];
+      if (e == null || settled.contains(f.key)) continue;
+      await repo.acceptSuggestion(
+        externalId: e.id,
+        title: e.title,
+        timeLabel: e.timeLabel,
+        attribute: kindOf[f.seriesKey]?.attribute ?? Attribute.order,
+      );
+    }
+    _merged = today.merged;
     suggestions = <CalendarEvent>[
-      for (final e in _eventsToday)
-        if (!choices.containsKey(e.id) &&
-            !settings.excludedCalendars.contains(e.calendarId) &&
-            settled.add(e.sameAs))
-          e,
+      for (final f in today.suggestions)
+        if (!settled.contains(f.key) && byKey[f.key] != null) byKey[f.key]!,
+    ];
+    offers = offersAt(
+      now: repo.clock(),
+      events: facts,
+      mappings: settings.mappings,
+      settled: choices.keys.toSet(),
+    );
+  }
+
+  EventFact _factOf(CalendarEvent e) => EventFact(
+        key: e.sameAs,
+        calendarId: e.calendarId,
+        title: e.title,
+        begin: e.begin,
+        end: e.end,
+        allDay: e.allDay,
+        timeLabel: e.timeLabel,
+      );
+
+  QuestFact _questFact(BoardQuest b) => QuestFact(
+        id: b.quest.id,
+        name: b.quest.name,
+        source: b.quest.source,
+        attribute: b.quest.attribute,
+        track: b.quest.track,
+        difficulty: b.quest.difficulty,
+        systemKey: b.quest.systemKey,
+        goalId: b.quest.goalId,
+        planId: b.quest.planId,
+        done: b.isDone,
+      );
+
+  /// Composes the loaded board: what each quest is for, the size it shows,
+  /// the order, and the one quest that feeds the class resource.
+  void _compose() {
+    final status = statusOf(encounterToday);
+    composed = composeBoard(
+      day: day,
+      quests: <QuestFact>[for (final b in board) _questFact(b)],
+      goals: settings.goals,
+      plans: settings.plans,
+      rhythm: settings.rhythm,
+      merged: _merged,
+      calendarTimes: <String, String>{
+        for (final b in board)
+          if (b.quest.source == QuestSource.calendar && b.quest.notes.isNotEmpty)
+            b.quest.id: b.quest.notes,
+      },
+      heroClass: HeroClass.byId(hero?.classId),
+      encounterOpen:
+          status == EncounterStatus.ready || status == EncounterStatus.retry,
+    );
+    final byId = <String, BoardQuest>{for (final b in board) b.quest.id: b};
+    board = <BoardQuest>[
+      for (final id in composed.order)
+        if (byId[id] != null) byId[id]!,
     ];
   }
 
@@ -443,6 +581,7 @@ class GameController extends ChangeNotifier {
   Future<bool> connectCalendar() async {
     final granted = await device.requestCalendar();
     await repo.setSetting(SettingKey.calendarAsked, '1');
+    await repo.setSetting(SettingKey.calendarAskedOn, day);
     await repo.setSetting(SettingKey.calendarOn, granted ? '1' : '0');
     await refresh(fromDevice: true);
     return granted;
@@ -451,6 +590,7 @@ class GameController extends ChangeNotifier {
   /// "Not now": the board stays as it is, and Settings can turn it on later.
   Future<void> declineCalendar() async {
     await repo.setSetting(SettingKey.calendarAsked, '1');
+    await repo.setSetting(SettingKey.calendarAskedOn, day);
     await repo.setSetting(SettingKey.calendarOn, '0');
     await refresh();
   }
@@ -907,10 +1047,226 @@ class GameController extends ChangeNotifier {
       note: note,
       progress: progress,
       at: at,
+      size: _sizeChoice[questId],
     );
+    _sizeChoice.remove(questId);
     await refresh();
     if (outcome != null) _exportSoon();
     return outcome;
+  }
+
+  // ---- Goals, sizes and First Dawn (Amendment v0.4) ---------------------
+
+  List<Goal> get goals => settings.activeGoals;
+  List<HabitPlan> get plans => settings.activePlans;
+
+  /// What the board shows for a quest beyond the quest itself, or null for
+  /// one that is not on today's board.
+  BoardLine? lineFor(String questId) => composed.lines[questId];
+
+  /// The size a habit quest's card is showing. Null for any other quest.
+  QuestSize? sizeFor(String questId) {
+    final line = composed.lines[questId];
+    if (line?.plan == null) return null;
+    return _sizeChoice[questId] ?? line!.size;
+  }
+
+  /// One tap on the size chip: Tiny, Target, Stretch, and round again.
+  void cycleSize(String questId) {
+    final current = sizeFor(questId);
+    if (current == null) return;
+    _sizeChoice[questId] = current.next;
+    notifyListeners();
+  }
+
+  /// The words on a quest's card: a habit's at the size showing, or at the
+  /// size it was done at.
+  String titleFor(BoardQuest b) {
+    final line = composed.lines[b.quest.id];
+    final plan = line?.plan;
+    if (line == null || plan == null) return b.quest.name;
+    final done = b.completion;
+    if (done != null) return done.questNameSnapshot;
+    return line.titleAt(
+      sizeFor(b.quest.id) ?? QuestSize.target,
+      calibration: settings.rhythm.calibrationOn(day),
+    );
+  }
+
+  /// What finishing a quest is worth at the size showing.
+  Difficulty worthFor(BoardQuest b) {
+    final done = b.completion;
+    if (done != null) return done.difficultySnapshot;
+    final line = composed.lines[b.quest.id];
+    final size = sizeFor(b.quest.id);
+    if (line == null || size == null) return b.quest.difficulty;
+    return line.difficultyAt(size, b.quest.difficulty);
+  }
+
+  /// What the scout says about today's board, or null.
+  String? get scoutBoardHint {
+    final cls = heroClass;
+    if (cls == null) return null;
+    return boardHint(
+      cls: cls,
+      type: enemyToday.type,
+      quests: <QuestFact>[for (final b in board) _questFact(b)],
+      lines: composed.lines,
+      pouch: pouch,
+    );
+  }
+
+  /// Where First Dawn stands. A hero from before 0.8 is offered it.
+  FirstDawnState get firstDawnState =>
+      settings.firstDawn ?? FirstDawnState.offered;
+
+  /// The board shows "Tell Valebound your goals" while this is true.
+  bool get firstDawnOffered =>
+      hasProfile &&
+      (firstDawnState == FirstDawnState.offered ||
+          firstDawnState == FirstDawnState.begun);
+
+  FirstDawnDraft get firstDawnDraft =>
+      FirstDawnDraft.decode(settings.firstDawnDraft);
+
+  /// Keeps the answers so far, so the flow can be left and resumed.
+  Future<void> saveFirstDawnDraft(FirstDawnDraft draft) async {
+    await repo.saveFirstDawnDraft(draft);
+    settings = await repo.settings();
+  }
+
+  Future<void> setFirstDawn(FirstDawnState state) async {
+    await repo.setFirstDawn(state);
+    await refresh();
+  }
+
+  /// The questionnaire is finished: its answers become goals, habits and
+  /// the first week's board.
+  Future<void> finishFirstDawn(FirstDawnDraft draft) async {
+    await repo.commitFirstDawn(
+      draft,
+      fresh: firstDawnState == FirstDawnState.fresh,
+    );
+    await refresh();
+    _exportSoon();
+  }
+
+  /// A goal added later (Amendment v0.4 §7): the same chain, one goal.
+  Future<void> addGoalFrom(FirstDawnDraft draft) async {
+    await repo.commitFirstDawn(draft, fresh: false, wholeFlow: false);
+    await refresh();
+    _exportSoon();
+  }
+
+  Future<void> setGoalActive(String goalId, {required bool active}) async {
+    await repo.setGoalActive(goalId, active: active);
+    await refresh();
+    _exportSoon();
+  }
+
+  Future<void> pinQuestToGoal(String questId, String? goalId) async {
+    await repo.pinQuestToGoal(questId, goalId);
+    await refresh();
+  }
+
+  Future<void> setExportEventNames({required bool on}) async {
+    await repo.setSetting(SettingKey.exportEventNames, on ? '1' : null);
+    await refresh();
+    _exportSoon();
+  }
+
+  /// The recurring events of the next four weeks, for the mapping pass
+  /// (Chapter 6). Read on the device, kept nowhere.
+  Future<List<EventSeries>> readSeries() async {
+    if (!settings.calendarOn || !calendarGranted) return const <EventSeries>[];
+    final start = DayKey.parse(day);
+    final end = DayKey.parse(DayKey.addDays(day, 28));
+    final events = await device.eventsBetween(start, end);
+    return recurringSeries(<EventFact>[
+      for (final e in events)
+        if (!settings.excludedCalendars.contains(e.calendarId)) _factOf(e),
+    ]);
+  }
+
+  Future<void> saveMappings(List<CalendarMapping> mappings) async {
+    await repo.setMappings(mappings);
+    await refresh();
+  }
+
+  CalendarMapping? _mappingOf(CalendarOffer offer) {
+    for (final m in settings.mappings) {
+      if (m.seriesKey == offer.event.seriesKey) return m;
+    }
+    return null;
+  }
+
+  /// Yes to a Prep or Follow-through: a Minor quest for today.
+  Future<void> acceptOffer(CalendarOffer offer) async {
+    await repo.acceptSuggestion(
+      externalId: offer.choiceKey,
+      title: offer.questName,
+      timeLabel: offer.prep ? 'Before ${offer.event.timeLabel}' : '',
+      attribute: _mappingOf(offer)?.kind.attribute ?? Attribute.order,
+      source: offer.prep ? QuestSource.prep : QuestSource.followThrough,
+      difficulty: Difficulty.minor,
+    );
+    await refresh();
+  }
+
+  /// "Not today".
+  Future<void> dismissOffer(CalendarOffer offer) async {
+    await repo.dismissSuggestion(offer.choiceKey);
+    await refresh();
+  }
+
+  /// "Never for this one": that offer is not made again for the series.
+  Future<void> neverOffer(CalendarOffer offer) async {
+    await repo.setMappings(<CalendarMapping>[
+      for (final m in settings.mappings)
+        if (m.seriesKey == offer.event.seriesKey)
+          offer.prep ? m.copyWith(prepOff: true) : m.copyWith(followOff: true)
+        else
+          m,
+    ]);
+    await refresh();
+  }
+
+  // ---- The Sunday Check-In (Amendment v0.4 §6) --------------------------
+
+  /// The check-in is open at the Campfire on the weekly day, once a week,
+  /// for anyone with a habit plan.
+  bool get checkInOpen =>
+      plans.isNotEmpty &&
+      DayKey.weekday(day) == settings.delveWeekday &&
+      settings.checkIns.feltOn(day) == null;
+
+  /// How each habit was done over the last two weeks, by size.
+  Future<Map<String, SizeCounts>> sizeCounts({int days = 14}) =>
+      repo.sizeCountsSince(DayKey.addDays(day, -(days - 1)));
+
+  /// Records how the week felt and returns the one change to put to the
+  /// user, or null. Nothing changes unless they accept it.
+  Future<Proposal?> answerCheckIn(Felt felt) async {
+    await repo.recordFelt(day, felt);
+    final counts = await sizeCounts();
+    await refresh();
+    return proposeChange(
+      plans: plans,
+      counts: counts,
+      felt: felt,
+      declined: settings.checkIns.declined,
+    );
+  }
+
+  Future<void> acceptProposal(Proposal proposal) async {
+    await repo.acceptProposal(proposal);
+    await refresh();
+    _exportSoon();
+  }
+
+  Future<void> declineProposal(Proposal proposal) async {
+    await repo.declineProposal(proposal);
+    await refresh();
   }
 
   @override

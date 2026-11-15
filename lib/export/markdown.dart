@@ -16,6 +16,11 @@ import '../rules/enums.dart';
 
 const String characterSheetFile = 'Character Sheet.md';
 const String questsFile = 'Quests.md';
+
+/// Goals, their habit plans, and the current class and companion
+/// (Amendment v0.4 §8). Overwritten on every export.
+const String goalsFile = 'Goals & Habits.md';
+const String typeGoals = 'valebound-goals';
 const String dailyFolder = 'Daily';
 
 String dailyFile(String day) => '$dailyFolder/$day.md';
@@ -223,9 +228,14 @@ class DayQuestLine {
     required this.difficulty,
     required this.heroXp,
     required this.companionXp,
+    this.forWhat = '',
   });
   final DateTime completedAt;
   final String quest;
+
+  /// What the quest was for (Amendment v0.4 §1), without the "For:".
+  /// Empty for a completion from before 0.8.
+  final String forWhat;
   final Track track;
   final Attribute attribute;
   final Difficulty difficulty;
@@ -326,12 +336,12 @@ String dailyMarkdown(DayData d) {
     if (d.quests.isEmpty)
       'A quiet day in the Vale.'
     else ...<String>[
-      '| Time | Quest | Track | Attribute | Difficulty | XP |',
-      '|---|---|---|---|---|---|',
+      '| Time | Quest | Track | Attribute | Difficulty | XP | For |',
+      '|---|---|---|---|---|---|---|',
       for (final q in d.quests)
         '| ${_clock(q.completedAt)} | ${tableCell(q.quest)} | '
             '${q.track.label} | ${q.attribute.label} | '
-            '${q.difficulty.label} | ${q.xp} |',
+            '${q.difficulty.label} | ${q.xp} | ${tableCell(q.forWhat)} |',
     ],
     if (hasJourney) ...<String>[
       '',
@@ -434,6 +444,102 @@ String questsMarkdown(QuestsData d) {
     for (final q in companion) line(q),
   ]);
 }
+
+// ---- Goals & Habits.md ---------------------------------------------------
+
+class HabitLine {
+  const HabitLine({
+    required this.target,
+    required this.tiny,
+    required this.stretch,
+    required this.anchor,
+    required this.frequency,
+    required this.track,
+  });
+  final String target;
+  final String tiny;
+  final String stretch;
+  final String anchor;
+  final String frequency;
+  final Track track;
+}
+
+class GoalBlock {
+  const GoalBlock({
+    required this.text,
+    required this.domain,
+    required this.why,
+    required this.horizon,
+    required this.check,
+    required this.habits,
+  });
+  final String text;
+  final String domain;
+  final String why;
+  final String horizon;
+  final String check;
+  final List<HabitLine> habits;
+}
+
+class GoalsData {
+  const GoalsData({
+    required this.updated,
+    required this.goals,
+    required this.heroClass,
+    required this.companionName,
+    required this.companionKind,
+  });
+  final DateTime updated;
+  final List<GoalBlock> goals;
+
+  /// The class's name, or empty when none is chosen yet.
+  final String heroClass;
+  final String companionName;
+  final String companionKind;
+}
+
+/// `Goals & Habits.md`: the active goals with their why-lines, the habit
+/// plans that serve each (anchor, frequency, the three sizes), and the
+/// current class and companion. Only what the user stated: no calendar
+/// event's title is ever written here.
+String goalsMarkdown(GoalsData d) => _lines(<String>[
+      '---',
+      'type: $typeGoals',
+      'updated: ${isoLocal(d.updated)}',
+      'active_goals: ${d.goals.length}',
+      if (d.heroClass.isNotEmpty) 'class: ${yamlString(d.heroClass)}',
+      'companion_name: ${yamlString(d.companionName)}',
+      'companion_kind: ${yamlString(d.companionKind)}',
+      '---',
+      '',
+      '# Goals & Habits',
+      '',
+      if (d.goals.isEmpty) 'No goals stated yet.',
+      for (final g in d.goals) ...<String>[
+        '## ${g.text}',
+        '',
+        '- Part of life: ${g.domain}',
+        if (g.why.isNotEmpty) '- Why: ${g.why}',
+        '- Horizon: ${g.horizon}',
+        if (g.check.isNotEmpty) '- Working when: ${g.check}',
+        '',
+        if (g.habits.isEmpty)
+          'No habits planned for this goal yet.'
+        else ...<String>[
+          '| Habit (Target) | When | How often | Tiny | Stretch | Track |',
+          '|---|---|---|---|---|---|',
+          for (final h in g.habits)
+            '| ${tableCell(h.target)} | ${tableCell(h.anchor)} | '
+                '${h.frequency} | ${tableCell(h.tiny)} | '
+                '${tableCell(h.stretch)} | ${h.track.label} |',
+        ],
+        '',
+      ],
+      '## Class and companion',
+      '',
+      '- Class: ${d.heroClass.isEmpty ? 'not chosen yet' : d.heroClass}',
+      '- Companion: ${d.companionName} (${d.companionKind})',
+    ]);
 
 /// How a completion type reads in `Quests.md`.
 String describeType(CompletionType type, int? target) => switch (type) {
