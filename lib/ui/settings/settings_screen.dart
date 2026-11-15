@@ -686,14 +686,15 @@ class _CalendarCardState extends State<_CalendarCard> {
         children: <Widget>[
           const _CardTitle('calendar', 'Calendar'),
           Text(
-            on ? 'Suggesting today’s events' : 'Not connected',
+            on ? 'Reading today’s events' : 'Not connected',
             style: AppText.cardTitle.copyWith(color: Palette.slate),
           ),
           const SizedBox(height: 6),
           Text(
-            'Today’s calendar events can appear on the board as suggested '
-            'quests to accept or dismiss. The app only reads your calendar. '
-            'It never changes an event and never completes one for you.',
+            'A recurring event you have named becomes a quest on its days. '
+            'Any other event is offered on the board, to accept or dismiss. '
+            'The app only reads your calendar: it never changes an event and '
+            'never completes one for you.',
             style: AppText.small.copyWith(color: Palette.slateSoft),
           ),
           if (on && game.calendars.isNotEmpty) ...<Widget>[
