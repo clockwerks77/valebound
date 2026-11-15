@@ -64,7 +64,20 @@ enum ScheduleType {
 }
 
 /// DESIGN §6.1 source.
-enum QuestSource { manual, recurring, calendar, health, system }
+enum QuestSource {
+  manual,
+  recurring,
+  calendar,
+  health,
+  system,
+
+  /// A habit plan's quest (Amendment v0.4 §2).
+  habit,
+
+  /// Offered before, and after, a heavy calendar event (Amendment v0.4 §5).
+  prep,
+  followThrough,
+}
 
 /// DESIGN §7A.1. Kind is identity and flavour only; no kind is stronger.
 enum CompanionKind {
