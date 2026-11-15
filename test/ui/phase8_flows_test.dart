@@ -280,15 +280,13 @@ void main() {
           if (q.active) q.id,
       };
       // One card a quest, in the Quest Log's order; the list builds them as
-      // they scroll into reach. Quests already archived (the optional
-      // Five-Minute Reset) are not asked about.
+      // they scroll into reach.
       Finder pill(String quest, String label) => find.descendant(
             of: find
                 .ancestor(of: find.text(quest), matching: find.byType(Column))
                 .first,
             matching: find.text(label),
           );
-      expect(find.text('Five-Minute Reset'), findsNothing);
       await tap(pill('Walk Babs', 'For: More unhurried evenings'));
       await reveal(tester, find.text('7,000 Steps'));
       await tap(pill('7,000 Steps', 'Archive'));

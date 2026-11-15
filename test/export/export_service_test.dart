@@ -9,6 +9,8 @@ import 'package:habit_adventure/export/export_service.dart';
 import 'package:habit_adventure/export/markdown.dart';
 import 'package:habit_adventure/rules/day_key.dart';
 import 'package:habit_adventure/rules/enums.dart';
+import 'package:habit_adventure/rules/first_dawn.dart';
+import 'package:habit_adventure/rules/goals.dart';
 
 import '../support/harness.dart' show MemoryVault;
 
@@ -306,10 +308,48 @@ void main() {
         }
       }
 
-      // Saturday 14 November: the day the samples show.
+      // Saturday 14 November: the day the samples show. That morning the
+      // hero answers First Dawn (Amendment v0.4): two goals, one new habit,
+      // and three of the quests already on the board pinned to them.
       final today = DateTime(2026, 11, 14);
+      await clock(today, 7, 30);
+      await repo.commitFirstDawn(
+        FirstDawnDraft(
+          goals: <GoalDraft>[
+            GoalDraft(
+              domain: LifeDomain.body,
+              text: 'Feel stronger',
+              why: 'Stairs without thinking about them',
+              horizon: Horizon.season,
+              check: 'I take the stairs',
+              plans: <PlanDraft>[
+                PlanDraft(
+                  habit: 'Stretch for 10 minutes',
+                  anchor: 'When I wake up',
+                ),
+              ],
+            ),
+            GoalDraft(
+              domain: LifeDomain.making,
+              text: 'Finish my army',
+              why: 'A painted army on the table',
+            ),
+          ],
+          chosenClass: 'warden',
+          existing: <String, String>{
+            await id('Walk Babs'): 'goal:0',
+            await id('7,000 Steps'): 'goal:0',
+            await id('Painting / Craft Block'): 'goal:1',
+          },
+        ),
+        fresh: false,
+      );
+      final stretch = (await repo.settings()).plans.single.questId!;
       await clock(today, 7, 40);
       await repo.completeQuest(await id('Morning Health Check'));
+      // A hard morning: the habit at its Tiny size, which counts in full.
+      await clock(today, 7, 50);
+      await repo.completeQuest(stretch, size: QuestSize.tiny);
       await repo.setHealthEntry('2026-11-14', 'glucose', '5.8', unit: 'mmol/L');
       await repo.setHealthEntry('2026-11-14', 'time_in_range', '86', unit: '%');
       await clock(today, 8, 25);
@@ -336,6 +376,7 @@ void main() {
         characterSheetFile: vault.files[characterSheetFile]!,
         dailyFile('2026-11-14'): vault.files[dailyFile('2026-11-14')]!,
         questsFile: vault.files[questsFile]!,
+        goalsFile: vault.files[goalsFile]!,
       };
 
       // Publish what was generated, so it can be read and filed.
@@ -348,7 +389,11 @@ void main() {
       // The contract, on real data.
       final day = samples[dailyFile('2026-11-14')]!;
       expect(day, startsWith('---\ntype: valebound-day\ndate: 2026-11-14\n'));
-      expect(day, contains('quests_completed: 7'));
+      expect(day, contains('quests_completed: 8'));
+      expect(day, contains('| Feel stronger · when I wake up |'));
+      expect(day, contains('| Finish my army |'));
+      expect(samples[goalsFile], contains('## Feel stronger'));
+      expect(samples[goalsFile], contains('- Why: A painted army on the table'));
       expect(day, contains('steps: 8214'));
       for (final heading in <String>[
         '## Quests Completed',

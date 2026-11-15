@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_adventure/rules/classes.dart';
 import 'package:habit_adventure/rules/first_dawn.dart';
@@ -146,8 +147,13 @@ Future<void> checkIn(
   await shot(tester, '167_checkin_$suffix');
   await tester.tap(find.text('About right'));
   await app.settle(tester);
-  await tester.ensureVisible(FirstDawnRun.quiet('No, leave it'));
+  // The whole card: what was said, the counts, the proposal, its answers.
+  await Scrollable.ensureVisible(
+    tester.element(find.text('THE WEEK')),
+    alignment: 0.05,
+  );
   await tester.pumpAndSettle();
+  expect(FirstDawnRun.quiet('No, leave it'), findsOneWidget);
   await shot(tester, '168_checkin_proposal_$suffix');
 }
 
