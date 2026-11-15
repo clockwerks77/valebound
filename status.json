@@ -1,0 +1,19 @@
+{
+  "sha": "499a274f26d42dc62fe3434e19233dcd8c2bf666",
+  "ref": "phase-8",
+  "run_id": "43663072974",
+  "stage": "final",
+  "pub_get": "success",
+  "codegen": "success",
+  "analyze": "success",
+  "test": "success",
+  "apk": "success",
+  "device": "",
+  "apk_path": "dist/Valebound-0.8.0.apk",
+  "apk_bytes": 30328349,
+  "apk_sha256": "a5c5c40eac9b6bf6389537ff8987eae8236c68430ae5ad21a9397e4c7e3e0313",
+  "apk_debug_path": "dist/Valebound-0.8.0-debug.apk",
+  "apk_debug_bytes": 169575655,
+  "apk_debug_sha256": "7db0caec0a2ed2ebe31250a748fa30bc09f6baedccdd6a4551cd34782f8eb201",
+  "time": "2026-11-15T01:36:22Z"
+}

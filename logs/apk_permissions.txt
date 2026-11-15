@@ -1,0 +1,24 @@
+Valebound-0.8.0-debug.apk
+package: app.habit_adventure
+uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.READ_CALENDAR'
+uses-permission: name='android.permission.health.READ_STEPS'
+uses-permission: name='android.permission.health.READ_BLOOD_GLUCOSE'
+uses-permission: name='android.permission.POST_NOTIFICATIONS'
+uses-permission: name='android.permission.RECEIVE_BOOT_COMPLETED'
+permission: app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+package: name='app.habit_adventure' versionCode='11' versionName='0.8.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+application-debuggable
+native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'
+Valebound-0.8.0.apk
+package: app.habit_adventure
+uses-permission: name='android.permission.READ_CALENDAR'
+uses-permission: name='android.permission.health.READ_STEPS'
+uses-permission: name='android.permission.health.READ_BLOOD_GLUCOSE'
+uses-permission: name='android.permission.POST_NOTIFICATIONS'
+uses-permission: name='android.permission.RECEIVE_BOOT_COMPLETED'
+permission: app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='app.habit_adventure.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+package: name='app.habit_adventure' versionCode='11' versionName='0.8.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'

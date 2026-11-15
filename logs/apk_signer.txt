@@ -1,0 +1,4 @@
+Valebound-0.8.0-debug.apk
+V2 Signer: certificate SHA-256 digest: 8dcf398e500a51a5c652d5c8405c6703e3767f6a9b26b45663e66abbf17a3b61
+Valebound-0.8.0.apk
+V2 Signer: certificate SHA-256 digest: 8dcf398e500a51a5c652d5c8405c6703e3767f6a9b26b45663e66abbf17a3b61

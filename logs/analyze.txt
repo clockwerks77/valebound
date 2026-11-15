@@ -1,0 +1,9 @@
+Analyzing valebound...                                          
+
+   info • Use the null-aware marker '?' rather than a null check via an 'if'. Try using '?' • lib/ui/board/board_screen.dart:342:25 • use_null_aware_elements
+   info • Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation • lib/ui/firstdawn/first_dawn_screen.dart:1288:19 • prefer_const_constructors
+   info • Use the null-aware marker '?' rather than a null check via an 'if'. Try using '?' • lib/ui/story/story.dart:299:41 • use_null_aware_elements
+   info • Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation • test/rules/combat_test.dart:177:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation • test/rules/combat_test.dart:305:9 • prefer_const_constructors
+
+5 issues found. (ran in 9.4s)

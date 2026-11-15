@@ -1,0 +1,556 @@
+00:00 +0: loading /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart
+00:00 +0: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: (setUpAll)
+00:00 +0: /home/runner/work/valebound/valebound/test/ui/art_test.dart: every place and its villager has a picture
+00:00 +1: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +2: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +3: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +4: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +5: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +6: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +7: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +8: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:00 +9: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:03 +10: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:04 +11: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:05 +12: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:07 +13: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:08 +14: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:08 +15: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:09 +16: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:09 +17: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:09 +18: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:13 +19: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:14 +20: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:14 +21: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:15 +22: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:15 +23: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:16 +24: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:16 +25: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:17 +26: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:18 +27: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:18 +28: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:19 +29: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:19 +30: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:20 +31: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:20 +32: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:21 +33: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) a new hero walks all seven chapters and comes out on a board made from the answers
+00:23 +34: /home/runner/work/valebound/valebound/test/ui/phase3_flows_test.dart: The weekly Delve (DESIGN §4.2) opens at the Campfire once the day is closed
+00:24 +35: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) skipping every chapter still lands on a working starter board
+00:25 +36: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) skipping every chapter still lands on a working starter board
+00:25 +37: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) skipping every chapter still lands on a working starter board
+00:26 +38: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) skipping every chapter still lands on a working starter board
+00:27 +39: /home/runner/work/valebound/valebound/test/ui/phase3_flows_test.dart: Settings and the reminder setting one in the quest editor asks for notifications then
+00:27 +40: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: First Dawn (Amendment v0.4 §3) left part way, it waits on the board and resumes where it stopped
+00:29 +41: /home/runner/work/valebound/valebound/test/ui/phase2_flows_test.dart: Undo a tapped quest waits five seconds before anything is awarded
+00:29 +42: /home/runner/work/valebound/valebound/test/ui/phase2_flows_test.dart: Undo a tapped quest waits five seconds before anything is awarded
+00:30 +43: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:31 +44: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:32 +45: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:32 +46: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:32 +47: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:33 +48: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:33 +49: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:34 +50: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A hero from before First Dawn (Amendment v0.4 §3, migration) their quests arrive in the review unpinned: pin, keep or archive, and nothing is deleted
+00:34 +51: /home/runner/work/valebound/valebound/test/ui/phase2_flows_test.dart: Campfire (DESIGN §4.1, §8.6) review, note, close the day, then edit the note
+00:35 +52: /home/runner/work/valebound/valebound/test/ui/phase2_flows_test.dart: Campfire (DESIGN §4.1, §8.6) review, note, close the day, then edit the note
+00:35 +53: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: The Sunday Check-In (Amendment v0.4 §6) two questions at the Campfire, one proposal, and "no" is final
+00:36 +54: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: The Sunday Check-In (Amendment v0.4 §6) two questions at the Campfire, one proposal, and "no" is final
+00:36 +55: /home/runner/work/valebound/valebound/test/ui/phase2_flows_test.dart: Settings (DESIGN §8.8) picking the vault folder starts the export
+00:37 +56: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:37 +57: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:37 +58: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:38 +59: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:39 +60: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:39 +61: /home/runner/work/valebound/valebound/test/ui/phase8_flows_test.dart: A goal added later (Amendment v0.4 §7) Settings: New goal runs the short flow and the board gains its quest
+00:41 +62: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) steps walked with the app open arrive within a few minutes
+00:42 +63: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: Glucose from Health Connect (DECISIONS D-71) connected in Settings, the day’s average shows as a number
+00:43 +64: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: Glucose from Health Connect (DECISIONS D-71) connected in Settings, the day’s average shows as a number
+00:44 +65: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) opening the Health Log reads at once
+00:44 +66: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: Glucose from Health Connect (DECISIONS D-71) refused, nothing is read and nothing is kept
+00:45 +67: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) nothing is asked while the app is out of sight
+00:46 +68: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) nothing is asked while the app is out of sight
+00:46 +69: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) nothing is asked while the app is out of sight
+00:46 +70: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: Glucose from Health Connect (DECISIONS D-71) yesterday’s whole-day figures are written back next morning
+00:46 +71: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Health Connect while the app stays open (DECISIONS D-74) with nothing connected, the timer reads nothing
+00:47 +72: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) on the first run it walks the board, one bubble at a time
+00:47 +73: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) on the first run it walks the board, one bubble at a time
+00:48 +74: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) is told on the first run, one page at a time, then the tour
+00:48 +75: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) Back returns to the bubble before
+00:48 +76: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) can be skipped, and is not told twice
+00:49 +77: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) can be skipped, and is not told twice
+00:50 +78: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) can be skipped, and is not told twice
+00:50 +79: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) a quest that is not on the board today is passed over
+00:50 +80: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) someone already in the Vale is told it once, without the tour
+00:51 +81: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) Settings can show it again
+00:51 +82: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The prologue (DECISIONS D-76) the Chronicle can tell it again
+00:51 +83: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) it finds its way from wherever the board was left
+00:52 +84: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) it finds its way from wherever the board was left
+00:52 +85: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) it finds its way from wherever the board was left
+00:52 +86: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) it finds its way from wherever the board was left
+00:52 +87: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: The narrator on the board and at the Campfire (DECISIONS D-76) after days away it says only that the Vale has kept
+00:52 +88: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) each other screen explains itself once
+00:53 +89: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) each other screen explains itself once
+00:54 +90: /home/runner/work/valebound/valebound/test/ui/phase4_flows_test.dart: The tour (DECISIONS D-72) each other screen explains itself once
+00:54 +91: /home/runner/work/valebound/valebound/test/ui/phase5_flows_test.dart: Chapters (DECISIONS D-76) a place in the middle of a region wakes without one
+00:55 +92: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:55 +93: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:56 +94: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:56 +95: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +96: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +97: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +98: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +99: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +100: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +101: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +102: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +103: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +104: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +105: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +106: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +107: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +108: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:57 +109: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:58 +110: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:58 +111: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:58 +112: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:58 +113: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) a hero with no class chooses one, and nothing earned moves
+00:58 +114: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +115: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +116: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +117: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +118: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +119: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +120: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +121: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +122: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +123: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +124: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +125: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +126: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +127: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +128: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +129: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +130: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +131: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +132: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +133: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +134: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +135: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +136: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +137: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +138: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) at the weekly Campfire the class can be changed for nothing, and XP and levels stay
+00:59 +139: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Classes (Amendment v0.3 §2) on any other day the Campfire does not offer it
+01:00 +140: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +141: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +142: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +143: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +144: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +145: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +146: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +147: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +148: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +149: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +150: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +151: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +152: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +153: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +154: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +155: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +156: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +157: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +158: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +159: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +160: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:00 +161: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +162: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +163: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +164: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +165: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +166: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +167: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +168: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +169: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +170: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +171: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +172: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +173: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:01 +174: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:02 +175: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:02 +176: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:02 +177: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) the board names it, the scout reports, a good plan wakes it, and the chest comes home
+01:02 +178: /home/runner/work/valebound/valebound/test/data/phase2_test.dart: Tricks and gear (DESIGN §7A.3) a Bond milestone brings a gift, kept on the companion
+01:02 +179: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +180: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +181: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +182: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +183: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +184: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +185: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +186: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +187: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +188: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +189: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +190: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +191: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +192: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:02 +193: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +194: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +195: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +196: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +197: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +198: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +199: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +200: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:03 +201: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +202: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +203: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +204: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +205: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +206: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +207: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +208: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +209: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +210: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +211: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:04 +212: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) when the creature holds, nothing earned is touched; any quest brings a Salve and another try
+01:05 +213: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +214: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +215: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +216: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +217: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +218: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +219: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +220: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +221: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +222: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +223: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +224: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +225: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +226: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +227: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +228: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +229: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +230: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +231: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +232: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +233: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +234: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +235: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +236: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +237: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +238: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +239: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +240: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +241: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +242: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +243: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:05 +244: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:06 +245: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:06 +246: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:06 +247: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:06 +248: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: Today’s encounter (Amendment v0.3 §§3, 5) tomorrow there is a new creature, whatever happened today
+01:06 +249: /home/runner/work/valebound/valebound/test/rules/world_test.dart: The Vale as drafted (DESIGN §7) five regions, four places each, every key and name its own
+01:06 +250: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +251: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +252: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +253: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +254: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +255: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +256: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +257: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +258: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +259: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +260: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +261: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +262: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +263: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +264: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +265: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +266: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +267: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +268: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +269: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +270: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +271: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +272: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +273: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +274: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +275: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +276: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +277: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:06 +278: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: The weekly boss (Amendment v0.3 §5) an attempt that does not finish it still wears it down, for good, and takes nothing
+01:07 +279: /home/runner/work/valebound/valebound/test/ui/phase7_flows_test.dart: (tearDownAll)
+01:07 +279: /home/runner/work/valebound/valebound/test/rules/balance_test.dart: the balance holds, and matches the reference model fight for fight
+BALANCE (3,500 fights a cell: 5 types x 7 party levels x 100 days)
+class      quests+reads  turns  no quests  ability-first  strike-only  heroic
+ranger           82.6%    3.7      60.0%          61.0%        39.1%   42.6%
+warden           83.3%    4.8      58.3%          90.7%        20.2%   43.8%
+sage             88.0%    4.3      79.2%          80.4%        22.2%   54.7%
+artificer        84.1%    3.9      49.4%          59.5%        21.2%   52.0%
+01:07 +280: /home/runner/work/valebound/valebound/test/rules/balance_test.dart: the fight is as hard at level 1 as at level 20
+BY LEVEL (quests done, reading intents; 500 fights a cell)
+class         L1/C1   L2/C2   L3/C3   L5/C4   L8/C6  L12/C9 L20/C12
+ranger          86%     86%     82%     83%     75%     88%     78%
+warden          80%     83%     80%     79%     77%     90%     94%
+sage            87%     85%     88%     88%     84%     91%     93%
+artificer       83%     85%     82%     84%     79%     85%     91%
+01:07 +281: /home/runner/work/valebound/valebound/test/rules/balance_test.dart: no class is shut out by any kind of creature, at any level
+01:07 +282: /home/runner/work/valebound/valebound/test/rules/balance_test.dart: a Warden walks in with a Shield at every level
+01:07 +283: /home/runner/work/valebound/valebound/test/rules/balance_test.dart: a simulated week for one class
+WEEK: Warden, hero level 4, companion level 3, Guard 7
+day         creature               type      match   outcome  turns  HP left
+2026-11-15  flutter of Hushmoths   Swarm     Hard    held         6  0/55
+2026-11-16  Lantern-eyed Mistling  Arcane    Even    won          4  36/55
+2026-11-17  Fogfinch               Swift     Hard    held         6  0/55
+2026-11-18  Yawnstone              Armoured  Even    won          4  42/55
+2026-11-19  Great Drowsel          Brute     Strong  won          3  16/55
+2026-11-20  drift of Mistlings     Swarm     Hard    won          6  5/55
+2026-11-21  Dozewisp               Arcane    Even    won          4  36/55
+WEEK: 5 of 7 won
+WEEK: ranger 6 of 7
+WEEK: warden 5 of 7
+WEEK: sage 6 of 7
+WEEK: artificer 5 of 7
+01:07 +284: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the matrix (Amendment v0.3 §4) every class meets every type as the amendment says
+01:07 +285: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the matrix (Amendment v0.3 §4) a strike does half as much again when Strong, a third less when Hard, and a Strong strike cannot be dodged
+01:07 +286: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the matrix (Amendment v0.3 §4) the scout has a line for every pairing, and a weakness for every type
+01:07 +287: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: seeded dice (Amendment v0.3 §3) the d20 matches the reference model
+01:07 +288: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: seeded dice (Amendment v0.3 §3) a roll depends on the day, the turn and who throws it, and on nothing else
+01:07 +289: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: seeded dice (Amendment v0.3 §3) trying again with the same actions gives the same fight, blow for blow
+01:07 +290: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: seeded dice (Amendment v0.3 §3) a different choice on a turn changes the fight but not the dice
+01:07 +291: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the engine and the reference model agree on 96 whole fights
+01:08 +292: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the turn a Brute winds up, then lands a big blow that Defend halves
+01:08 +293: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the turn a Sage reads an Arcane trick; nobody else can
+01:08 +294: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the turn a ward takes the next blow whole, then it is gone
+01:08 +295: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the turn a fight that runs to the turn limit is held, not won
+01:08 +296: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the turn the companion is winded, never worse, and sits the rest out
+01:08 +297: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the boss (Amendment v0.3 §5) what an attempt takes off it stays off
+01:08 +298: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the boss (Amendment v0.3 §5) the state remembers the boss, its HP, the Marks and the titles
+01:08 +299: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the day ten templates, two to a type, and no two days running alike
+01:08 +300: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the day quests feed the class resource: more for the home attribute
+01:08 +301: /home/runner/work/valebound/valebound/test/rules/combat_test.dart: the day an encounter record survives being written down
+01:08 +302: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: DayKey formats and parses local days
+01:08 +303: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: DayKey weekday and day arithmetic
+01:08 +304: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: DayKey day counts are steady across daylight-saving changes
+01:08 +305: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: DayKey friendly form
+01:08 +306: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) daily is due every day
+01:08 +307: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) selected weekdays
+01:08 +308: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) weekly on a day
+01:08 +309: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) custom interval from an anchor day
+01:08 +310: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) one-off with a date
+01:08 +311: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Schedules (DESIGN §6.1) weekday text round-trips
+01:08 +312: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) the very first Dawn
+01:08 +313: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) same day: nothing new
+01:08 +314: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) a new day begins at local midnight
+01:08 +315: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) one day away is just a new day
+01:08 +316: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) the comeback quest is due after 2+ days away
+01:08 +317: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Day rollover and time away (DESIGN §4.1, §4.3, §6.4) a clock set backwards does no harm
+01:08 +318: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Companion kinds, tricks and titles the v1 roster is the six kinds in the design
+01:08 +319: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Companion kinds, tricks and titles each kind has a temperament and its own attribute affinity
+01:08 +320: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Companion kinds, tricks and titles tricks unlock at companion levels 2, 4, 6, 8 and 10
+01:08 +321: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Companion kinds, tricks and titles titles
+01:08 +322: /home/runner/work/valebound/valebound/test/rules/schedule_and_day_test.dart: Companion kinds, tricks and titles bond milestones
+01:08 +323: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The prologue opens with the three beats Adam chose
+01:08 +324: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The prologue then says what the Vale is and what the days do for it
+01:08 +325: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The prologue speaks to the player, in the present tense
+01:08 +326: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: Chapters one to a region, in the order the regions wake
+01:08 +327: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: Chapters the chapter follows the place being woken
+01:08 +328: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: Chapters a chapter closes with the last place of its region
+01:08 +329: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: Chapters progress counts the places of that region only
+01:08 +330: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: Chapters the heading over the story
+01:08 +331: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line the line Adam chose, on the day he first reads it
+01:08 +332: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line follows the clock
+01:08 +333: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line is set where the camp is on the road
+01:08 +334: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line before anything is awake
+01:08 +335: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line always ends on the place that is waiting
+01:08 +336: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line is the same all day, and turns with the calendar
+01:08 +337: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line names the companion on its day
+01:08 +338: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line counts what is awake, in words
+01:08 +339: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line after days away it says only that the Vale has kept
+01:08 +340: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line every drafted place has its own two lines
+01:08 +341: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Dawn line every region has a setting of its own
+01:08 +342: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Campfire line a day with nothing done is as warm as any other
+01:08 +343: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Campfire line counts the quests done, in words
+01:08 +344: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Campfire line a place that woke comes first
+01:08 +345: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Campfire line then the day’s creature
+01:08 +346: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Campfire line closes three ways, turning with the calendar
+01:08 +347: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Chronicle begins with the arrival and Chapter One
+01:08 +348: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Chronicle adds each place as it wakes, with who came home and when
+01:08 +349: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Chronicle closes a chapter and opens the next on the same day
+01:08 +350: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Chronicle ends with the Vale awake, then the lanterns along the road
+01:08 +351: /home/runner/work/valebound/valebound/test/rules/narrator_test.dart: The Chronicle is told oldest first
+01:08 +352: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) matches the worked examples in the design
+01:08 +353: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) every stored step equals the formula
+01:08 +354: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) cumulative thresholds are the running sum of the steps
+01:08 +355: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) the curve gets steeper at every level
+01:08 +356: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) level boundaries, including the L1→2 = 100 XP step
+01:08 +357: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) progress inside a level
+01:08 +358: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) level never drops as XP grows
+01:09 +359: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: XP curve (DESIGN §5.1) the table tops out cleanly
+01:09 +360: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: Hero and companion share one curve (DESIGN §7A.3) equal XP gives equal levels on both tracks
+01:09 +361: /home/runner/work/valebound/valebound/test/rules/xp_curve_test.dart: Hero and companion share one curve (DESIGN §7A.3) the companion reaches level 2 at exactly 100 Companion XP
+01:09 +362: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Which creature a day always has the same one
+01:09 +363: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Which creature they take turns: no two days running are the same
+01:09 +364: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Which creature over six days every drafted creature has its day
+01:09 +365: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Which creature days before the reference date work too
+01:09 +366: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Stirring and waking three quests wake it
+01:09 +367: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Stirring and waking it wakes once a day, however many quests follow
+01:09 +368: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Stirring and waking a day already past three when the creature first appears
+01:09 +369: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: Stirring and waking each quest is one stir, and it never shows more than three
+01:09 +370: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: The gift a little gold and one material the place still needs
+01:09 +371: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: The gift no XP: a level stays the sum of the quests done
+01:09 +372: /home/runner/work/valebound/valebound/test/rules/daily_still_test.dart: The gift the gift can be the last thing a place needs
+01:09 +373: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) the Delve day is the latest chosen weekday, today included
+01:09 +374: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) the week is the seven days ending on the Delve day
+01:09 +375: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) supplies come from the week’s quests
+01:09 +376: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) three outcomes: Cleared, Scouted, Rested
+01:09 +377: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) every outcome brings something home, and more for a fuller week
+01:09 +378: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) the site changes week by week and is the same all week
+01:09 +379: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The weekly Delve (DESIGN §3B, §4.2) each outcome has a warm line naming the companion
+01:09 +380: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The comeback bonus (DESIGN §4.3, §7A.3) a Minor quest plus the welcome is worth 25 XP
+01:09 +381: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The comeback bonus (DESIGN §4.3, §7A.3) Comfort adds Bond, which only ever rises
+01:09 +382: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The comeback bonus (DESIGN §4.3, §7A.3) an ordinary quest is unchanged, and a bonus can never take
+01:09 +383: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: The comeback bonus (DESIGN §4.3, §7A.3) the quest and its numbers
+01:09 +384: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) times are HH:mm on a 24-hour clock
+01:09 +385: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) off by default: no time, no reminders
+01:09 +386: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) a daily quest reminds today if the time is still ahead
+01:09 +387: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) once the time has gone by, the next one is tomorrow
+01:09 +388: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) a quest already done or set aside today does not remind today
+01:09 +389: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) a weekly quest reminds on its day only
+01:09 +390: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) a one-off whose time has gone by has nothing left to remind
+01:09 +391: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Quest reminders (DESIGN §6.1) ids are stable, small and distinct per reminder
+01:09 +392: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) the default is steps plus the presets, all optional
+01:09 +393: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) the chosen fields survive being stored
+01:09 +394: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) nothing stored means the defaults; an empty list stays empty
+01:09 +395: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) a field the user names gets a key of its own
+01:09 +396: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) a tick stores Done, with the note when one was typed
+01:09 +397: /home/runner/work/valebound/valebound/test/rules/phase3_rules_test.dart: Health Log fields (DESIGN §9.3) a unit can be changed without touching anything else
+01:09 +398: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: sizes (Amendment v0.4 §4) a timed habit is proposed in three lengths
+01:10 +399: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: sizes (Amendment v0.4 §4) a habit with no minutes is proposed in words
+01:10 +400: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: sizes (Amendment v0.4 §4) Tiny is Minor, Target is Standard, Stretch is Heroic; a heavy habit carries Heroic weight at its Target
+01:10 +401: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: sizes (Amendment v0.4 §4) the default size is Target, and Tiny through a Tiny-only week
+01:10 +402: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: sizes (Amendment v0.4 §4) week one runs timed Targets at its calibration
+01:10 +403: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: tracks and anchors (Chapter 3) care for the companion is offered the Companion track, things done together the Shared one
+01:10 +404: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: tracks and anchors (Chapter 3) an anchor names its part of the day
+01:10 +405: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the class recommendation (Chapter 5) goals and answers both count, and the reasoning is shown
+01:10 +406: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the class recommendation (Chapter 5) with nothing answered it still recommends, and says why
+01:10 +407: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the class recommendation (Chapter 5) the quiz has six questions with an answer for each class
+01:10 +408: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the questionnaire (Amendment v0.4 §3) seven chapters, each ending in its mirror, one step a screen
+01:10 +409: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the questionnaire (Amendment v0.4 §3) with nothing chosen every chapter is still there to pass
+01:10 +410: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the questionnaire (Amendment v0.4 §3) the draft survives being saved and read back
+01:10 +411: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the questionnaire (Amendment v0.4 §3) answers become goals and plans, in the user’s words
+01:10 +412: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the questionnaire (Amendment v0.4 §3) the first week is laid out by the same rules as the board
+01:10 +413: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the board Dawn composes (Amendment v0.4 §§1, 5) no quest without a source: every quest has a kind and a For-line
+01:10 +414: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the board Dawn composes (Amendment v0.4 §§1, 5) two heavy habits are not left side by side
+01:10 +415: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the board Dawn composes (Amendment v0.4 §§1, 5) a rest day runs light: Tiny sizes, and the heavy habits stay off
+01:10 +416: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the board Dawn composes (Amendment v0.4 §§1, 5) one quest is marked as feeding the class resource, and only while nothing done has fed it
+01:10 +417: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the board Dawn composes (Amendment v0.4 §§1, 5) the scout points existing quests at the fight, and says so when none feeds the resource
+01:10 +418: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the calendar (Chapter 6, §2) a series is remembered by a key that does not hold its title
+01:10 +419: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the calendar (Chapter 6, §2) recurring events are found, typed, and counted once each
+01:10 +420: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the calendar (Chapter 6, §2) a calendar event that is a habit plan makes exactly one quest
+01:10 +421: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the calendar (Chapter 6, §2) a mapped event whose words match a quest on the board merges too; an unmapped one is only offered; an ignored one is nothing
+01:10 +422: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the calendar (Chapter 6, §2) a heavy event is offered a Prep before it and a Follow-through after, each once, and never again once turned off
+01:10 +423: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the Sunday Check-In (Amendment v0.4 §6) at most one change is proposed, with the counts it rests on
+01:10 +424: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the Sunday Check-In (Amendment v0.4 §6) declining a proposal is final for that suggestion
+01:10 +425: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the Sunday Check-In (Amendment v0.4 §6) nothing is proposed when the counts suggest nothing
+01:10 +426: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the Sunday Check-In (Amendment v0.4 §6) a week that felt too heavy offers weekdays only; one outgrown offers more
+01:10 +427: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: the Sunday Check-In (Amendment v0.4 §6) what was answered, declined and accepted is remembered
+01:10 +428: /home/runner/work/valebound/valebound/test/rules/phase8_rules_test.dart: goals, plans, mappings and the rhythm survive the settings table
+01:10 +429: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Difficulty awards (DESIGN §5.4) XP values are fixed by the design
+01:10 +430: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Track splits (DESIGN §7A.2) Hero quests award hero XP and attribute XP only
+01:10 +431: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Track splits (DESIGN §7A.2) Companion quests award Companion XP only, at the same values
+01:10 +432: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Track splits (DESIGN §7A.2) Shared quests award full Companion XP + half hero XP, rounded up
+01:10 +433: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Track splits (DESIGN §7A.2) half is always rounded up
+01:10 +434: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Applying a completion a Hero quest feeds hero XP and its attribute
+01:10 +435: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Applying a completion Walk Babs (Shared, Standard, Care): her adventure and your Care
+01:10 +436: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Applying a completion a Companion quest leaves the hero untouched
+01:10 +437: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Applying a completion four Standard hero quests make level 2 (L1→2 = 100 XP)
+01:10 +438: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Applying a completion attribute XP levels on the same curve
+01:10 +439: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Bond (DESIGN §7A.3) +1 per companion or shared quest, nothing for hero quests
+01:10 +440: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Bond (DESIGN §7A.3) +3 on a companion level-up day, once
+01:10 +441: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Bond (DESIGN §7A.3) no bonus without a level-up
+01:10 +442: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) 1 Pace per companion/shared quest, 2 for Heroic and Boss
+01:10 +443: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) a Discovery fires on the tenth Pace
+01:10 +444: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) a two-Pace quest that steps over the mark still fires it
+01:10 +445: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) no Discovery between the marks
+01:10 +446: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) exactly one Discovery every 10 Paces, in order, none skipped
+01:10 +447: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) journey helpers
+01:10 +448: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Paces and Discoveries (DESIGN §7A.4) twenty drafted scenes, then plain waymarkers
+01:10 +449: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Materials and gold Hero quests drop materials; companion and shared earn Paces
+01:10 +450: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Materials and gold material kind rotates Timber, Stone, Star Shards
+01:10 +451: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) finds one bonus material on a companion quest
+01:10 +452: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) also on a shared quest
+01:10 +453: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) not before the trick is learned
+01:10 +454: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) starts on the very quest that reaches level 2
+01:10 +455: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) never on a hero quest, and only once a day
+01:10 +456: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Sniff Out (DESIGN §7A.3, learned at companion level 2) the kind rotates by calendar day and is the same all day
+01:10 +457: /home/runner/work/valebound/valebound/test/rules/awards_test.dart: Nothing is ever taken away (DESIGN §6.4) every total only grows over 2,000 random completions
+01:10 +458: /home/runner/work/valebound/valebound/test/copy/copy_audit_test.dart: the scan covers the app
+01:10 +459: /home/runner/work/valebound/valebound/test/copy/copy_audit_test.dart: the literal scanner skips comments and reads strings
+01:10 +460: /home/runner/work/valebound/valebound/test/copy/copy_audit_test.dart: no guilt, shame or loss language (DESIGN §6.4)
+01:10 +461: /home/runner/work/valebound/valebound/test/copy/copy_audit_test.dart: no banned property names or vocabulary (DESIGN §13)
+01:10 +462: /home/runner/work/valebound/valebound/test/copy/copy_audit_test.dart: the app makes no network calls and bundles no network package
+01:11 +463: /home/runner/work/valebound/valebound/test/acceptance/completion_types_test.dart: Tap: one tap completes it
+01:11 +464: /home/runner/work/valebound/valebound/test/acceptance/completion_types_test.dart: Count: it completes on reaching its number
+01:11 +465: /home/runner/work/valebound/valebound/test/acceptance/completion_types_test.dart: Timer: it records the time that ran and completes
+01:11 +466: /home/runner/work/valebound/valebound/test/acceptance/completion_types_test.dart: Timer: minutes can be typed in instead of timed
+01:11 +467: /home/runner/work/valebound/valebound/test/acceptance/completion_types_test.dart: Auto: the day’s steps complete it at its target
+01:11 +468: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the cover screen
+01:11 +469: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the cover screen
+01:11 +470: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the cover screen
+01:11 +471: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the cover screen
+01:16 +472: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the cover screen
+01:17 +473: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Cover screen (compact) Party Sheet
+01:17 +474: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the opened Fold
+01:19 +475: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the opened Fold
+01:20 +476: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the opened Fold
+01:22 +477: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The tour on the opened Fold
+01:22 +478: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Opened Fold (expanded, with crease) Board + Vale side by side
+01:24 +479: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The day’s creature awake, and glucose from Health Connect
+01:25 +480: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: The day’s creature awake, and glucose from Health Connect
+01:25 +481: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Opened Fold (expanded, with crease) Quest Log: list + detail
+01:26 +482: /home/runner/work/valebound/valebound/test/golden/phase4_golden_test.dart: A screen’s one-time hint
+01:27 +483: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Opened Fold (expanded, with crease) Dialogs stay on one side of the crease
+01:29 +484: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:30 +485: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:31 +486: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:33 +487: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:35 +488: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:36 +489: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the cover screen
+01:37 +490: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Phase 2 on the cover screen A place is restored; a quest waits to be undone
+01:38 +491: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:39 +492: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:40 +493: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:42 +494: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:43 +495: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:44 +496: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Phase 3 on the opened Fold
+01:45 +497: /home/runner/work/valebound/valebound/test/golden/screens_golden_test.dart: Compact phone Board on a 360dp phone
+01:45 +498: /home/runner/work/valebound/valebound/test/golden/phase3_golden_test.dart: Coming back, on the cover screen
+01:47 +499: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+01:49 +500: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+01:50 +501: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+01:56 +502: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:01 +503: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:02 +504: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:04 +505: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:06 +506: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:14 +507: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:16 +508: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the cover screen
+02:16 +509: /home/runner/work/valebound/valebound/test/golden/phase5_golden_test.dart: The sky over the board keeps the hours
+02:18 +510: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:19 +511: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:21 +512: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:25 +513: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:27 +514: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:31 +515: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:36 +516: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:38 +517: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:39 +518: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: First Dawn, every chapter, on the opened Fold
+02:47 +519: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: A hero from before 0.8 is offered First Dawn (cover)
+02:51 +520: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: The Sunday Check-In at the Campfire (cover)
+02:53 +521: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: Goals & habits in Settings (cover)
+02:54 +522: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: A hero from before 0.8 is offered First Dawn (open)
+02:58 +523: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: The Sunday Check-In at the Campfire (open)
+03:01 +524: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: Goals & habits in Settings (open)
+03:02 +525: /home/runner/work/valebound/valebound/test/golden/phase8_golden_test.dart: (tearDownAll)
+03:02 +525: All tests passed!
