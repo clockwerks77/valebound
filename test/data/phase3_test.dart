@@ -543,7 +543,8 @@ void main() {
       final tables = decoded['tables'] as Map<String, dynamic>;
       expect((tables['delves'] as List<dynamic>).length, 1);
       expect((tables['calendarChoices'] as List<dynamic>).length, 2);
-      expect((tables['settings'] as List<dynamic>).length, 1);
+      // The Delve's day, and where First Dawn stands.
+      expect((tables['settings'] as List<dynamic>).length, 2);
 
       final other = AppDatabase(NativeDatabase.memory());
       addTearDown(other.close);

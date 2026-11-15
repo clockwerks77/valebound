@@ -1116,6 +1116,30 @@ class GameController extends ChangeNotifier {
     );
   }
 
+  /// Quests finished in the last seven days, today included: what someone
+  /// who works in sprints is shown in place of the day's count.
+  int get questsThisWeek {
+    final from = DayKey.addDays(day, -6);
+    var total = 0;
+    var countedToday = false;
+    for (final d in history) {
+      if (DayKey.daysBetween(from, d.day) < 0) continue;
+      total += d.quests;
+      if (d.day == day) countedToday = true;
+    }
+    return countedToday ? total : total + questsDoneToday;
+  }
+
+  /// The companion has a habit of their own, and none of it fell today:
+  /// the Campfire says they rested, and that is all (Amendment v0.4 §5.4).
+  bool get companionRested =>
+      plans.any((p) => p.track != Track.hero) &&
+      !board.any((b) => b.quest.track != Track.hero);
+
+  /// Whether today is the day of the weekly check-in.
+  bool get checkInDay =>
+      plans.isNotEmpty && DayKey.weekday(day) == settings.delveWeekday;
+
   /// Where First Dawn stands. A hero from before 0.8 is offered it.
   FirstDawnState get firstDawnState =>
       settings.firstDawn ?? FirstDawnState.offered;
@@ -1145,7 +1169,7 @@ class GameController extends ChangeNotifier {
   Future<void> finishFirstDawn(FirstDawnDraft draft) async {
     await repo.commitFirstDawn(
       draft,
-      fresh: firstDawnState == FirstDawnState.fresh,
+      fresh: draft.fresh || firstDawnState == FirstDawnState.fresh,
     );
     await refresh();
     _exportSoon();

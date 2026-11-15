@@ -241,8 +241,8 @@ class _UndoRingPainter extends CustomPainter {
 }
 
 /// What a quest will award, in a few words.
-String rewardLabel(QuestRow quest, String companionName) {
-  final a = awardFor(difficulty: quest.difficulty, track: quest.track);
+String rewardLabel(QuestRow quest, String companionName, {Difficulty? worth}) {
+  final a = awardFor(difficulty: worth ?? quest.difficulty, track: quest.track);
   if (quest.systemKey == systemKeyComeback) {
     return '+${a.heroXp + comebackBonusXp} XP';
   }

@@ -152,18 +152,28 @@ HabitPlan? planMatching(
   MappingKind kind,
   List<HabitPlan> plans,
 ) {
+  final byWords = planByWords(title, plans);
+  if (byWords != null) return byWords;
   final live = <HabitPlan>[for (final p in plans) if (p.active) p];
-  for (final p in live) {
-    if (questMatching(title, <String>[p.target, p.tiny, p.stretch]) != null) {
-      return p;
-    }
-  }
   if (kind == MappingKind.commitment || kind == MappingKind.ignore) return null;
   final same = <HabitPlan>[
     for (final p in live)
       if (p.attribute == kind.attribute) p,
   ];
   return same.length == 1 ? same.first : null;
+}
+
+/// The habit plan whose own words match an event's title, or null. A
+/// match by words is sure enough to be switched on for the user to see;
+/// one by type alone is only offered.
+HabitPlan? planByWords(String title, List<HabitPlan> plans) {
+  for (final p in plans) {
+    if (!p.active) continue;
+    if (questMatching(title, <String>[p.target, p.tiny, p.stretch]) != null) {
+      return p;
+    }
+  }
+  return null;
 }
 
 /// What today's events become (Amendment v0.4 §2): a mapped event is a

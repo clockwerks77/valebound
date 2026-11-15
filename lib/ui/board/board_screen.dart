@@ -9,6 +9,9 @@ import '../../rules/day_cycle.dart';
 import '../../rules/day_key.dart';
 import '../../rules/encounter.dart';
 import '../../rules/enums.dart';
+import '../../rules/first_dawn.dart' show FirstDawnState;
+import '../../rules/generation.dart' show CalendarOffer;
+import '../../rules/goals.dart' show QuestSize;
 import '../../rules/journey.dart';
 import '../../rules/narrator.dart';
 import '../../rules/still.dart';
@@ -22,6 +25,7 @@ import '../art/painted.dart';
 import '../art/vista.dart';
 import '../encounter/encounter_screen.dart';
 import '../campfire/campfire_screen.dart';
+import '../firstdawn/first_dawn_screen.dart';
 import '../health/health_log_screen.dart';
 import '../log/quest_editor.dart';
 import '../motion.dart';
@@ -59,7 +63,9 @@ class BoardScreen extends StatelessWidget {
           children: <Widget>[
             const DawnHeader(),
             const _VillagerLine(),
+            const _FirstDawnCard(),
             const _ComebackCard(),
+            const _PrepOffers(),
             const _Suggestions(),
             if (now.isNotEmpty) ...<Widget>[
               SectionHeader('Now', icon: 'sun', count: now.length),
@@ -189,9 +195,14 @@ class DawnHeader extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '${narration.setting.toUpperCase()} · '
-                        '${game.questsDoneToday} OF '
-                        '${game.questsTotalToday} DONE',
+                        // Someone who works in sprints is shown the week,
+                        // not the day (Amendment v0.4 §3, Chapter 4).
+                        game.settings.rhythm.sprints
+                            ? '${narration.setting.toUpperCase()} · '
+                                '${game.questsThisWeek} THIS WEEK'
+                            : '${narration.setting.toUpperCase()} · '
+                                '${game.questsDoneToday} OF '
+                                '${game.questsTotalToday} DONE',
                         maxLines: 1,
                         style:
                             AppText.label.copyWith(color: Palette.goldBright),
@@ -880,6 +891,11 @@ class QuestCard extends StatelessWidget {
     final isCampfire = quest.systemKey == systemKeyCampfire;
     final still = drawsStill(quest.difficulty) ? stillFor(quest.id) : null;
     final pending = game.isPending(quest.id);
+    // What it is for, and for a habit the size showing (Amendment v0.4).
+    final line = game.lineFor(quest.id);
+    final size = entry.isDone ? null : game.sizeFor(quest.id);
+    final worth = game.worthFor(entry);
+    final title = game.titleFor(entry);
     final Widget action;
     if (pending) {
       action = UndoButton(
@@ -899,7 +915,7 @@ class QuestCard extends StatelessWidget {
         CompletionType.count => CountStepper(entry: entry),
         CompletionType.timer => TimerControl(entry: entry),
         _ => CompleteButton(
-            label: 'Complete ${quest.name}',
+            label: 'Complete $title',
             color: companionStyle ? Palette.companion : Palette.forest,
             onComplete: () => completeFromBoard(context, entry),
           ),
@@ -926,7 +942,7 @@ class QuestCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  quest.name,
+                  title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: AppText.cardTitle.copyWith(
@@ -943,7 +959,7 @@ class QuestCard extends StatelessWidget {
                     ],
                     Flexible(
                       child: Text(
-                        '${quest.attribute.label} · ${quest.difficulty.label}',
+                        '${quest.attribute.label} · ${worth.label}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppText.small.copyWith(
@@ -958,7 +974,7 @@ class QuestCard extends StatelessWidget {
                 Text(
                   pending
                       ? 'Done. Undo if that was a slip.'
-                      : rewardLabel(quest, game.companionName),
+                      : rewardLabel(quest, game.companionName, worth: worth),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppText.small.copyWith(
@@ -977,6 +993,33 @@ class QuestCard extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
+                if (line != null && !pending)
+                  Text(
+                    line.forLine,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.small.copyWith(
+                      color: Palette.slateSoft,
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                if (!pending && (size != null || line?.feeds != null)) ...<Widget>[
+                  const SizedBox(height: 5),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: <Widget>[
+                      if (size != null)
+                        _SizeChip(
+                          key: ValueKey<String>('size-${quest.id}'),
+                          size: size,
+                          onTap: () => game.cycleSize(quest.id),
+                        ),
+                      if (line?.feeds != null) _FeedsChip(line!.feeds!),
+                    ],
+                  ),
+                ],
                 if (still != null && !pending) ...<Widget>[
                   const SizedBox(height: 4),
                   Row(
@@ -1022,6 +1065,220 @@ String? _detailLine(BoardQuest entry) {
     return quest.notes;
   }
   return null;
+}
+
+/// The size a habit quest is showing: one tap moves to the next
+/// (Amendment v0.4 §4).
+class _SizeChip extends StatelessWidget {
+  const _SizeChip({super.key, required this.size, required this.onTap});
+
+  final QuestSize size;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Size: ${size.label}. Tap for another size.',
+      child: ExcludeSemantics(
+        child: Material(
+          color: Palette.parchmentShade,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: Palette.parchmentEdge),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(9, 4, 7, 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    size.label.toUpperCase(),
+                    style: AppText.label.copyWith(
+                      color: Palette.goldDeep,
+                      fontSize: 10.5,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  const VIcon('chevron', size: 11, color: Palette.goldDeep),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Feeds Guard": the one quest today that best stocks the class resource
+/// for the encounter (Amendment v0.4 §5.1). A highlight, never an addition.
+class _FeedsChip extends StatelessWidget {
+  const _FeedsChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+      decoration: BoxDecoration(
+        color: Palette.moss.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Palette.moss.withValues(alpha: 0.55)),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: AppText.label.copyWith(color: Palette.forest, fontSize: 10.5),
+      ),
+    );
+  }
+}
+
+/// "Tell Valebound your goals" (Amendment v0.4 §3): First Dawn, offered to
+/// a hero from before it existed, or to one who began it and stopped.
+class _FirstDawnCard extends StatelessWidget {
+  const _FirstDawnCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    if (!game.firstDawnOffered) return const SizedBox.shrink();
+    final begun = game.firstDawnState == FirstDawnState.begun;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: ParchmentCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                const VIcon('banner', size: 19, color: Palette.goldDeep),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Tell $appName your goals',
+                    style: AppText.cardTitle.copyWith(color: Palette.slate),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              begun
+                  ? 'You stopped part way. Everything you answered is kept.'
+                  : 'Seven short chapters turn this board into yours: what '
+                      'you want, the habits that serve it, and how your days '
+                      'run. About five minutes, and you can stop and come '
+                      'back. The quests you have now stay until you say '
+                      'otherwise.',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: <Widget>[
+                PrimaryButton(
+                  label: begun ? 'Carry on' : 'Begin',
+                  icon: 'banner',
+                  onPressed: () => showFirstDawn(context),
+                ),
+                QuietButton(
+                  label: 'Later',
+                  onPressed: () => game.setFirstDawn(FirstDawnState.later),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A Prep quest offered before a heavy calendar event (Amendment v0.4
+/// §5.3). An offer: nothing is added unless it is accepted.
+class _PrepOffers extends StatelessWidget {
+  const _PrepOffers();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final offers = <CalendarOffer>[
+      for (final o in game.offers)
+        if (o.prep) o,
+    ];
+    if (offers.isEmpty) return const SizedBox.shrink();
+    return Column(
+      children: <Widget>[
+        for (final o in offers)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: OfferCard(offer: o),
+          ),
+      ],
+    );
+  }
+}
+
+/// One Prep or Follow-through offer, with its three answers.
+class OfferCard extends StatelessWidget {
+  const OfferCard({super.key, required this.offer});
+
+  final CalendarOffer offer;
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.read(context);
+    final time = offer.event.timeLabel;
+    return ParchmentCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            offer.prep
+                ? 'Before ${offer.event.title}${time.isEmpty ? '' : ' ($time)'}'
+                : 'After ${offer.event.title}',
+            style: AppText.cardTitle.copyWith(color: Palette.slate),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            offer.prep
+                ? 'A small Prep quest, if you want it: lay out what you need, '
+                    'half an hour to an hour ahead.'
+                : 'A small Follow-through, if you want it: note one thing '
+                    'from it.',
+            style: AppText.small.copyWith(color: Palette.slateSoft),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: <Widget>[
+              QuietButton(
+                label: 'Add it',
+                icon: 'plus',
+                color: Palette.forest,
+                onPressed: () => game.acceptOffer(offer),
+              ),
+              QuietButton(
+                label: 'Not today',
+                onPressed: () => game.dismissOffer(offer),
+              ),
+              QuietButton(
+                label: 'Never for this one',
+                onPressed: () => game.neverOffer(offer),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// "Return to the Vale" (DESIGN §4.3): the single welcome after time away.
@@ -1109,6 +1366,12 @@ class _CalendarOffer extends StatelessWidget {
   Widget build(BuildContext context) {
     final game = GameScope.of(context);
     if (!game.calendarOfferDue) return const SizedBox.shrink();
+    // Asked late (Amendment v0.4 §3): First Dawn asks in its sixth chapter,
+    // so the board only asks once that is finished or put off.
+    final dawn = game.firstDawnState;
+    if (dawn != FirstDawnState.done && dawn != FirstDawnState.later) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: ParchmentCard(
@@ -1129,9 +1392,9 @@ class _CalendarOffer extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '$appName can offer today’s calendar events here as '
-              'suggested quests. It only reads your calendar and never '
-              'changes it, and nothing is accepted for you.',
+              '$appName reads today’s events on this phone only. Nothing '
+              'leaves the device. Event titles are never written to logs; '
+              'you choose what becomes a quest.',
               style: AppText.small.copyWith(color: Palette.slateSoft),
             ),
             const SizedBox(height: 10),
@@ -1297,7 +1560,7 @@ class _DoneList extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        entry.quest.name,
+                        game.titleFor(entry),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppText.body.copyWith(

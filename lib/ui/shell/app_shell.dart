@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../rules/first_dawn.dart' show FirstDawnState;
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/palette.dart';
@@ -10,6 +11,7 @@ import '../board/board_screen.dart';
 import '../celebrations.dart';
 import '../encounter/class_choice.dart';
 import '../feel.dart';
+import '../firstdawn/first_dawn_screen.dart';
 import '../health/health_note.dart';
 import '../log/quest_log_screen.dart';
 import '../map/map_panel.dart';
@@ -113,9 +115,17 @@ class _AppShellState extends State<AppShell>
       // A hero with no class yet, new or from before 0.7, chooses one
       // (Amendment v0.3 §2).
       final choose = game.needsClass;
-      if (prologue || tour || choose) {
+      // A new hero is asked about their goals once the story has been told
+      // (Amendment v0.4 §3). First Dawn recommends the class itself.
+      final dawn = game.firstDawnState == FirstDawnState.fresh;
+      if (prologue || tour || choose || dawn) {
         _touring = true;
-        _welcome(prologue: prologue, tour: tour, chooseClass: choose);
+        _welcome(
+          prologue: prologue,
+          tour: tour,
+          chooseClass: choose,
+          firstDawn: dawn,
+        );
       }
     }
     if (_marking) return;
@@ -147,6 +157,7 @@ class _AppShellState extends State<AppShell>
     required bool prologue,
     required bool tour,
     bool chooseClass = false,
+    bool firstDawn = false,
   }) async {
     final game = _game;
     try {
@@ -158,11 +169,26 @@ class _AppShellState extends State<AppShell>
         await showPrologue(context, companionName: game.companionName);
         await game.finishPrologue();
       }
-      if (chooseClass) {
+      var played = false;
+      if (firstDawn) {
+        if (!mounted) return;
+        await showFirstDawn(context);
+        // Left before the end: it waits on the board, and does not open
+        // by itself again.
+        if (game.firstDawnState == FirstDawnState.fresh) {
+          await game.setFirstDawn(FirstDawnState.begun);
+        }
+        played = game.firstDawnState == FirstDawnState.done;
+      }
+      if (game.needsClass && (chooseClass || firstDawn)) {
         if (!mounted) return;
         await showClassChoice(context, mustChoose: true);
       }
-      if (tour) {
+      if (tour && played) {
+        // First Dawn ends by playing, not by a tour of the board (§3,
+        // Chapter 7). The tour stays in Settings for anyone who wants it.
+        await game.finishTour();
+      } else if (tour) {
         if (!mounted) return;
         await runTour(
           context,

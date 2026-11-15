@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../export/export_service.dart';
+import '../../rules/checkin.dart';
 import '../../rules/companion_rules.dart';
 import '../../rules/day_key.dart';
 import '../../rules/encounter.dart' show withArticle;
@@ -16,7 +17,7 @@ import '../adaptive.dart';
 import '../motion.dart';
 import '../art/crests.dart';
 import '../art/painted.dart';
-import '../board/board_screen.dart' show VillagerCard;
+import '../board/board_screen.dart' show OfferCard, VillagerCard;
 import '../celebrations.dart';
 import '../encounter/class_choice.dart';
 import '../encounter/encounter_screen.dart';
@@ -104,6 +105,24 @@ class _CampfireScreenState extends State<CampfireScreen> {
 
     final review = <Widget>[
       const _TodayCard(),
+      if (game.companionRested) ...<Widget>[
+        const SizedBox(height: 8),
+        Text(
+          '${game.companionName} rested today.',
+          style: AppText.small.copyWith(color: Palette.onDarkSoft),
+        ),
+      ],
+      if (game.checkInDay) ...<Widget>[
+        const SizedBox(height: 12),
+        const CheckInCard(),
+      ],
+      // A Follow-through is offered here, after the event (Amendment v0.4
+      // §5.3). An offer only.
+      for (final offer in game.offers)
+        if (!offer.prep) ...<Widget>[
+          const SizedBox(height: 12),
+          OfferCard(offer: offer),
+        ],
       const SizedBox(height: 12),
       const _WorldCard(),
       if (game.campfireLine != null) ...<Widget>[
@@ -282,6 +301,148 @@ class _DelveCard extends StatelessWidget {
 
 /// On the Delve's day the fire is where a class can be changed, for
 /// nothing (Amendment v0.3 §2).
+/// The Sunday Check-In (Amendment v0.4 §6): how the week felt, a glance
+/// at each habit by size, and at most one proposed change. The change is
+/// only ever made by the user saying yes; declining it is final.
+class CheckInCard extends StatefulWidget {
+  const CheckInCard({super.key});
+
+  @override
+  State<CheckInCard> createState() => _CheckInCardState();
+}
+
+class _CheckInCardState extends State<CheckInCard> {
+  Map<String, SizeCounts>? _counts;
+  Proposal? _proposal;
+  String? _said;
+  bool _busy = false;
+  bool _asked = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_asked) return;
+    _asked = true;
+    GameScope.read(context).sizeCounts(days: 7).then((counts) {
+      if (mounted) setState(() => _counts = counts);
+    });
+  }
+
+  Future<void> _answer(Felt felt) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final proposal = await GameScope.read(context).answerCheckIn(felt);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _proposal = proposal;
+      if (proposal == null) _said = 'Noted. Nothing to change.';
+    });
+  }
+
+  Future<void> _decide({required bool yes}) async {
+    final proposal = _proposal;
+    if (proposal == null || _busy) return;
+    setState(() => _busy = true);
+    final game = GameScope.read(context);
+    if (yes) {
+      await game.acceptProposal(proposal);
+    } else {
+      await game.declineProposal(proposal);
+    }
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _proposal = null;
+      _said = yes
+          ? 'Changed. It starts tomorrow.'
+          : 'Left as it is. That suggestion will not come up again.';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final felt = game.settings.checkIns.feltOn(game.day);
+    final counts = _counts ?? const <String, SizeCounts>{};
+    final proposal = _proposal;
+    return ParchmentCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'THE WEEK',
+            style: AppText.label.copyWith(color: Palette.goldDeep),
+          ),
+          const SizedBox(height: 6),
+          if (felt == null) ...<Widget>[
+            Text(
+              'This week’s quests felt…',
+              style: AppText.cardTitle.copyWith(color: Palette.slate),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: <Widget>[
+                for (final f in Felt.values)
+                  ChoicePill(
+                    label: f.label,
+                    selected: false,
+                    onTap: () => _answer(f),
+                  ),
+              ],
+            ),
+          ] else
+            Text(
+              'This week felt: ${felt.label.toLowerCase()}.',
+              style: AppText.cardTitle.copyWith(color: Palette.slate),
+            ),
+          const SizedBox(height: 10),
+          // The glance: what was done, by size. Information, not a score.
+          for (final goal in game.goals)
+            for (final plan in game.plans)
+              if (plan.goalId == goal.id)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '${plan.target}: '
+                    '${(counts[plan.id] ?? const SizeCounts()).label}',
+                    style: AppText.small.copyWith(color: Palette.slateSoft),
+                  ),
+                ),
+          if (proposal != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              proposal.ask,
+              style: AppText.body.copyWith(color: Palette.slate),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: <Widget>[
+                PrimaryButton(
+                  label: 'Yes, change it',
+                  onPressed: _busy ? null : () => _decide(yes: true),
+                ),
+                QuietButton(
+                  label: 'No, leave it',
+                  onPressed: _busy ? null : () => _decide(yes: false),
+                ),
+              ],
+            ),
+          ],
+          if (_said != null) ...<Widget>[
+            const SizedBox(height: 6),
+            Text(_said!, style: AppText.small.copyWith(color: Palette.moss)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _RespecCard extends StatelessWidget {
   const _RespecCard();
 

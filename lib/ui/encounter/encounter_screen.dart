@@ -374,6 +374,14 @@ class _EncounterScreenState extends State<EncounterScreen> {
             '${carried.isEmpty ? 'The pouch is empty.' : 'In the pouch: ${carried.join(', ')}.'}',
             style: AppText.small.copyWith(color: Palette.slate),
           ),
+          // Today's board, pointed at the fight (Amendment v0.4 §5).
+          if (!widget.boss && game.scoutBoardHint != null) ...<Widget>[
+            const SizedBox(height: 6),
+            Text(
+              game.scoutBoardHint!,
+              style: AppText.small.copyWith(color: Palette.slate),
+            ),
+          ],
           if (widget.boss) ...<Widget>[
             const SizedBox(height: 6),
             Text(

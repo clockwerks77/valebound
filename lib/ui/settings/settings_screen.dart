@@ -7,6 +7,7 @@ import '../../export/markdown.dart';
 import '../../rules/day_key.dart';
 import '../../rules/delve.dart';
 import '../../rules/enums.dart';
+import '../../rules/first_dawn.dart' show FirstDawnState;
 import '../../rules/health_fields.dart';
 import '../../state/game_controller.dart';
 import '../../theme/app_theme.dart';
@@ -15,6 +16,7 @@ import '../adaptive.dart';
 import '../motion.dart';
 import '../art/crests.dart';
 import '../campfire/campfire_screen.dart' show exportStatusLine;
+import '../firstdawn/first_dawn_screen.dart';
 import '../health/health_log_screen.dart';
 import '../health/health_note.dart';
 import '../widgets/common.dart';
@@ -107,6 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
     const party = _PartyCard();
+    const goals = _GoalsCard();
     const about = _AboutCard();
     const calendar = _CalendarCard();
     const health = _HealthCard();
@@ -131,6 +134,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     padding: const EdgeInsets.fromLTRB(14, 10, 0, 24),
                     children: <Widget>[
                       const _Heading(),
+                      goals,
+                      const SizedBox(height: 14),
                       vault,
                       const SizedBox(height: 14),
                       calendar,
@@ -157,6 +162,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   padding: const EdgeInsets.fromLTRB(14, 10, 14, 28),
                   children: <Widget>[
                     const _Heading(),
+                    goals,
+                    const SizedBox(height: 14),
                     vault,
                     const SizedBox(height: 14),
                     party,
@@ -700,7 +707,23 @@ class _CalendarCardState extends State<_CalendarCard> {
                     game.setCalendarExcluded(c.id, excluded: !show),
               ),
           ],
+          const SizedBox(height: 8),
+          ToggleRow(
+            label: 'Include event names in exports',
+            caption: 'Off, a calendar quest is written to your vault as '
+                '“Calendar commitment”.',
+            value: game.settings.exportEventNames,
+            onChanged: (v) => game.setExportEventNames(on: v),
+          ),
           const SizedBox(height: 10),
+          if (on) ...<Widget>[
+            QuietButton(
+              label: 'Review recurring events',
+              icon: 'calendar',
+              onPressed: () => showSeriesReview(context),
+            ),
+            const SizedBox(height: 6),
+          ],
           if (on)
             QuietButton(
               label: 'Stop using the calendar',
@@ -724,6 +747,89 @@ class _CalendarCardState extends State<_CalendarCard> {
           if (_message != null) ...<Widget>[
             const SizedBox(height: 10),
             Text(_message!, style: AppText.small.copyWith(color: Palette.moss)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Goals and habits (Amendment v0.4 §§3, 7): the way into First Dawn for
+/// anyone who has not finished it, and after that the goals themselves,
+/// with a way to add one.
+class _GoalsCard extends StatelessWidget {
+  const _GoalsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = GameScope.of(context);
+    final state = game.firstDawnState;
+    final done = state == FirstDawnState.done;
+    return ParchmentCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const _CardTitle('banner', 'Goals & habits'),
+          if (!done) ...<Widget>[
+            Text(
+              'Tell $appName your goals',
+              style: AppText.cardTitle.copyWith(color: Palette.slate),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Seven short chapters make the board yours: what you want, the '
+              'habits that serve it, how your days run. About five minutes, '
+              'and it can be left and picked up again.',
+              style: AppText.small.copyWith(color: Palette.slateSoft),
+            ),
+            const SizedBox(height: 10),
+            PrimaryButton(
+              label: state == FirstDawnState.begun ? 'Carry on' : 'Begin',
+              icon: 'banner',
+              onPressed: () => showFirstDawn(context),
+            ),
+          ] else ...<Widget>[
+            if (game.goals.isEmpty)
+              Text(
+                'No goals yet. The board is the starter quests.',
+                style: AppText.body.copyWith(color: Palette.slate),
+              ),
+            for (final goal in game.goals) ...<Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      goal.text,
+                      style: AppText.cardTitle.copyWith(color: Palette.slate),
+                    ),
+                  ),
+                  QuietButton(
+                    label: 'Archive',
+                    onPressed: () => game.setGoalActive(goal.id, active: false),
+                  ),
+                ],
+              ),
+              for (final plan in game.plans)
+                if (plan.goalId == goal.id)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      <String>[
+                        plan.target,
+                        plan.frequencyLabel,
+                        if (plan.anchor.isNotEmpty) plan.anchor,
+                      ].join(' · '),
+                      style: AppText.small.copyWith(color: Palette.slateSoft),
+                    ),
+                  ),
+              const SizedBox(height: 8),
+            ],
+            const SizedBox(height: 4),
+            PrimaryButton(
+              label: 'New goal',
+              icon: 'plus',
+              onPressed: () => showNewGoal(context),
+            ),
           ],
         ],
       ),

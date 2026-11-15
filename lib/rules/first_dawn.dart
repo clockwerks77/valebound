@@ -528,6 +528,7 @@ class FirstDawnDraft {
     this.calibration = 100,
     Map<String, String>? existing,
     this.at = '',
+    this.fresh = false,
     Set<int>? confirmed,
     Set<int>? passed,
   })  : goals = goals ?? <GoalDraft>[],
@@ -569,6 +570,7 @@ class FirstDawnDraft {
           e.key: '${e.value}',
       },
       at: '${j['at'] ?? ''}',
+      fresh: j['fresh'] == true,
       confirmed: ints(j['confirmed']),
       passed: ints(j['passed']),
     );
@@ -610,6 +612,10 @@ class FirstDawnDraft {
 
   /// The step the user is on, so the flow resumes there.
   String at;
+
+  /// Begun by a hero who had never had a board of their own, so it is
+  /// still known after the flow has been left and come back to.
+  bool fresh;
 
   /// Chapters whose mirror has been confirmed, and chapters passed over.
   Set<int> confirmed;
@@ -657,6 +663,7 @@ class FirstDawnDraft {
         'calibration': calibration,
         'existing': existing,
         'at': at,
+        if (fresh) 'fresh': true,
         'confirmed': confirmed.toList()..sort(),
         'passed': passed.toList()..sort(),
       };

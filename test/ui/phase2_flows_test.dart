@@ -280,6 +280,7 @@ void main() {
       expect(vault.shared!.keys.toSet(), <String>{
         'Character Sheet.md',
         'Quests.md',
+        'Goals & Habits.md',
         'Daily/2026-11-14.md',
       });
     });
